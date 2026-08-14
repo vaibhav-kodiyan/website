@@ -7,7 +7,7 @@
 </head>
 <body>
 <x-dc>
-<helmet data-dc-atomics><link rel="stylesheet" href="./nocturne.css"><link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css"><script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
+<helmet data-dc-atomics><link rel="stylesheet" href="./nocturne.css"><link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css"><script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
 :root{
   --color-bg:#05070a;--color-surface:#0b0f14;--color-divider:#1b232c;
   --color-text:#e6f2e9;--color-neutral-100:#e6f2e9;--color-neutral-200:#c7d6cb;--color-neutral-300:#a9c2b0;
@@ -31,7 +31,7 @@ a:hover{color:var(--color-accent-400)}
 
 <div ref="{{ rootRef }}" style="position:relative;width:100%;background:var(--color-bg)">
 
-<canvas ref="{{ starRef }}" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none"></canvas>
+<canvas ref="{{ starRef }}" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;contain:strict"></canvas>
 <div ref="{{ tintRef }}" style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 60%,var(--color-section-glow),transparent 62%),linear-gradient(180deg,transparent,var(--color-accent-900))"></div>
 
 <div ref="{{ cursorRef }}" style="position:fixed;top:0;left:0;width:22px;height:22px;margin:-11px 0 0 -11px;border:1px solid var(--color-accent-600);border-radius:50%;z-index:9999;pointer-events:none;mix-blend-mode:difference;transition:width .3s cubic-bezier(.2,.8,.2,1),height .3s cubic-bezier(.2,.8,.2,1),margin .3s cubic-bezier(.2,.8,.2,1),background .3s"></div>
@@ -47,7 +47,7 @@ a:hover{color:var(--color-accent-400)}
   <div style="height:1px;background:var(--color-divider);position:relative"><div ref="{{ barRef }}" style="position:absolute;inset:0 100% 0 0;background:var(--color-accent)"></div></div>
 </div>
 
-<header style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) 56px;backdrop-filter:blur(10px);background:linear-gradient(#161826cc,#16182600)">
+<header style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) 56px;background:linear-gradient(#05070ae6,#05070a00)">
   <div style="display:flex;align-items:center;gap:var(--space-4)">
     <div style="width:20px;height:20px;border:1px solid var(--color-accent);border-radius:50%;position:relative"><div style="position:absolute;inset:6px;background:var(--color-accent);border-radius:50%"></div></div>
     <span style="font:500 13px/1 var(--font-heading);letter-spacing:.12em">VK</span>
@@ -61,13 +61,13 @@ a:hover{color:var(--color-accent-400)}
 <section data-screen-label="Hero" style="position:relative;z-index:2;height:200vh">
   <div ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
 
-    <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:min(56vw,700px);aspect-ratio:1;margin:-28vw 0 0 -28vw;max-width:700px;max-height:700px;pointer-events:none;will-change:transform">
-      <canvas ref="{{ holeRef }}" style="position:absolute;inset:-95%;width:290%;height:290%"></canvas>
+    <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:min(56vw,700px);aspect-ratio:1;margin:-28vw 0 0 -28vw;max-width:700px;max-height:700px;pointer-events:none">
+      <canvas ref="{{ holeRef }}" style="position:absolute;inset:-20%;width:140%;height:140%"></canvas>
       <div style="position:absolute;inset:-14%;border:1px solid var(--color-accent-800);border-radius:50%;animation:spin 40s linear infinite;opacity:.5"></div>
       <div style="position:absolute;inset:-28%;border:1px dashed var(--color-neutral-800);border-radius:50%;animation:spin 90s linear infinite reverse;opacity:.5"></div>
     </div>
 
-    <div ref="{{ heroCoreRef }}" style="position:relative;display:flex;flex-direction:column;gap:var(--space-8);max-width:1180px;margin:0 auto;width:100%;will-change:transform,filter">
+    <div ref="{{ heroCoreRef }}" style="position:relative;display:flex;flex-direction:column;gap:var(--space-8);max-width:1180px;margin:0 auto;width:100%">
       <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>01 — Agentic Engineer</span><span>CSE '29 · MIT Manipal</span></div>
       <h1 style="margin:0;font:300 clamp(60px,12.5vw,188px)/0.86 var(--font-heading);letter-spacing:-.055em;color:var(--color-neutral-100);text-shadow:0 0 70px #161826"><span data-line="1" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">VAIBHAV</span></span><span data-line="2" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">KODIYAN</span></span></h1>
       <div style="display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;padding-top:var(--space-6);border-top:1px solid var(--color-divider)">
@@ -80,7 +80,7 @@ a:hover{color:var(--color-accent-400)}
       </div>
     </div>
 
-    <div ref="{{ heroEndRef }}" style="position:absolute;left:56px;right:56px;top:50%;opacity:0;pointer-events:none;will-change:transform,opacity;display:flex;justify-content:center;will-change:transform,opacity">
+    <div ref="{{ heroEndRef }}" style="position:absolute;left:56px;right:56px;top:50%;opacity:0;pointer-events:none;display:flex;justify-content:center">
       <p style="margin:0;max-width:900px;text-align:center;font:300 clamp(30px,4.6vw,68px)/1.12 var(--font-heading);letter-spacing:-.04em;color:var(--color-neutral-100);text-wrap:pretty">Break assumptions,<br><span style="color:var(--color-accent-300)">not production.</span></p>
     </div>
 
@@ -89,20 +89,20 @@ a:hover{color:var(--color-accent-400)}
 </section>
 
 <div ref="{{ bandRef }}" style="position:relative;z-index:2;padding:var(--space-4) 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);overflow:hidden;white-space:nowrap;background:var(--color-bg)">
-  <div ref="{{ marqRef }}" style="display:inline-flex;gap:52px;will-change:transform;font:400 12px/1 var(--font-body);letter-spacing:.26em;text-transform:uppercase;color:var(--color-neutral-500)">
+  <div ref="{{ marqRef }}" style="display:inline-flex;gap:52px;font:400 12px/1 var(--font-body);letter-spacing:.26em;text-transform:uppercase;color:var(--color-neutral-500)">
     <span>break assumptions not production</span><span style="color:var(--color-accent)">✳</span><span>agent infrastructure</span><span style="color:var(--color-accent)">✳</span><span>autonomous systems</span><span style="color:var(--color-accent)">✳</span><span>break assumptions not production</span><span style="color:var(--color-accent)">✳</span><span>agent infrastructure</span><span style="color:var(--color-accent)">✳</span><span>autonomous systems</span><span style="color:var(--color-accent)">✳</span>
   </div>
 </div>
 
 <section id="work" data-screen-label="Work" style="position:relative;z-index:2;padding:150px 56px 120px;perspective:1200px">
   <div style="max-width:1180px;margin:0 auto">
-    <div data-row="1" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:56px;will-change:transform,opacity">
+    <div data-row="1" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:56px">
       <h2 style="margin:0;font:400 clamp(34px,5vw,66px)/1 var(--font-heading);letter-spacing:-.04em">Selected work</h2>
       <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">02 — Index</span>
     </div>
     <div style="display:flex;flex-direction:column;transform-style:preserve-3d">
       <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
-        <a href="#rig" data-row="1" style="position:relative;display:grid;grid-template-columns:56px 1fr 260px 120px;gap:28px;align-items:center;padding:34px 24px;border-top:1px solid var(--color-divider);color:var(--color-text);will-change:transform,opacity,filter;transition:background .4s" style-hover="background:var(--color-accent-900)">
+        <a href="#rig" data-row="1" style="position:relative;display:grid;grid-template-columns:56px 1fr 260px 120px;gap:28px;align-items:center;padding:34px 24px;border-top:1px solid var(--color-divider);color:var(--color-text);transition:background .4s" style-hover="background:var(--color-accent-900)">
           <span style="font:400 11px/1 var(--font-body);color:var(--color-neutral-600)">{{ p.num }}</span>
           <div style="display:flex;flex-direction:column;gap:8px">
             <span style="font:400 clamp(26px,3.2vw,44px)/1 var(--font-heading);letter-spacing:-.03em">{{ p.name }}</span>
@@ -124,7 +124,7 @@ a:hover{color:var(--color-accent-400)}
 <section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:320vh">
   <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
     <div style="display:flex;justify-content:space-between;padding:0 56px var(--space-8);font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>03 — How I work</span><span>Scroll →</span></div>
-    <div ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform">
+    <div ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px">
       <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
         <div style="flex:none;width:min(46vw,560px);height:56vh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8);border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-sm)">
           <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-accent-300)">{{ r.k }}</span>
@@ -140,15 +140,15 @@ a:hover{color:var(--color-accent-400)}
 
 <section id="rig" data-screen-label="Rig case study" style="position:relative;z-index:2;height:300vh">
   <div style="position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden">
-    <div ref="{{ rigPanelRef }}" style="position:relative;width:100vw;height:100vh;overflow:hidden;will-change:transform,border-radius;background:linear-gradient(180deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-md)">
-      <div ref="{{ rigFieldRef }}" style="position:absolute;inset:-14%;will-change:transform;background:radial-gradient(ellipse at 32% 40%,var(--color-accent-800),transparent 56%),radial-gradient(ellipse at 72% 62%,var(--color-section-glow),transparent 55%);filter:blur(30px)"></div>
+    <div ref="{{ rigPanelRef }}" style="position:relative;width:100vw;height:100vh;overflow:hidden;background:linear-gradient(180deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-md)">
+      <div ref="{{ rigFieldRef }}" style="position:absolute;inset:-14%;background:radial-gradient(ellipse at 32% 40%,var(--color-accent-800),transparent 56%),radial-gradient(ellipse at 72% 62%,var(--color-section-glow),transparent 55%);opacity:.85"></div>
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(28px,4vw,58px)">
         <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-400)"><span>04 — Case study</span><span>Qaynel Agentic Solutions</span></div>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
           <h3 style="margin:0;font:300 clamp(64px,12vw,180px)/0.84 var(--font-heading);letter-spacing:-.055em">Rig</h3>
           <p style="margin:0 0 14px;max-width:360px;font:300 16px/1.5 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">A runtime for coding agents: sandboxed execution, repo-aware context, and review loops that catch what the model missed.</p>
         </div>
-        <div ref="{{ rigMetaRef }}" style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider);will-change:opacity,transform">
+        <div ref="{{ rigMetaRef }}" style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
           <div style="padding:var(--space-6) var(--space-8) 0 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Role</div><div style="font:300 17px/1.3">Founding engineer</div></div>
           <div style="padding:var(--space-6) var(--space-8) 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Stack</div><div style="font:300 17px/1.3">Python · TS · AWS</div></div>
           <div style="padding:var(--space-6) var(--space-8) 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Year</div><div style="font:300 17px/1.3">2025 — now</div></div>
@@ -161,11 +161,11 @@ a:hover{color:var(--color-accent-400)}
 
 <section data-screen-label="Rig detail" style="position:relative;z-index:2;padding:130px 56px">
   <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:70px">
-    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-6);will-change:transform,opacity">
+    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-6);">
       <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">The problem</h4>
       <p style="margin:0;font:300 20px/1.55 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">Coding agents fail quietly. They pass tests, open a PR, and leave a reviewer to reconstruct intent from a diff. Rig makes the agent show its work: every action is a replayable step with the context that produced it.</p>
     </div>
-    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-4);will-change:transform,opacity">
+    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-4);">
       <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">What I built</h4>
       <sc-for list="{{ rigPoints }}" as="pt" hint-placeholder-count="3">
         <div style="display:flex;gap:16px;padding:var(--space-4) 0;border-bottom:1px solid var(--color-divider)"><span style="font:400 11px/1.6 var(--font-body);color:var(--color-accent)">{{ pt.i }}</span><span style="font:300 16px/1.5 var(--font-body);color:var(--color-neutral-300)">{{ pt.t }}</span></div>
@@ -179,14 +179,14 @@ a:hover{color:var(--color-accent-400)}
     <div style="display:flex;flex-direction:column;gap:var(--space-8)">
       <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">05 — About</span>
       <p data-split="1" style="margin:0;font:300 clamp(24px,3.1vw,40px)/1.32 var(--font-heading);letter-spacing:-.022em;text-wrap:pretty">I'm a computer science student at MIT Manipal who spends most of his time on autonomous systems — agents that ship code, cars that drive themselves, satellites that know where they are.</p>
-      <p data-row="1" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;will-change:transform,opacity">Formula Manipal Driverless recruit, working on racing-line optimization. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
+      <p data-row="1" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;">Formula Manipal Driverless recruit, working on racing-line optimization. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
       <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;padding-top:var(--space-2)">
         <sc-for list="{{ tags }}" as="t" hint-placeholder-count="6">
           <span style="padding:9px 16px;border:1px solid var(--color-neutral-800);border-radius:100px;white-space:nowrap;flex:none;font:400 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">{{ t }}</span>
         </sc-for>
       </div>
     </div>
-    <div data-row="1" style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider);will-change:transform,opacity">
+    <div data-row="1" style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider);">
       <sc-for list="{{ certs }}" as="c" hint-placeholder-count="3">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:var(--space-6) 0;border-bottom:1px solid var(--color-divider)"><span style="font:300 16px/1.3 var(--font-body)">{{ c.n }}</span><span style="font:400 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-500);white-space:nowrap">{{ c.o }}</span></div>
       </sc-for>
@@ -195,7 +195,7 @@ a:hover{color:var(--color-accent-400)}
 </section>
 
 <section id="contact" data-screen-label="Contact" style="position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:120px 56px 40px;overflow:hidden">
-  <div ref="{{ contactRef }}" style="max-width:1180px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:var(--space-8);will-change:transform">
+  <div ref="{{ contactRef }}" style="max-width:1180px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:var(--space-8)">
     <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">06 — Contact</span>
     <a href="#contact" data-magnet="1" data-split="1" style="display:block;font:300 clamp(48px,10vw,146px)/0.92 var(--font-heading);letter-spacing:-.05em;color:var(--color-text);transition:color .3s" style-hover="color:var(--color-accent-300)">Let's build something unreasonable.</a>
     <div style="display:flex;gap:28px;flex-wrap:wrap;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase">
@@ -232,11 +232,11 @@ class Component extends DCLogic {
     const tick=()=>{
       if(this._dead)return;
       const t=performance.now()-this._t0;
-      if(window.Lenis&&window.gsap){clearInterval(this._poll);wire();return;}
-      if(!this._fell&&t>2200){this._fell=true;wire();}
-      if(t>20000)clearInterval(this._poll);
+      if(window.Lenis){clearInterval(this._poll);wire();return;}
+      if(!this._fell&&t>1200){this._fell=true;wire();}
+      if(t>8000)clearInterval(this._poll);
     };
-    this._poll=setInterval(tick,100);tick();
+    this._poll=setInterval(tick,50);tick();
   }
   componentWillUnmount(){
     this._dead=true;clearInterval(this._poll);clearInterval(this._ci);
@@ -250,21 +250,22 @@ class Component extends DCLogic {
   componentDidUpdate(){try{this.split();}catch(e){}}
 
   engine(){
-    const g=window.gsap;
+    if(this._engineOn)return;this._engineOn=true;
     cancelAnimationFrame(this._raf);this._raf=0;
-    if(this._tick&&g&&g.ticker)g.ticker.remove(this._tick);
-    if(g){
-      this._tick=t=>{if(this.lenis)this.lenis.raf(t*1000);this.paint();};
-      g.ticker.add(this._tick);g.ticker.lagSmoothing(0);
-    }else{
-      const loop=t=>{if(this.lenis)this.lenis.raf(t);this.paint();this._raf=requestAnimationFrame(loop);};
+    if(this._tick&&window.gsap&&window.gsap.ticker)window.gsap.ticker.remove(this._tick);
+    const loop=t=>{
+      if(this._dead)return;
+      if(this.lenis)this.lenis.raf(t);
+      this.paint();
       this._raf=requestAnimationFrame(loop);
-    }
+    };
+    this._raf=requestAnimationFrame(loop);
     try{
       if(window.Lenis&&!this.lenis){
         this.lenis=new window.Lenis({
-          duration:this.props.scrollDuration!=null?this.props.scrollDuration:1.35,
+          duration:this.props.scrollDuration!=null?this.props.scrollDuration:1,
           easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),
+          smoothWheel:true,syncTouch:false,
           anchors:true,allowNestedScroll:true,stopInertiaOnNavigate:true
         });
         this.lenis.on('scroll',e=>{this.velocity=e.velocity;this.armSnap();});
@@ -343,121 +344,132 @@ class Component extends DCLogic {
       c.style.margin=over?'-23px 0 0 -23px':'-11px 0 0 -11px';
       c.style.background=over?'rgba(145,132,217,.12)':'transparent';
     };
-    this._or=()=>{this.initStars(true);this.initHole(true);};
+    this._or=()=>{this.initStars(true);this.initHole(true);this._dirtyLayout=true;};
     window.addEventListener('mousemove',this._om,{passive:true});
     window.addEventListener('resize',this._or);
+  }
+  measure(){
+    const vh=window.innerHeight||1,vw=window.innerWidth||1;
+    this._vh=vh;this._vw=vw;
+    this._sh=document.documentElement.scrollHeight||1;
+    const hero=this.heroPinRef.current;
+    this._heroRange=hero&&hero.parentElement?Math.max(1,hero.parentElement.offsetHeight-vh):1;
+    const rail=this.railRef.current;
+    if(rail&&rail.parentElement&&rail.parentElement.parentElement){
+      const sec=rail.parentElement.parentElement;
+      this._railTop=sec.offsetTop;
+      this._railRange=Math.max(1,sec.offsetHeight-vh);
+      this._railDist=Math.max(0,rail.scrollWidth-vw+112);
+    }
+    const rp=this.rigPanelRef.current;
+    if(rp&&rp.parentElement&&rp.parentElement.parentElement){
+      const sec=rp.parentElement.parentElement;
+      this._rigTop=sec.offsetTop;
+      this._rigRange=Math.max(1,sec.offsetHeight-vh);
+    }
+    const m=this.marqRef.current;
+    this._marqHalf=m?(m.scrollWidth||0)/2:0;
+    this._dirtyLayout=false;
   }
   /* one frame, one eased scroll value: every zoom, pin and drift below reads
      the same number, so nothing drifts apart under fast scrolling */
   paint(){
     const L=this.lenis;
     const sy=L?(L.animatedScroll!=null?L.animatedScroll:(L.scroll||0)):(window.scrollY||0);
-    const vh=window.innerHeight||1,vw=window.innerWidth||1;
     const v=this.velocity||0;this.velocity=v*.93;
+    const moving=Math.abs(sy-(this._lsy||0))>0.2||Math.abs(v)>0.05||Math.abs(this.mx-this.cx)>0.5||Math.abs(this.my-this.cy)>0.5;
+    const heroLive=sy<(this._heroRange||window.innerHeight)*1.05;
+    if(this._dirtyLayout||!this._vh)this.measure();
+    if(!this.reduced){
+      this.marqX-=(.6+Math.min(Math.abs(v)*2.2,32));
+      const half=this._marqHalf||0;
+      if(half&&this.marqX<=-half)this.marqX+=half;
+      const m=this.marqRef.current;
+      if(m)m.style.transform='translate3d('+this.marqX.toFixed(1)+'px,0,0)';
+    }
+    if(!moving&&!heroLive&&this._settled)return;
+    this._settled=!moving&&!heroLive;
+    this._lsy=sy;
+    const vh=this._vh,vw=this._vw;
     const Z=this.props.zoomIntensity!=null?this.props.zoomIntensity:1;
     const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
 
     this.cx+=(this.mx-this.cx)*.18;this.cy+=(this.my-this.cy)*.18;
     const c=this.cursorRef.current;
-    if(c)c.style.transform='translate3d('+this.cx+'px,'+this.cy+'px,0)';
+    if(c)c.style.transform='translate3d('+this.cx.toFixed(1)+'px,'+this.cy.toFixed(1)+'px,0)';
 
-    const doc=document.documentElement;
-    const gp=cl(sy/Math.max(1,doc.scrollHeight-vh),0,1);
-    const pr=this.progRef.current;if(pr)pr.style.transform='scaleX('+gp+')';
+    const gp=cl(sy/Math.max(1,this._sh-vh),0,1);
+    const pr=this.progRef.current;if(pr)pr.style.transform='scaleX('+gp.toFixed(4)+')';
     const tn=this.tintRef.current;if(tn)tn.style.opacity=(gp*0.55).toFixed(3);
 
-    // hero: scroll drives the camera into the singularity
-    const hero=this.heroPinRef.current;
-    if(hero&&hero.parentElement){
-      const range=Math.max(1,hero.parentElement.offsetHeight-vh);
-      const p=cl(sy/range,0,1);
-      const o=this.orbRef.current;
-      if(o){
-        const rx=((this.cy/vh)-.5)*-12,ry=((this.cx/vw)-.5)*16;
-        o.style.transform='perspective(1200px) rotateX('+rx+'deg) rotateY('+ry+'deg) rotate('+(p*90+v*.3)+'deg) scale('+(1+Math.pow(p,1.7)*9*Z)+')';
-        o.style.opacity=(1-cl((p-.78)/.22,0,1)).toFixed(3);
-        this.paintHole(p);
-      }
-      const hc=this.heroCoreRef.current;
-      if(hc){
-        hc.style.transform='translate3d(0,'+(-p*90)+'px,0) scale('+(1-p*.28*Z)+')';
-        hc.style.opacity=(1-cl(p/.42,0,1)).toFixed(3);
-        hc.style.filter='blur('+(p*9).toFixed(2)+'px)';
-        hc.style.pointerEvents=p>.35?'none':'auto';
-      }
-      /* the statement carries the middle of the fall, so the viewport is never
-         empty between the headline dissolving and the next section arriving */
-      const he=this.heroEndRef.current;
-      if(he){
-        const inn=cl((p-.34)/.2,0,1);
-        he.style.opacity=inn.toFixed(3);
-        he.style.transform='translate3d(0,'+((1-inn)*40).toFixed(1)+'px,0) scale('+(0.94+inn*.06+cl((p-.7)/.3,0,1)*.1).toFixed(4)+')';
-      }
-      const sh=this.scrollHintRef.current;
-      if(sh)sh.style.opacity=(1-cl(p*4,0,1)).toFixed(3);
+    const p=cl(sy/this._heroRange,0,1);
+    const o=this.orbRef.current;
+    if(o&&heroLive){
+      const rx=((this.cy/vh)-.5)*-12,ry=((this.cx/vw)-.5)*16;
+      o.style.transform='perspective(1200px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) rotate('+(p*90+v*.3).toFixed(2)+'deg) scale('+(1+Math.pow(p,1.7)*9*Z).toFixed(4)+')';
+      o.style.opacity=(1-cl((p-.78)/.22,0,1)).toFixed(3);
+      if(p<0.92)this.paintHole(p);
     }
+    const hc=this.heroCoreRef.current;
+    if(hc){
+      hc.style.transform='translate3d(0,'+(-p*90).toFixed(1)+'px,0) scale('+(1-p*.28*Z).toFixed(4)+')';
+      hc.style.opacity=(1-cl(p/.42,0,1)).toFixed(3);
+      hc.style.pointerEvents=p>.35?'none':'auto';
+    }
+    const he=this.heroEndRef.current;
+    if(he){
+      const inn=cl((p-.34)/.2,0,1);
+      he.style.opacity=inn.toFixed(3);
+      he.style.transform='translate3d(0,'+((1-inn)*40).toFixed(1)+'px,0) scale('+(0.94+inn*.06+cl((p-.7)/.3,0,1)*.1).toFixed(4)+')';
+    }
+    const sh=this.scrollHintRef.current;
+    if(sh)sh.style.opacity=(1-cl(p*4,0,1)).toFixed(3);
 
-    // velocity skew + marquee
     const sk=cl(v*.035,-4,4);this.skew+=(sk-this.skew)*.12;
     const bd=this.bandRef.current;
     if(bd&&!this.reduced&&this.props.velocitySkew!==false)
       bd.style.transform='skewY('+this.skew.toFixed(3)+'deg)';
-    const m=this.marqRef.current;
-    if(m&&!this.reduced){
-      this.marqX-=(.6+Math.min(Math.abs(v)*2.2,32));
-      const half=(m.scrollWidth||0)/2;
-      if(half&&this.marqX<=-half)this.marqX+=half;
-      m.style.transform='translate3d('+this.marqX+'px,0,0)';
-    }
 
-    // work rows and text blocks recede as they pass the middle of the screen
     if(!this._rows||this._rowsN!==(this.rootRef.current?this.rootRef.current.querySelectorAll('[data-row]').length:0)){
       this._rows=Array.from((this.rootRef.current||document).querySelectorAll('[data-row]'));
       this._rowsN=this._rows.length;
     }
     for(const el of this._rows){
       const r=el.getBoundingClientRect();
-      if(r.bottom<-200||r.top>vh+200)continue;
+      if(r.bottom<-80||r.top>vh+80)continue;
       const d=cl(((r.top+r.height/2)-vh/2)/vh,-1,1);
       const a=Math.abs(d);
-      el.style.transform='translate3d(0,0,'+(-a*160*Z).toFixed(1)+'px) scale('+(1-a*.09*Z).toFixed(4)+')';
-      el.style.opacity=(1-a*.72).toFixed(3);
-      el.style.filter='blur('+(a*a*3.2).toFixed(2)+'px)';
+      el.style.transform='translate3d(0,'+(d*18).toFixed(1)+'px,0) scale('+(1-a*.05*Z).toFixed(4)+')';
+      el.style.opacity=(1-a*.35).toFixed(3);
     }
 
-    // horizontal rail
     const rail=this.railRef.current;
-    if(rail&&rail.parentElement&&rail.parentElement.parentElement){
-      const sec=rail.parentElement.parentElement;
-      const top=sec.offsetTop,range=Math.max(1,sec.offsetHeight-vh);
-      const p=cl((sy-top)/range,0,1);
-      const dist=Math.max(0,rail.scrollWidth-vw+112);
-      rail.style.transform='translate3d('+(-p*dist).toFixed(1)+'px,0,0)';
+    if(rail&&this._railRange){
+      const rp=cl((sy-this._railTop)/this._railRange,0,1);
+      rail.style.transform='translate3d('+(-rp*this._railDist).toFixed(1)+'px,0,0)';
     }
 
-    // rig: a card that grows into the full bleed
-    const rp=this.rigPanelRef.current;
-    if(rp&&rp.parentElement&&rp.parentElement.parentElement){
-      const sec=rp.parentElement.parentElement;
-      const range=Math.max(1,sec.offsetHeight-vh);
-      const p=cl((sy-sec.offsetTop)/range,0,1);
-      const e=p<.5?(p/.5):1;
-      const out=cl((p-.82)/.18,0,1);
+    const panel=this.rigPanelRef.current;
+    if(panel&&this._rigRange){
+      const rp=cl((sy-this._rigTop)/this._rigRange,0,1);
+      const e=rp<.5?(rp/.5):1;
+      const out=cl((rp-.82)/.18,0,1);
       const s=(.46+.54*e)*(1-out*.06);
-      rp.style.transform='scale('+s.toFixed(4)+')';
-      rp.style.borderRadius=((1-e)*18).toFixed(1)+'px';
+      panel.style.transform='scale('+s.toFixed(4)+')';
+      panel.style.borderRadius=((1-e)*18).toFixed(1)+'px';
       const f=this.rigFieldRef.current;
-      if(f)f.style.transform='rotate('+(p*22).toFixed(2)+'deg) scale('+(1.1+p*.25)+')';
+      if(f)f.style.transform='rotate('+(rp*22).toFixed(2)+'deg) scale('+(1.1+rp*.25)+')';
       const mt=this.rigMetaRef.current;
       if(mt){mt.style.opacity=cl((e-.55)/.35,0,1).toFixed(3);mt.style.transform='translate3d(0,'+((1-cl((e-.55)/.35,0,1))*22).toFixed(1)+'px,0)';}
     }
 
-    // contact settles out of a zoom as the page ends
     const ct=this.contactRef.current;
     if(ct){
       const r=ct.getBoundingClientRect();
-      const p=cl(1-(r.top/vh),0,1);
-      ct.style.transform='scale('+(1.16-0.16*p).toFixed(4)+')';
+      if(r.top<vh+40){
+        const cp=cl(1-(r.top/vh),0,1);
+        ct.style.transform='scale('+(1.16-0.16*cp).toFixed(4)+')';
+      }
     }
 
     this.paintStars(sy,gp);
@@ -478,30 +490,29 @@ class Component extends DCLogic {
   }
   initStars(resize){
     const cv=this.starRef.current;if(!cv)return;
-    const dpr=Math.min(2,window.devicePixelRatio||1);
+    const dpr=Math.min(1.25,window.devicePixelRatio||1);
     const w=cv.clientWidth||window.innerWidth,h=cv.clientHeight||window.innerHeight;
     cv.width=w*dpr;cv.height=h*dpr;
-    const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+    const ctx=cv.getContext('2d',{alpha:false});ctx.setTransform(dpr,0,0,dpr,0,0);
     this._ctx=ctx;this._w=w;this._h=h;
-    if(!this._pts||resize)this._pts=Array.from({length:430},()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random(),r:Math.random()*1.5+.2}));
+    const n=this.reduced?40:90;
+    if(!this._pts||resize)this._pts=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random(),r:Math.random()*1.4+.2}));
     const g=ctx.createRadialGradient(w*.5,h*.45,0,w*.5,h*.45,Math.max(w,h)*.8);
     g.addColorStop(0,'#0c1010');g.addColorStop(.55,'#05070a');g.addColorStop(1,'#000000');
     this._bg=g;
   }
   paintStars(sy,gp){
     const ctx=this._ctx;if(!ctx||this.props.starfield===false)return;
+    if(this._starSkip){this._starSkip=0;return;}
+    this._starSkip=1;
     const w=this._w,h=this._h;
     ctx.fillStyle=this._bg;ctx.fillRect(0,0,w,h);
-    const smear=Math.min(3.2,Math.abs(this.velocity||0)*.06);
     for(const p of this._pts){
       const y=(p.y-sy*p.z*.28)%h,yy=y<0?y+h:y;
       ctx.globalAlpha=.22+p.z*.68;
       ctx.fillStyle=p.z>.92?'#39ff9c':(p.z>.55?'#8ba394':'#e6f2e9');
       const r=p.r*(.5+p.z)*(1+gp*.4);
-      ctx.beginPath();
-      if(smear>.4)ctx.ellipse(p.x,yy,r,r*(1+smear*p.z),0,0,6.283);
-      else ctx.arc(p.x,yy,r,0,6.283);
-      ctx.fill();
+      ctx.fillRect(p.x-r,yy-r,r*2,r*2);
     }
     ctx.globalAlpha=1;
   }
@@ -510,15 +521,15 @@ class Component extends DCLogic {
      the old orb used, so mouse parallax and scroll zoom carry over untouched */
   initHole(resize){
     const cv=this.holeRef.current;if(!cv)return;
-    const dpr=Math.min(2,window.devicePixelRatio||1);
+    const dpr=Math.min(1.25,window.devicePixelRatio||1);
     const w=cv.clientWidth||400,h=cv.clientHeight||400;
     cv.width=w*dpr;cv.height=h*dpr;
     const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
-    this._hctx=ctx;this._hw=w;this._hh=h;
+    this._hctx=ctx;this._hw=w;this._hh=h;this._hdpr=dpr;
     if(!this._streams||resize){
-      const N=64;
+      const N=18;
       this._streams=Array.from({length:N},(_,i)=>({
-        ang:(i/N)*6.283+ (Math.random()-.5)*.05,
+        ang:(i/N)*6.283+(Math.random()-.5)*.05,
         str:this._randStream(),
         off:Math.random()*200,
         spd:.55+Math.random()*.5
@@ -528,7 +539,7 @@ class Component extends DCLogic {
   }
   _randStream(){
     const src='if(x){}else return; const let=fn=>node.next.push(a,b)===true?await Promise.all():null|for<T>[i]=arr.map(v=>v.id)&&git commit -m"fix" 0x1A9F while(!done){yield* gen();}';
-    let out='';for(let i=0;i<140;i++)out+=src[Math.floor(Math.random()*src.length)];
+    let out='';for(let i=0;i<80;i++)out+=src[Math.floor(Math.random()*src.length)];
     return out;
   }
   paintHole(p){
@@ -539,37 +550,33 @@ class Component extends DCLogic {
     const horizon=maxR*(.14+p*.6);
     const outerR=maxR*1.06;
     const fallBoost=1+p*2.4;
-    const fontSize=Math.max(5.5,maxR*.02);
-    ctx.textAlign='left';ctx.textBaseline='middle';
+    const fontSize=Math.max(7,maxR*.028);
+    ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.font='500 '+fontSize+'px "JetBrains Mono",ui-monospace,monospace';
     this._holeT+=.6*fallBoost;
     ctx.save();
     ctx.beginPath();ctx.ellipse(cx,cy,outerR,outerR*.68,0,0,6.283);ctx.clip();
     ctx.globalCompositeOperation='lighter';
-    const steps=90;
+    const steps=22;
     for(const s of this._streams){
       const flow=this._holeT*s.spd+s.off;
       for(let i=0;i<steps;i++){
         const t=i/(steps-1);
         const rad=t*t*(outerR-horizon)+horizon;
-        const density=.55+ (1-t)*.9;
-        const idx=Math.floor((flow*.18+i*density))%s.str.length;
+        const idx=Math.floor((flow*.18+i*(.55+(1-t)*.9)))%s.str.length;
         const ch=s.str[idx<0?idx+s.str.length:idx];
         const swirl=(1-t)*1.6*(1+p*.6);
         const ang=s.ang+swirl;
         const x=cx+Math.cos(ang)*rad,y=cy+Math.sin(ang)*rad*.68;
         const near=1-t;
-        const alpha=Math.min(1,.06+near*near*.85);
-        let col;
-        if(t<.14){
-          const hh=1-t/.14;
-          col='rgba('+Math.round(120+130*hh)+','+Math.round(160+95*hh)+','+Math.round(120+90*hh)+','+alpha.toFixed(2)+')';
-        }else col='rgba(90,255,170,'+alpha.toFixed(2)+')';
-        ctx.fillStyle=col;
-        ctx.save();
-        ctx.translate(x,y);ctx.rotate(ang+1.5708);
+        const alpha=Math.min(1,.08+near*near*.85);
+        ctx.fillStyle=t<.14
+          ?'rgba(230,240,200,'+alpha.toFixed(2)+')'
+          :'rgba(90,255,170,'+alpha.toFixed(2)+')';
+        ctx.setTransform(this._hdpr,0,0,this._hdpr,x*this._hdpr,y*this._hdpr);
+        ctx.rotate(ang+1.5708);
         ctx.fillText(ch,0,0);
-        ctx.restore();
+        ctx.setTransform(this._hdpr,0,0,this._hdpr,0,0);
       }
     }
     ctx.globalCompositeOperation='source-over';
@@ -581,13 +588,10 @@ class Component extends DCLogic {
     ctx.beginPath();ctx.ellipse(cx,cy,horizon*1.3,horizon*1.3*.68,0,0,6.283);ctx.clip();
     ctx.fillStyle=hg;ctx.fillRect(0,0,w,h);
     ctx.restore();
-    ctx.save();
     ctx.beginPath();ctx.ellipse(cx,cy,horizon,horizon*.68,0,0,6.283);
     ctx.lineWidth=Math.max(1,horizon*.05);
-    const rg=ctx.createLinearGradient(cx-horizon,cy,cx+horizon,cy);
-    rg.addColorStop(0,'rgba(255,214,166,.2)');rg.addColorStop(.5,'rgba(255,236,214,.95)');rg.addColorStop(1,'rgba(90,255,170,.4)');
-    ctx.strokeStyle=rg;ctx.stroke();
-    ctx.restore();
+    ctx.strokeStyle='rgba(255,236,214,.85)';
+    ctx.stroke();
   }
   renderVals(){
     return {
