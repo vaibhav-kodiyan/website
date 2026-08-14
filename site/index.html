@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="stylesheet" href="./nocturne.css"><link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css"><script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
+:root{
+  --color-bg:#05070a;--color-surface:#0b0f14;--color-divider:#1b232c;
+  --color-text:#e6f2e9;--color-neutral-100:#e6f2e9;--color-neutral-200:#c7d6cb;--color-neutral-300:#a9c2b0;
+  --color-neutral-400:#8ba394;--color-neutral-500:#71877a;--color-neutral-600:#55645c;--color-neutral-700:#3a4640;
+  --color-neutral-800:#232d27;--color-neutral-900:#141c17;
+  --color-accent:#39ff9c;--color-accent-300:#6dffb8;--color-accent-400:#2bd97a;--color-accent-600:#2ee085;
+  --color-accent-700:#1f6b3f;--color-accent-800:#164a2c;--color-accent-900:#0d1f16;
+  --color-section-glow:rgba(57,255,156,.14);
+  --font-body:"JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --font-heading:"JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+html{overflow-x:hidden}
+html,body{margin:0;padding:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:var(--color-accent);text-decoration:none}
+a:hover{color:var(--color-accent-400)}
+:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes wipe{to{transform:translateY(-101%)}}
+</style></helmet>
+
+<div ref="{{ rootRef }}" style="position:relative;width:100%;background:var(--color-bg)">
+
+<canvas ref="{{ starRef }}" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none"></canvas>
+<div ref="{{ tintRef }}" style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 60%,var(--color-section-glow),transparent 62%),linear-gradient(180deg,transparent,var(--color-accent-900))"></div>
+
+<div ref="{{ cursorRef }}" style="position:fixed;top:0;left:0;width:22px;height:22px;margin:-11px 0 0 -11px;border:1px solid var(--color-accent-600);border-radius:50%;z-index:9999;pointer-events:none;mix-blend-mode:difference;transition:width .3s cubic-bezier(.2,.8,.2,1),height .3s cubic-bezier(.2,.8,.2,1),margin .3s cubic-bezier(.2,.8,.2,1),background .3s"></div>
+
+<div style="position:fixed;left:0;right:0;top:0;height:1px;z-index:9998;pointer-events:none;background:var(--color-divider)"><div ref="{{ progRef }}" style="height:100%;transform:scaleX(0);transform-origin:0 50%;background:linear-gradient(90deg,transparent,var(--color-accent),var(--color-accent-300))"></div></div>
+
+<div ref="{{ loaderRef }}" style="position:fixed;inset:0;z-index:9000;background:var(--color-bg);display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8) 56px;animation:wipe 1s cubic-bezier(.76,0,.24,1) 2.2s forwards">
+  <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.18em;color:var(--color-neutral-500);text-transform:uppercase"><span>Vaibhav Kodiyan</span><span>Agentic Engineer</span></div>
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
+    <div style="font:300 clamp(44px,8vw,120px)/0.92 var(--font-heading);letter-spacing:-.045em">break assumptions<br><span style="color:var(--color-accent)">not production.</span></div>
+    <div ref="{{ countRef }}" style="font:300 clamp(36px,6vw,84px)/1 var(--font-heading);color:var(--color-neutral-300);letter-spacing:-.04em;font-variant-numeric:tabular-nums">000</div>
+  </div>
+  <div style="height:1px;background:var(--color-divider);position:relative"><div ref="{{ barRef }}" style="position:absolute;inset:0 100% 0 0;background:var(--color-accent)"></div></div>
+</div>
+
+<header style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) 56px;backdrop-filter:blur(10px);background:linear-gradient(#161826cc,#16182600)">
+  <div style="display:flex;align-items:center;gap:var(--space-4)">
+    <div style="width:20px;height:20px;border:1px solid var(--color-accent);border-radius:50%;position:relative"><div style="position:absolute;inset:6px;background:var(--color-accent);border-radius:50%"></div></div>
+    <span style="font:500 13px/1 var(--font-heading);letter-spacing:.12em">VK</span>
+  </div>
+  <nav style="display:flex;gap:34px;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-400)">
+    <a href="#work" style="color:inherit" style-hover="color:var(--color-accent-300)">Work</a><a href="#rig" style="color:inherit" style-hover="color:var(--color-accent-300)">Rig</a><a href="#about" style="color:inherit" style-hover="color:var(--color-accent-300)">About</a><a href="#contact" style="color:inherit" style-hover="color:var(--color-accent-300)">Contact</a>
+  </nav>
+  <a href="#contact" style="display:flex;align-items:center;gap:10px;padding:9px 18px;border:1px solid var(--color-accent-700);border-radius:100px;font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-text);white-space:nowrap;flex:none;transition:border-color .3s,background .3s" style-hover="border-color:var(--color-accent);background:var(--color-accent-900)"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)"></span>Open to work</a>
+</header>
+
+<section data-screen-label="Hero" style="position:relative;z-index:2;height:200vh">
+  <div ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
+
+    <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:min(56vw,700px);aspect-ratio:1;margin:-28vw 0 0 -28vw;max-width:700px;max-height:700px;pointer-events:none;will-change:transform">
+      <canvas ref="{{ holeRef }}" style="position:absolute;inset:-95%;width:290%;height:290%"></canvas>
+      <div style="position:absolute;inset:-14%;border:1px solid var(--color-accent-800);border-radius:50%;animation:spin 40s linear infinite;opacity:.5"></div>
+      <div style="position:absolute;inset:-28%;border:1px dashed var(--color-neutral-800);border-radius:50%;animation:spin 90s linear infinite reverse;opacity:.5"></div>
+    </div>
+
+    <div ref="{{ heroCoreRef }}" style="position:relative;display:flex;flex-direction:column;gap:var(--space-8);max-width:1180px;margin:0 auto;width:100%;will-change:transform,filter">
+      <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>01 — Agentic Engineer</span><span>CSE '29 · MIT Manipal</span></div>
+      <h1 style="margin:0;font:300 clamp(60px,12.5vw,188px)/0.86 var(--font-heading);letter-spacing:-.055em;color:var(--color-neutral-100);text-shadow:0 0 70px #161826"><span data-line="1" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">VAIBHAV</span></span><span data-line="2" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">KODIYAN</span></span></h1>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;padding-top:var(--space-6);border-top:1px solid var(--color-divider)">
+        <p style="margin:0;max-width:430px;font:300 17px/1.5 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty">I build agents that write, review and ship code. Currently making <span style="color:var(--color-accent-300)">Rig</span> at Qaynel Agentic Solutions — infrastructure for coding agents that don't need babysitting.</p>
+        <div style="display:flex;gap:44px;font:400 11px/1.6 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-500)">
+          <div><div style="color:var(--color-text);font-size:26px;letter-spacing:-.02em">04</div>shipped systems</div>
+          <div><div style="color:var(--color-text);font-size:26px;letter-spacing:-.02em">03</div>certifications</div>
+          <div><div style="color:var(--color-text);font-size:26px;letter-spacing:-.02em">FMD</div>driverless</div>
+        </div>
+      </div>
+    </div>
+
+    <div ref="{{ heroEndRef }}" style="position:absolute;left:56px;right:56px;top:50%;opacity:0;pointer-events:none;will-change:transform,opacity;display:flex;justify-content:center;will-change:transform,opacity">
+      <p style="margin:0;max-width:900px;text-align:center;font:300 clamp(30px,4.6vw,68px)/1.12 var(--font-heading);letter-spacing:-.04em;color:var(--color-neutral-100);text-wrap:pretty">Break assumptions,<br><span style="color:var(--color-accent-300)">not production.</span></p>
+    </div>
+
+    <div ref="{{ scrollHintRef }}" style="position:absolute;left:50%;bottom:34px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font:400 10px/1 var(--font-body);letter-spacing:.24em;text-transform:uppercase;color:var(--color-neutral-600)"><span>Fall in</span><span style="width:1px;height:38px;background:linear-gradient(var(--color-accent),transparent)"></span></div>
+  </div>
+</section>
+
+<div ref="{{ bandRef }}" style="position:relative;z-index:2;padding:var(--space-4) 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);overflow:hidden;white-space:nowrap;background:var(--color-bg)">
+  <div ref="{{ marqRef }}" style="display:inline-flex;gap:52px;will-change:transform;font:400 12px/1 var(--font-body);letter-spacing:.26em;text-transform:uppercase;color:var(--color-neutral-500)">
+    <span>break assumptions not production</span><span style="color:var(--color-accent)">✳</span><span>agent infrastructure</span><span style="color:var(--color-accent)">✳</span><span>autonomous systems</span><span style="color:var(--color-accent)">✳</span><span>break assumptions not production</span><span style="color:var(--color-accent)">✳</span><span>agent infrastructure</span><span style="color:var(--color-accent)">✳</span><span>autonomous systems</span><span style="color:var(--color-accent)">✳</span>
+  </div>
+</div>
+
+<section id="work" data-screen-label="Work" style="position:relative;z-index:2;padding:150px 56px 120px;perspective:1200px">
+  <div style="max-width:1180px;margin:0 auto">
+    <div data-row="1" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:56px;will-change:transform,opacity">
+      <h2 style="margin:0;font:400 clamp(34px,5vw,66px)/1 var(--font-heading);letter-spacing:-.04em">Selected work</h2>
+      <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">02 — Index</span>
+    </div>
+    <div style="display:flex;flex-direction:column;transform-style:preserve-3d">
+      <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
+        <a href="#rig" data-row="1" style="position:relative;display:grid;grid-template-columns:56px 1fr 260px 120px;gap:28px;align-items:center;padding:34px 24px;border-top:1px solid var(--color-divider);color:var(--color-text);will-change:transform,opacity,filter;transition:background .4s" style-hover="background:var(--color-accent-900)">
+          <span style="font:400 11px/1 var(--font-body);color:var(--color-neutral-600)">{{ p.num }}</span>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font:400 clamp(26px,3.2vw,44px)/1 var(--font-heading);letter-spacing:-.03em">{{ p.name }}</span>
+            <span style="font:300 14px/1.4 var(--font-body);color:var(--color-neutral-500)">{{ p.desc }}</span>
+          </div>
+          <span style="font:400 11px/1.7 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-300)">{{ p.stack }}</span>
+          <span style="justify-self:end;font:400 11px/1 var(--font-body);color:var(--color-neutral-500)">{{ p.year }} ↗</span>
+          <div style="position:absolute;right:150px;top:50%;width:190px;height:120px;margin-top:-60px;border-radius:var(--radius-md);overflow:hidden;opacity:0;transform:translateY(14px) rotate(-4deg);transition:opacity .35s,transform .35s;pointer-events:none;background:var(--color-surface);box-shadow:var(--shadow-sm)" style-hover="opacity:1;transform:translateY(0) rotate(-2deg)">
+            <div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,var(--color-accent-800),transparent 62%),repeating-linear-gradient(135deg,transparent 0 7px,#ffffff08 7px 8px)"></div>
+            <div style="position:absolute;left:12px;bottom:10px;font:400 9px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-400)">preview · placeholder</div>
+          </div>
+        </a>
+      </sc-for>
+      <div style="border-top:1px solid var(--color-divider)"></div>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:320vh">
+  <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
+    <div style="display:flex;justify-content:space-between;padding:0 56px var(--space-8);font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>03 — How I work</span><span>Scroll →</span></div>
+    <div ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform">
+      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
+        <div style="flex:none;width:min(46vw,560px);height:56vh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8);border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-sm)">
+          <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-accent-300)">{{ r.k }}</span>
+          <div style="display:flex;flex-direction:column;gap:var(--space-6)">
+            <h3 style="margin:0;font:400 clamp(30px,4vw,54px)/1.02 var(--font-heading);letter-spacing:-.035em">{{ r.t }}</h3>
+            <p style="margin:0;max-width:400px;font:300 16px/1.55 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty">{{ r.d }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="rig" data-screen-label="Rig case study" style="position:relative;z-index:2;height:300vh">
+  <div style="position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <div ref="{{ rigPanelRef }}" style="position:relative;width:100vw;height:100vh;overflow:hidden;will-change:transform,border-radius;background:linear-gradient(180deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-md)">
+      <div ref="{{ rigFieldRef }}" style="position:absolute;inset:-14%;will-change:transform;background:radial-gradient(ellipse at 32% 40%,var(--color-accent-800),transparent 56%),radial-gradient(ellipse at 72% 62%,var(--color-section-glow),transparent 55%);filter:blur(30px)"></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(28px,4vw,58px)">
+        <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-400)"><span>04 — Case study</span><span>Qaynel Agentic Solutions</span></div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
+          <h3 style="margin:0;font:300 clamp(64px,12vw,180px)/0.84 var(--font-heading);letter-spacing:-.055em">Rig</h3>
+          <p style="margin:0 0 14px;max-width:360px;font:300 16px/1.5 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">A runtime for coding agents: sandboxed execution, repo-aware context, and review loops that catch what the model missed.</p>
+        </div>
+        <div ref="{{ rigMetaRef }}" style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider);will-change:opacity,transform">
+          <div style="padding:var(--space-6) var(--space-8) 0 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Role</div><div style="font:300 17px/1.3">Founding engineer</div></div>
+          <div style="padding:var(--space-6) var(--space-8) 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Stack</div><div style="font:300 17px/1.3">Python · TS · AWS</div></div>
+          <div style="padding:var(--space-6) var(--space-8) 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Year</div><div style="font:300 17px/1.3">2025 — now</div></div>
+          <div style="padding:var(--space-6) 0 0 var(--space-8)"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Status</div><div style="font:300 17px/1.3;color:var(--color-accent-300)">Private beta</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Rig detail" style="position:relative;z-index:2;padding:130px 56px">
+  <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:70px">
+    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-6);will-change:transform,opacity">
+      <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">The problem</h4>
+      <p style="margin:0;font:300 20px/1.55 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">Coding agents fail quietly. They pass tests, open a PR, and leave a reviewer to reconstruct intent from a diff. Rig makes the agent show its work: every action is a replayable step with the context that produced it.</p>
+    </div>
+    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-4);will-change:transform,opacity">
+      <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">What I built</h4>
+      <sc-for list="{{ rigPoints }}" as="pt" hint-placeholder-count="3">
+        <div style="display:flex;gap:16px;padding:var(--space-4) 0;border-bottom:1px solid var(--color-divider)"><span style="font:400 11px/1.6 var(--font-body);color:var(--color-accent)">{{ pt.i }}</span><span style="font:300 16px/1.5 var(--font-body);color:var(--color-neutral-300)">{{ pt.t }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="about" data-screen-label="About" style="position:relative;z-index:2;padding:110px 56px 140px">
+  <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr .85fr;gap:80px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:var(--space-8)">
+      <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">05 — About</span>
+      <p data-split="1" style="margin:0;font:300 clamp(24px,3.1vw,40px)/1.32 var(--font-heading);letter-spacing:-.022em;text-wrap:pretty">I'm a computer science student at MIT Manipal who spends most of his time on autonomous systems — agents that ship code, cars that drive themselves, satellites that know where they are.</p>
+      <p data-row="1" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;will-change:transform,opacity">Formula Manipal Driverless recruit, working on racing-line optimization. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
+      <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;padding-top:var(--space-2)">
+        <sc-for list="{{ tags }}" as="t" hint-placeholder-count="6">
+          <span style="padding:9px 16px;border:1px solid var(--color-neutral-800);border-radius:100px;white-space:nowrap;flex:none;font:400 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">{{ t }}</span>
+        </sc-for>
+      </div>
+    </div>
+    <div data-row="1" style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider);will-change:transform,opacity">
+      <sc-for list="{{ certs }}" as="c" hint-placeholder-count="3">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:var(--space-6) 0;border-bottom:1px solid var(--color-divider)"><span style="font:300 16px/1.3 var(--font-body)">{{ c.n }}</span><span style="font:400 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-500);white-space:nowrap">{{ c.o }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="contact" data-screen-label="Contact" style="position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:120px 56px 40px;overflow:hidden">
+  <div ref="{{ contactRef }}" style="max-width:1180px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:var(--space-8);will-change:transform">
+    <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">06 — Contact</span>
+    <a href="#contact" data-magnet="1" data-split="1" style="display:block;font:300 clamp(48px,10vw,146px)/0.92 var(--font-heading);letter-spacing:-.05em;color:var(--color-text);transition:color .3s" style-hover="color:var(--color-accent-300)">Let's build something unreasonable.</a>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase">
+      <a href="#contact">Email ↗</a><a href="#contact">GitHub ↗</a><a href="#contact">LinkedIn ↗</a><a href="#contact">Résumé ↗</a>
+    </div>
+  </div>
+  <div style="max-width:1180px;margin:0 auto;width:100%;display:flex;justify-content:space-between;padding-top:var(--space-8);border-top:1px solid var(--color-divider);font:400 10px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-600)">
+    <span>© 2026 Vaibhav Kodiyan</span><span>break assumptions not production</span><span ref="{{ clockRef }}">IST</span>
+  </div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;scrollDuration&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1.35,&quot;min&quot;:0.4,&quot;max&quot;:2.4,&quot;step&quot;:0.05,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;zoomIntensity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:1.6,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;snapHero&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;velocitySkew&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;starfield&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scroll feel&quot;}}">
+class Component extends DCLogic {
+  constructor(p){
+    super(p);
+    ['root','star','tint','cursor','prog','loader','count','bar','clock','marq','band',
+     'heroPin','heroCore','heroEnd','orb','hole','scrollHint','rail','rigPanel','rigField','rigMeta','contact']
+      .forEach(k=>{this[k+'Ref']=React.createRef();});
+  }
+  componentDidMount(){
+    this.reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    this.velocity=0;this.marqX=0;this.skew=0;this._t0=performance.now();
+    const run=(n,f)=>{try{f();}catch(e){console.error('[portfolio] '+n,e);}};
+    run('stars',()=>this.initStars());
+    run('hole',()=>this.initHole());
+    run('loader',()=>this.loader());
+    run('pointer',()=>this.pointer());
+    run('clock',()=>this.clock());
+    run('split',()=>this.split());
+    run('reveals',()=>this.reveals());
+    const wire=()=>{run('engine',()=>this.engine());run('heroLines',()=>this.heroLines());};
+    const tick=()=>{
+      if(this._dead)return;
+      const t=performance.now()-this._t0;
+      if(window.Lenis&&window.gsap){clearInterval(this._poll);wire();return;}
+      if(!this._fell&&t>2200){this._fell=true;wire();}
+      if(t>20000)clearInterval(this._poll);
+    };
+    this._poll=setInterval(tick,100);tick();
+  }
+  componentWillUnmount(){
+    this._dead=true;clearInterval(this._poll);clearInterval(this._ci);
+    if(this._tick&&window.gsap)window.gsap.ticker.remove(this._tick);
+    cancelAnimationFrame(this._raf);
+    if(this._io)this._io.disconnect();
+    if(this.lenis)this.lenis.destroy();
+    window.removeEventListener('mousemove',this._om);
+    window.removeEventListener('resize',this._or);
+  }
+  componentDidUpdate(){try{this.split();}catch(e){}}
+
+  engine(){
+    const g=window.gsap;
+    cancelAnimationFrame(this._raf);this._raf=0;
+    if(this._tick&&g&&g.ticker)g.ticker.remove(this._tick);
+    if(g){
+      this._tick=t=>{if(this.lenis)this.lenis.raf(t*1000);this.paint();};
+      g.ticker.add(this._tick);g.ticker.lagSmoothing(0);
+    }else{
+      const loop=t=>{if(this.lenis)this.lenis.raf(t);this.paint();this._raf=requestAnimationFrame(loop);};
+      this._raf=requestAnimationFrame(loop);
+    }
+    try{
+      if(window.Lenis&&!this.lenis){
+        this.lenis=new window.Lenis({
+          duration:this.props.scrollDuration!=null?this.props.scrollDuration:1.35,
+          easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),
+          anchors:true,allowNestedScroll:true,stopInertiaOnNavigate:true
+        });
+        this.lenis.on('scroll',e=>{this.velocity=e.velocity;this.armSnap();});
+      }
+    }catch(e){this.lenis=null;console.error('[portfolio] lenis init',e);}
+  }
+  /* hero-only snap: once the wheel settles inside the hero pin, ease to the
+     nearer edge (top of page, or the moment the singularity has swallowed it) */
+  armSnap(){
+    if(this.props.snapHero===false||this.reduced||!this.lenis)return;
+    clearTimeout(this._snapT);
+    this._snapT=setTimeout(()=>{
+      const el=this.heroPinRef.current;if(!el)return;
+      const range=el.parentElement.offsetHeight-window.innerHeight;
+      const sy=this.lenis.animatedScroll||0;
+      if(sy<=4||sy>=range-4)return;
+      const p=sy/range;
+      if(p>0.12&&p<0.88)return;
+      this.lenis.scrollTo(p<0.5?0:range,{duration:0.9});
+    },170);
+  }
+  heroLines(){
+    const root=this.rootRef.current||document;
+    const spans=Array.from(root.querySelectorAll('[data-line] > span'));
+    const g=window.gsap;
+    if(!g||this.reduced){
+      spans.forEach((s,i)=>{s.style.transition='transform 1.1s cubic-bezier(.16,1,.3,1) '+(this.reduced?0:2.45+i*.09)+'s';s.style.transform='none';});
+      return;
+    }
+    const wait=Math.max(0,2.45-(performance.now()-this._t0)/1000);
+    g.to(spans,{y:'0%',duration:1.1,ease:'power4.out',stagger:.09,delay:wait});
+  }
+  /* per-character reveal: split once, then let the observer stagger them in */
+  split(){
+    const root=this.rootRef.current;if(!root)return;
+    root.querySelectorAll('[data-split]').forEach(el=>{
+      if(el.dataset.splitDone==='1')return;
+      const txt=el.textContent;el.textContent='';
+      let i=0;
+      txt.split(/(\s+)/).forEach(word=>{
+        if(/^\s+$/.test(word)){el.appendChild(document.createTextNode(' '));return;}
+        const w=document.createElement('span');
+        w.style.cssText='display:inline-block;white-space:nowrap';
+        for(const ch of word){
+          const s=document.createElement('span');
+          s.textContent=ch;
+          s.style.cssText='display:inline-block;opacity:0;transform:translateY(.5em) rotate(3deg);transition:opacity .7s cubic-bezier(.2,.8,.2,1) '+(i*0.012)+'s,transform .9s cubic-bezier(.16,1,.3,1) '+(i*0.012)+'s';
+          w.appendChild(s);i++;
+        }
+        el.appendChild(w);
+      });
+      el.dataset.splitDone='1';
+      el.dataset.reveal='chars';
+      if(this._io)this._io.observe(el);
+    });
+  }
+  reveals(){
+    const root=this.rootRef.current||document;
+    const showChars=el=>el.querySelectorAll('span span').forEach(s=>{s.style.opacity='1';s.style.transform='none';});
+    if(!window.IntersectionObserver||this.reduced){
+      root.querySelectorAll('[data-split]').forEach(showChars);return;
+    }
+    this._io=new IntersectionObserver(es=>es.forEach(e=>{
+      if(!e.isIntersecting)return;
+      showChars(e.target);this._io.unobserve(e.target);
+    }),{rootMargin:'0px 0px -12% 0px'});
+    root.querySelectorAll('[data-split]').forEach(el=>this._io.observe(el));
+  }
+  pointer(){
+    this.mx=window.innerWidth/2;this.my=window.innerHeight/2;this.cx=this.mx;this.cy=this.my;
+    this._om=e=>{
+      this.mx=e.clientX;this.my=e.clientY;
+      const c=this.cursorRef.current;if(!c)return;
+      const over=!!(e.target.closest&&e.target.closest('a,[data-magnet]'));
+      c.style.width=over?'46px':'22px';c.style.height=over?'46px':'22px';
+      c.style.margin=over?'-23px 0 0 -23px':'-11px 0 0 -11px';
+      c.style.background=over?'rgba(145,132,217,.12)':'transparent';
+    };
+    this._or=()=>{this.initStars(true);this.initHole(true);};
+    window.addEventListener('mousemove',this._om,{passive:true});
+    window.addEventListener('resize',this._or);
+  }
+  /* one frame, one eased scroll value: every zoom, pin and drift below reads
+     the same number, so nothing drifts apart under fast scrolling */
+  paint(){
+    const L=this.lenis;
+    const sy=L?(L.animatedScroll!=null?L.animatedScroll:(L.scroll||0)):(window.scrollY||0);
+    const vh=window.innerHeight||1,vw=window.innerWidth||1;
+    const v=this.velocity||0;this.velocity=v*.93;
+    const Z=this.props.zoomIntensity!=null?this.props.zoomIntensity:1;
+    const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+    this.cx+=(this.mx-this.cx)*.18;this.cy+=(this.my-this.cy)*.18;
+    const c=this.cursorRef.current;
+    if(c)c.style.transform='translate3d('+this.cx+'px,'+this.cy+'px,0)';
+
+    const doc=document.documentElement;
+    const gp=cl(sy/Math.max(1,doc.scrollHeight-vh),0,1);
+    const pr=this.progRef.current;if(pr)pr.style.transform='scaleX('+gp+')';
+    const tn=this.tintRef.current;if(tn)tn.style.opacity=(gp*0.55).toFixed(3);
+
+    // hero: scroll drives the camera into the singularity
+    const hero=this.heroPinRef.current;
+    if(hero&&hero.parentElement){
+      const range=Math.max(1,hero.parentElement.offsetHeight-vh);
+      const p=cl(sy/range,0,1);
+      const o=this.orbRef.current;
+      if(o){
+        const rx=((this.cy/vh)-.5)*-12,ry=((this.cx/vw)-.5)*16;
+        o.style.transform='perspective(1200px) rotateX('+rx+'deg) rotateY('+ry+'deg) rotate('+(p*90+v*.3)+'deg) scale('+(1+Math.pow(p,1.7)*9*Z)+')';
+        o.style.opacity=(1-cl((p-.78)/.22,0,1)).toFixed(3);
+        this.paintHole(p);
+      }
+      const hc=this.heroCoreRef.current;
+      if(hc){
+        hc.style.transform='translate3d(0,'+(-p*90)+'px,0) scale('+(1-p*.28*Z)+')';
+        hc.style.opacity=(1-cl(p/.42,0,1)).toFixed(3);
+        hc.style.filter='blur('+(p*9).toFixed(2)+'px)';
+        hc.style.pointerEvents=p>.35?'none':'auto';
+      }
+      /* the statement carries the middle of the fall, so the viewport is never
+         empty between the headline dissolving and the next section arriving */
+      const he=this.heroEndRef.current;
+      if(he){
+        const inn=cl((p-.34)/.2,0,1);
+        he.style.opacity=inn.toFixed(3);
+        he.style.transform='translate3d(0,'+((1-inn)*40).toFixed(1)+'px,0) scale('+(0.94+inn*.06+cl((p-.7)/.3,0,1)*.1).toFixed(4)+')';
+      }
+      const sh=this.scrollHintRef.current;
+      if(sh)sh.style.opacity=(1-cl(p*4,0,1)).toFixed(3);
+    }
+
+    // velocity skew + marquee
+    const sk=cl(v*.035,-4,4);this.skew+=(sk-this.skew)*.12;
+    const bd=this.bandRef.current;
+    if(bd&&!this.reduced&&this.props.velocitySkew!==false)
+      bd.style.transform='skewY('+this.skew.toFixed(3)+'deg)';
+    const m=this.marqRef.current;
+    if(m&&!this.reduced){
+      this.marqX-=(.6+Math.min(Math.abs(v)*2.2,32));
+      const half=(m.scrollWidth||0)/2;
+      if(half&&this.marqX<=-half)this.marqX+=half;
+      m.style.transform='translate3d('+this.marqX+'px,0,0)';
+    }
+
+    // work rows and text blocks recede as they pass the middle of the screen
+    if(!this._rows||this._rowsN!==(this.rootRef.current?this.rootRef.current.querySelectorAll('[data-row]').length:0)){
+      this._rows=Array.from((this.rootRef.current||document).querySelectorAll('[data-row]'));
+      this._rowsN=this._rows.length;
+    }
+    for(const el of this._rows){
+      const r=el.getBoundingClientRect();
+      if(r.bottom<-200||r.top>vh+200)continue;
+      const d=cl(((r.top+r.height/2)-vh/2)/vh,-1,1);
+      const a=Math.abs(d);
+      el.style.transform='translate3d(0,0,'+(-a*160*Z).toFixed(1)+'px) scale('+(1-a*.09*Z).toFixed(4)+')';
+      el.style.opacity=(1-a*.72).toFixed(3);
+      el.style.filter='blur('+(a*a*3.2).toFixed(2)+'px)';
+    }
+
+    // horizontal rail
+    const rail=this.railRef.current;
+    if(rail&&rail.parentElement&&rail.parentElement.parentElement){
+      const sec=rail.parentElement.parentElement;
+      const top=sec.offsetTop,range=Math.max(1,sec.offsetHeight-vh);
+      const p=cl((sy-top)/range,0,1);
+      const dist=Math.max(0,rail.scrollWidth-vw+112);
+      rail.style.transform='translate3d('+(-p*dist).toFixed(1)+'px,0,0)';
+    }
+
+    // rig: a card that grows into the full bleed
+    const rp=this.rigPanelRef.current;
+    if(rp&&rp.parentElement&&rp.parentElement.parentElement){
+      const sec=rp.parentElement.parentElement;
+      const range=Math.max(1,sec.offsetHeight-vh);
+      const p=cl((sy-sec.offsetTop)/range,0,1);
+      const e=p<.5?(p/.5):1;
+      const out=cl((p-.82)/.18,0,1);
+      const s=(.46+.54*e)*(1-out*.06);
+      rp.style.transform='scale('+s.toFixed(4)+')';
+      rp.style.borderRadius=((1-e)*18).toFixed(1)+'px';
+      const f=this.rigFieldRef.current;
+      if(f)f.style.transform='rotate('+(p*22).toFixed(2)+'deg) scale('+(1.1+p*.25)+')';
+      const mt=this.rigMetaRef.current;
+      if(mt){mt.style.opacity=cl((e-.55)/.35,0,1).toFixed(3);mt.style.transform='translate3d(0,'+((1-cl((e-.55)/.35,0,1))*22).toFixed(1)+'px,0)';}
+    }
+
+    // contact settles out of a zoom as the page ends
+    const ct=this.contactRef.current;
+    if(ct){
+      const r=ct.getBoundingClientRect();
+      const p=cl(1-(r.top/vh),0,1);
+      ct.style.transform='scale('+(1.16-0.16*p).toFixed(4)+')';
+    }
+
+    this.paintStars(sy,gp);
+  }
+  clock(){
+    const tick=()=>{const el=this.clockRef.current;if(!el)return;
+      el.textContent=new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' IST';};
+    tick();this._ci=setInterval(tick,1000);
+  }
+  loader(){
+    const t0=performance.now(),dur=2000;
+    const step=()=>{const p=Math.min(1,(performance.now()-t0)/dur),e=1-Math.pow(1-p,3);
+      if(this.countRef.current)this.countRef.current.textContent=String(Math.round(e*100)).padStart(3,'0');
+      if(this.barRef.current)this.barRef.current.style.right=(100-e*100)+'%';
+      if(p<1)requestAnimationFrame(step);
+      else setTimeout(()=>{const l=this.loaderRef.current;if(l)l.style.display='none';},1200);
+    };requestAnimationFrame(step);
+  }
+  initStars(resize){
+    const cv=this.starRef.current;if(!cv)return;
+    const dpr=Math.min(2,window.devicePixelRatio||1);
+    const w=cv.clientWidth||window.innerWidth,h=cv.clientHeight||window.innerHeight;
+    cv.width=w*dpr;cv.height=h*dpr;
+    const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+    this._ctx=ctx;this._w=w;this._h=h;
+    if(!this._pts||resize)this._pts=Array.from({length:430},()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random(),r:Math.random()*1.5+.2}));
+    const g=ctx.createRadialGradient(w*.5,h*.45,0,w*.5,h*.45,Math.max(w,h)*.8);
+    g.addColorStop(0,'#0c1010');g.addColorStop(.55,'#05070a');g.addColorStop(1,'#000000');
+    this._bg=g;
+  }
+  paintStars(sy,gp){
+    const ctx=this._ctx;if(!ctx||this.props.starfield===false)return;
+    const w=this._w,h=this._h;
+    ctx.fillStyle=this._bg;ctx.fillRect(0,0,w,h);
+    const smear=Math.min(3.2,Math.abs(this.velocity||0)*.06);
+    for(const p of this._pts){
+      const y=(p.y-sy*p.z*.28)%h,yy=y<0?y+h:y;
+      ctx.globalAlpha=.22+p.z*.68;
+      ctx.fillStyle=p.z>.92?'#39ff9c':(p.z>.55?'#8ba394':'#e6f2e9');
+      const r=p.r*(.5+p.z)*(1+gp*.4);
+      ctx.beginPath();
+      if(smear>.4)ctx.ellipse(p.x,yy,r,r*(1+smear*p.z),0,0,6.283);
+      else ctx.arc(p.x,yy,r,0,6.283);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+  /* the hero singularity: falling code glyphs spiral into a black event
+     horizon on a dedicated canvas, tilted by the same perspective wrapper
+     the old orb used, so mouse parallax and scroll zoom carry over untouched */
+  initHole(resize){
+    const cv=this.holeRef.current;if(!cv)return;
+    const dpr=Math.min(2,window.devicePixelRatio||1);
+    const w=cv.clientWidth||400,h=cv.clientHeight||400;
+    cv.width=w*dpr;cv.height=h*dpr;
+    const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+    this._hctx=ctx;this._hw=w;this._hh=h;
+    if(!this._streams||resize){
+      const N=64;
+      this._streams=Array.from({length:N},(_,i)=>({
+        ang:(i/N)*6.283+ (Math.random()-.5)*.05,
+        str:this._randStream(),
+        off:Math.random()*200,
+        spd:.55+Math.random()*.5
+      }));
+      this._holeT=0;
+    }
+  }
+  _randStream(){
+    const src='if(x){}else return; const let=fn=>node.next.push(a,b)===true?await Promise.all():null|for<T>[i]=arr.map(v=>v.id)&&git commit -m"fix" 0x1A9F while(!done){yield* gen();}';
+    let out='';for(let i=0;i<140;i++)out+=src[Math.floor(Math.random()*src.length)];
+    return out;
+  }
+  paintHole(p){
+    const ctx=this._hctx;if(!ctx||!this._streams)return;
+    const w=this._hw,h=this._hh,cx=w/2,cy=h/2;
+    const maxR=Math.min(w,h)*.5;
+    ctx.clearRect(0,0,w,h);
+    const horizon=maxR*(.14+p*.6);
+    const outerR=maxR*1.06;
+    const fallBoost=1+p*2.4;
+    const fontSize=Math.max(5.5,maxR*.02);
+    ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.font='500 '+fontSize+'px "JetBrains Mono",ui-monospace,monospace';
+    this._holeT+=.6*fallBoost;
+    ctx.save();
+    ctx.beginPath();ctx.ellipse(cx,cy,outerR,outerR*.68,0,0,6.283);ctx.clip();
+    ctx.globalCompositeOperation='lighter';
+    const steps=90;
+    for(const s of this._streams){
+      const flow=this._holeT*s.spd+s.off;
+      for(let i=0;i<steps;i++){
+        const t=i/(steps-1);
+        const rad=t*t*(outerR-horizon)+horizon;
+        const density=.55+ (1-t)*.9;
+        const idx=Math.floor((flow*.18+i*density))%s.str.length;
+        const ch=s.str[idx<0?idx+s.str.length:idx];
+        const swirl=(1-t)*1.6*(1+p*.6);
+        const ang=s.ang+swirl;
+        const x=cx+Math.cos(ang)*rad,y=cy+Math.sin(ang)*rad*.68;
+        const near=1-t;
+        const alpha=Math.min(1,.06+near*near*.85);
+        let col;
+        if(t<.14){
+          const hh=1-t/.14;
+          col='rgba('+Math.round(120+130*hh)+','+Math.round(160+95*hh)+','+Math.round(120+90*hh)+','+alpha.toFixed(2)+')';
+        }else col='rgba(90,255,170,'+alpha.toFixed(2)+')';
+        ctx.fillStyle=col;
+        ctx.save();
+        ctx.translate(x,y);ctx.rotate(ang+1.5708);
+        ctx.fillText(ch,0,0);
+        ctx.restore();
+      }
+    }
+    ctx.globalCompositeOperation='source-over';
+    ctx.restore();
+    const hg=ctx.createRadialGradient(cx,cy,horizon*.68,cx,cy,horizon*1.3);
+    hg.addColorStop(0,'rgba(0,0,0,1)');hg.addColorStop(.7,'rgba(0,0,0,1)');
+    hg.addColorStop(.85,'rgba(20,26,18,.85)');hg.addColorStop(1,'rgba(57,255,156,0)');
+    ctx.save();
+    ctx.beginPath();ctx.ellipse(cx,cy,horizon*1.3,horizon*1.3*.68,0,0,6.283);ctx.clip();
+    ctx.fillStyle=hg;ctx.fillRect(0,0,w,h);
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();ctx.ellipse(cx,cy,horizon,horizon*.68,0,0,6.283);
+    ctx.lineWidth=Math.max(1,horizon*.05);
+    const rg=ctx.createLinearGradient(cx-horizon,cy,cx+horizon,cy);
+    rg.addColorStop(0,'rgba(255,214,166,.2)');rg.addColorStop(.5,'rgba(255,236,214,.95)');rg.addColorStop(1,'rgba(90,255,170,.4)');
+    ctx.strokeStyle=rg;ctx.stroke();
+    ctx.restore();
+  }
+  renderVals(){
+    return {
+      heroEndRef:this.heroEndRef,
+      rootRef:this.rootRef,starRef:this.starRef,tintRef:this.tintRef,cursorRef:this.cursorRef,progRef:this.progRef,
+      loaderRef:this.loaderRef,countRef:this.countRef,barRef:this.barRef,clockRef:this.clockRef,
+      marqRef:this.marqRef,bandRef:this.bandRef,heroPinRef:this.heroPinRef,heroCoreRef:this.heroCoreRef,
+      orbRef:this.orbRef,holeRef:this.holeRef,scrollHintRef:this.scrollHintRef,railRef:this.railRef,
+      rigPanelRef:this.rigPanelRef,rigFieldRef:this.rigFieldRef,rigMetaRef:this.rigMetaRef,contactRef:this.contactRef,
+      projects:[
+        {num:'01',name:'Rig',desc:'Runtime and review loop for coding agents',stack:'Python · TS · AWS',year:'2025'},
+        {num:'02',name:'Nova Genesis Orbital Guard',desc:'Satellite tracking and conjunction alerts',stack:'Python · TLE · Three.js',year:'2025'},
+        {num:'03',name:'Racing-line Optimizer',desc:'Minimum-lap-time solver for Formula Manipal Driverless',stack:'Python · NumPy · ROS',year:'2024'},
+        {num:'04',name:'PR Review Agent',desc:'Diff-aware reviewer that argues with itself first',stack:'LLM · GitHub API',year:'2024'}
+      ],
+      rail:[
+        {k:'Method 01',t:'Start at the assumption',d:'Most agent failures are specification failures. I write the assumption down first, then build the smallest thing that can falsify it.'},
+        {k:'Method 02',t:'Make the work replayable',d:'Every step an agent takes is recorded with the context that produced it, so a reviewer reads intent instead of reconstructing it from a diff.'},
+        {k:'Method 03',t:'Sandbox before you trust',d:'Execution is isolated by default. Nothing an agent runs can reach production until a human has seen the trace it produced.'},
+        {k:'Method 04',t:'Ship, then measure',d:'Systems earn their complexity. If a layer cannot show what it caught last week, it comes back out.'}
+      ],
+      rigPoints:[
+        {i:'01',t:'Sandboxed execution layer with replayable step traces.'},
+        {i:'02',t:'Repo-aware context builder — retrieval scoped to the change, not the codebase.'},
+        {i:'03',t:'Self-review pass that flags the diff the agent is least confident about.'}
+      ],
+      tags:['Agents','LLM infra','Autonomous driving','Orbital mechanics','Python','TypeScript','AWS'],
+      certs:[
+        {n:'Machine Learning Specialization',o:'DeepLearning.AI'},
+        {n:'Google Data Analytics',o:'Google'},
+        {n:'Cloud Practitioner',o:'AWS'},
+        {n:'Driverless recruit',o:'Formula Manipal'},
+        {n:'Head Delegate',o:'MUN circuit'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

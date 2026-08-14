@@ -28,8 +28,7 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p _site
-          cp "Personal portfolio website mockups/Vaibhav Portfolio.dc.html" _site/index.html
-          cp "Personal portfolio website mockups/support.js" _site/support.js
+          cp site/index.html site/support.js site/nocturne.css _site/
           touch _site/.nojekyll
 
       - name: Setup Pages
