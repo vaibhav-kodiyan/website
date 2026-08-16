@@ -61,7 +61,7 @@ a:hover{color:var(--color-accent-400)}
   <a href="#contact" style="display:flex;align-items:center;gap:10px;padding:9px 18px;border:1px solid var(--color-accent-700);border-radius:100px;font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-text);white-space:nowrap;flex:none;transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)" style-hover="border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-sm)"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)"></span>Open to work</a>
 </header>
 
-<section data-screen-label="Hero" style="position:relative;z-index:2;height:200vh">
+<section data-screen-label="Hero" style="position:relative;z-index:2;height:320vh">
   <div ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
 
     <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:115vmax;height:115vmax;transform:translate(-50%,-50%);pointer-events:none;will-change:transform,opacity">
@@ -223,6 +223,13 @@ class Component extends DCLogic {
     this.reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     this.velocity=0;this.marqX=0;this.skew=0;this._t0=performance.now();
     const run=(n,f)=>{try{f();}catch(e){console.error('[portfolio] '+n,e);}};
+    run('heroHeight',()=>{
+      // The hero owns two stages: the collapse (first 100vh of scroll) and the zoom-through
+      // that follows it. Reduced motion skips the second one, so hand that scroll back
+      // rather than leaving 120vh of nothing under the pin.
+      const pin=this.heroPinRef.current;
+      if(this.reduced&&pin&&pin.parentElement)pin.parentElement.style.height='200vh';
+    });
     run('stars',()=>this.initStars());
     run('hole',()=>this.initHole());
     run('loader',()=>this.loader());
@@ -327,10 +334,13 @@ class Component extends DCLogic {
       const range=el.parentElement.offsetHeight-window.innerHeight;
       const sy=this.lenis.animatedScroll||0;
       if(sy<=4||sy>=range-4)return;
-      const p=sy/range;
-      if(p>0.12&&p<0.88)return;
+      // Measured against each stage, not the whole pin: the head window stays as tight as
+      // it was before the zoom existed, and the tail only grabs a stalled zoom near the end.
+      const head=(this._collapseRange||range)*.12;
+      const tail=range-(this._zoomRange||range)*.12;
+      if(sy>head&&sy<tail)return;
       this._snapping=true;
-      this.lenis.scrollTo(p<0.5?0:range,{
+      this.lenis.scrollTo(sy<=head?0:range,{
         lerp:this.scrollLerp(),
         userData:{initiator:'snap'},
         onComplete:()=>{this._snapping=false;}
@@ -405,6 +415,11 @@ class Component extends DCLogic {
     this._sh=document.documentElement.scrollHeight||1;
     const hero=this.heroPinRef.current;
     this._heroRange=hero&&hero.parentElement?Math.max(1,hero.parentElement.offsetHeight-vh):1;
+    // Stage one collapses the orb over one screen; whatever is left of the pin is the
+    // zoom-through. Deriving both from the measured height means the reduced-motion
+    // hero (which has no leftover) simply reports a zoom range of zero.
+    this._collapseRange=Math.min(this._heroRange,vh);
+    this._zoomRange=Math.max(0,this._heroRange-this._collapseRange);
     const rail=this.railRef.current;
     if(rail&&rail.parentElement&&rail.parentElement.parentElement){
       const sec=rail.parentElement.parentElement;
@@ -435,8 +450,11 @@ class Component extends DCLogic {
     const moving=Math.abs(sy-(this._lsy||0))>0.15||Math.abs(v)>0.04||Math.abs(this.mx-this.cx)>0.4||Math.abs(this.my-this.cy)>0.4;
     if(this._dirtyLayout||!this._vh)this.measure();
     const heroLive=sy<(this._heroRange||window.innerHeight)*1.05;
-    const pRaw=cl(sy/(this._heroRange||1),0,1);
+    const pRaw=cl(sy/(this._collapseRange||this._heroRange||1),0,1);
     const pEase=1-Math.pow(1-pRaw,1.35);
+    // Zoom-through progress, taken straight off Lenis' interpolated scroll. No second
+    // smoothing pass here: at 15x the lag of an extra lerp is very visible as rubber-banding.
+    const z=this._zoomRange?cl((sy-this._collapseRange)/this._zoomRange,0,1):0;
     // The collapse eases behind the scroll, so it can still be mid-flight after the
     // scroll has already left the hero. Staying awake until it lands is what keeps a
     // fast flick from stranding the orb halfway open.
@@ -489,8 +507,18 @@ class Component extends DCLogic {
     const he=this.heroEndRef.current;
     if(he){
       const inn=cl((p-.34)/.2,0,1);
-      he.style.opacity=inn.toFixed(3);
-      he.style.transform='translate3d(0,'+((1-inn)*40+v*.28).toFixed(1)+'px,0) scale('+(0.94+inn*.06+cl((p-.7)/.3,0,1)*.1).toFixed(4)+')';
+      // Settles at ~1.05 by the end of the collapse, then the zoom takes it the rest of the way.
+      const base=0.94+inn*.06+cl((p-.62)/.38,0,1)*.05;
+      // Exponential, so the growth reads at a constant rate the whole way in — linear scale
+      // feels like the camera is braking. The slight ease-in keeps the handoff from the
+      // collapse seamless instead of snapping into motion at z=0.
+      const ze=z*(.34+.66*z);
+      const zs=Math.pow(1+14*Z,ze);
+      // Gone before the camera reaches the gap between the two lines, which is what you'd
+      // otherwise be staring into for the last stretch.
+      const gone=cl((z-.6)/.34,0,1);
+      he.style.opacity=(inn*(1-gone)).toFixed(3);
+      he.style.transform='translate3d(0,'+((1-inn)*40+v*.28*(1-z)).toFixed(1)+'px,0) scale('+(base*zs).toFixed(4)+')';
     }
     const sh=this.scrollHintRef.current;
     if(sh)sh.style.opacity=(1-cl(p*4,0,1)).toFixed(3);
@@ -551,7 +579,10 @@ class Component extends DCLogic {
       }
     }
 
-    this.paintStars(sy,gp,v);
+    // Peaks just before the text clears, then eases back to nothing so the field is at rest
+    // by the time the pin releases — and stays that way for the rest of the page, where z is
+    // pinned at 1.
+    this.paintStars(sy,gp,v,cl(z/.5,0,1)*(1-cl((z-.82)/.18,0,1)));
   }
   clock(){
     const tick=()=>{const el=this.clockRef.current;if(!el)return;
@@ -573,26 +604,41 @@ class Component extends DCLogic {
     const w=cv.clientWidth||window.innerWidth,h=cv.clientHeight||window.innerHeight;
     cv.width=w*dpr;cv.height=h*dpr;
     const ctx=cv.getContext('2d',{alpha:false});ctx.setTransform(dpr,0,0,dpr,0,0);
-    this._ctx=ctx;this._w=w;this._h=h;
+    this._ctx=ctx;this._w=w;this._h=h;this._sdpr=dpr;
     const n=this.reduced?40:130;
     if(!this._pts||resize)this._pts=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random(),r:Math.random()*1.4+.2}));
     const g=ctx.createRadialGradient(w*.5,h*.45,0,w*.5,h*.45,Math.max(w,h)*.8);
     g.addColorStop(0,'#141110');g.addColorStop(.55,'#0c0b0a');g.addColorStop(1,'#000000');
     this._bg=g;
   }
-  paintStars(sy,gp,v){
+  paintStars(sy,gp,v,warp){
     const ctx=this._ctx;if(!ctx||this.props.starfield===false)return;
-    const w=this._w,h=this._h;
+    const w=this._w,h=this._h,dpr=this._sdpr||1;
     ctx.fillStyle=this._bg;ctx.fillRect(0,0,w,h);
     const stretch=1+Math.min(Math.abs(v||0)*0.07,2.8);
     const kick=(v||0)*0.95;
+    const wp=warp||0,cx=w/2,cy=h/2;
     for(const p of this._pts){
       const y=(p.y-sy*p.z*.22-kick*p.z)%h,yy=y<0?y+h:y;
       ctx.globalAlpha=.2+p.z*.7;
       ctx.fillStyle=p.z>.92?'#c99a3c':(p.z>.55?'#8f8672':'#ece6d9');
       const r=p.r*(.5+p.z)*(1+gp*.35);
+      if(wp>.004){
+        // Flying in. Speed shows mostly as a trail rather than displacement — a small push
+        // keeps the field from emptying out, and a shrinking trail on the way back down
+        // reads as slowing rather than as reversing.
+        const push=wp*wp*(.08+p.z*.38);
+        const x1=cx+(p.x-cx)*(1+push),y1=cy+(yy-cy)*(1+push);
+        if(x1<-60||x1>w+60||y1<-60||y1>h+60)continue;
+        const a=Math.atan2(y1-cy,x1-cx),len=wp*wp*(8+p.z*76);
+        ctx.setTransform(dpr,0,0,dpr,(x1-Math.cos(a)*len)*dpr,(y1-Math.sin(a)*len)*dpr);
+        ctx.rotate(a);
+        ctx.fillRect(-r,-r,len+r*2,r*2);
+        continue;
+      }
       ctx.fillRect(p.x-r,yy-r*stretch,r*2,r*2*stretch);
     }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
     ctx.globalAlpha=1;
   }
   initHole(resize){
