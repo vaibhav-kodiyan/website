@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>07 · Stack build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0b0a;--divider:#2c261d;--text:#ece6d9;--n300:#a39a87;--n500:#5f584a;--n700:#342d21;
+  --accent:#9c1f22;--accent300:#b8342f;
+  --font:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+/* Vanishing point parked up-left of the cards, so the stack recedes toward it on its own —
+   the diagonal offset is real perspective rather than a translate pretending to be one. */
+#stage{position:fixed;inset:0;overflow:hidden;perspective:1400px;perspective-origin:24% 22%;
+  background:radial-gradient(ellipse 66% 48% at 56% 46%,#150e0c,#0a0908 72%)}
+#warp{position:absolute;inset:0;z-index:0}
+#deck{position:absolute;inset:0;transform-style:preserve-3d;z-index:1}
+/* Cards, not full bleed. The inset is what lets the cards already read sit behind the
+   current one — the whole point of a stack is that the earlier points stay on screen. */
+.pnl{position:absolute;left:15vw;top:11vh;width:71vw;height:75vh;border-radius:4px;overflow:hidden;
+  border:1px solid rgba(236,230,217,.14);box-shadow:0 44px 96px rgba(0,0,0,.66),inset 0 1px 0 rgba(236,230,217,.09)}
+/* Translucent on purpose. The card behind ghosts through the one in front, which is what
+   makes the stack read as one continuous argument instead of four unrelated slides. */
+.face{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;
+  padding:clamp(26px,4.4vh,52px) clamp(24px,3.4vw,52px) clamp(30px,5vh,58px)}
+.hd{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.num{font:300 clamp(52px,6.6vw,104px)/0.78 var(--font);letter-spacing:-.06em;color:var(--accent300)}
+.k{font:400 11px/1 var(--font);letter-spacing:.22em;text-transform:uppercase;color:var(--n300);padding-top:6px}
+.copy{display:flex;flex-direction:column;gap:clamp(13px,1.9vh,24px);max-width:760px}
+h1{margin:0;font:300 clamp(30px,4.6vw,74px)/1.0 var(--font);letter-spacing:-.045em;text-wrap:balance}
+.rule{height:1px;width:min(100%,280px);background:linear-gradient(90deg,var(--accent),transparent)}
+p{margin:0;max-width:52ch;font:300 clamp(13px,1.05vw,16px)/1.6 var(--font);color:var(--n300);text-wrap:pretty}
+.sh{position:absolute;inset:0;background:#070605;opacity:0;pointer-events:none}
+#hud{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;gap:clamp(12px,2vw,24px);padding:16px clamp(16px,3vw,28px);font:400 10px/1 var(--font);letter-spacing:.16em;text-transform:uppercase;color:var(--n500);background:linear-gradient(#0c0b0a00,#0c0b0aee)}
+#hud b{color:var(--text);font-weight:500}
+#track{position:relative;flex:1;height:2px;background:var(--n700);cursor:ew-resize;touch-action:none}
+#fill{position:absolute;inset:0;background:var(--accent300);transform-origin:0 50%}
+#pos{min-width:130px;color:var(--n300)}
+#keys{opacity:.66}
+a{color:var(--n500);text-decoration:none;position:fixed;top:0;left:0;z-index:50;padding:16px 20px;font:400 10px/1 var(--font);letter-spacing:.16em;text-transform:uppercase}
+a:hover{color:var(--accent300)}
+@media (max-width:760px){
+  .pnl{left:7vw;top:12vh;width:86vw;height:70vh}
+  #keys{display:none}#pos{min-width:0}
+}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="warp"></canvas><div id="deck"></div></div>
+<a href="./index.html">← all</a>
+<div id="hud">
+  <span><b>07</b> Stack build</span>
+  <div id="track"><span id="fill"></span></div>
+  <span id="pos"></span>
+  <span id="keys">scroll / drag · ← → step · space play</span>
+</div>
+<script>
+const DATA=[
+ {n:'01',k:'Specification',g:'20% 26%',t:'Start at the assumption',d:'Most agent failures are specification failures. I write the assumption down first, then build the smallest thing that can falsify it.'},
+ {n:'02',k:'Traceability',g:'78% 24%',t:'Make the work replayable',d:'Every step an agent takes is recorded with the context that produced it, so a reviewer reads intent instead of reconstructing it from a diff.'},
+ {n:'03',k:'Isolation',g:'26% 74%',t:'Sandbox before you trust',d:'Execution is isolated by default. Nothing an agent runs can reach production until a human has seen the trace it produced.'},
+ {n:'04',k:'Evidence',g:'74% 70%',t:'Ship, then measure',d:'Systems earn their complexity. If a layer cannot show what it caught last week, it comes back out.'}
+];
+// Alpha, not a solid fill. The stack only means anything if you can see through it.
+const bg=r=>'radial-gradient(ellipse 92% 74% at '+r.g+',rgba(44,19,16,.9),transparent 62%),linear-gradient(160deg,rgba(31,27,20,.91),rgba(15,13,11,.94))';
+const faceHTML=r=>'<div class="face"><div class="hd"><span class="num">'+r.n+'</span><span class="k">'+r.k+'</span></div><div class="copy"><h1>'+r.t+'</h1><span class="rule"></span><p>'+r.d+'</p></div></div><span class="sh"></span>';
+
+const deck=document.getElementById('deck');
+const panels=DATA.map(r=>{
+  const el=document.createElement('div');el.className='pnl';
+  el.style.background=bg(r);el.innerHTML=faceHTML(r);deck.appendChild(el);
+  el.sh=el.querySelector('.sh');return el;
+});
+const ease=x=>x*x*(3-2*x);
+const clamp01=x=>Math.max(0,Math.min(1,x));
+
+// A nudge on top of what perspective already does, and the throw-in distance. Both scale with
+// the viewport so the stack still reads on a phone.
+let OFFX=58,OFFY=26,INX=190,INY=380;
+function sizes(){
+  OFFX=Math.min(84,innerWidth*.056);OFFY=Math.min(42,innerHeight*.043);
+  INX=Math.min(200,innerWidth*.14);INY=Math.min(400,innerHeight*.42);
+}
+sizes();addEventListener('resize',sizes);
+
+function render(f){
+  for(let i=0;i<panels.length;i++){
+    const p=panels[i],k=f-i;                      // 0 = the card being read, >0 = already read
+    if(k>3.4||k<-1.05){p.style.visibility='hidden';continue;}
+    p.style.visibility='visible';
+    if(k>=0){
+      // Settled into the stack: one fixed slice of depth per step. Nothing is removed — every
+      // point already made stays on screen, which is the whole argument for a stack.
+      p.style.transform='translate3d('+(-k*OFFX).toFixed(1)+'px,'+(-k*OFFY).toFixed(1)+'px,'+(-k*300).toFixed(1)+'px) rotateY('+(-k*3.2).toFixed(2)+'deg)';
+      p.style.opacity=(1-clamp01((k-2.5)/.9)).toFixed(3);
+      // Far enough down that an old headline ghosting through the current card stays a
+      // texture rather than a second headline competing for the same eye.
+      p.sh.style.opacity=Math.min(.8,k*.55).toFixed(3);
+    }else{
+      // Dealt in from the lower right and nearer the camera than the deck, so it arrives
+      // oversized and tilted, then settles onto the exact slot the last card just vacated.
+      const a=ease(clamp01(k+1)),u=1-a;
+      p.style.transform='translate3d('+(u*INX).toFixed(1)+'px,'+(u*INY).toFixed(1)+'px,'+(u*300).toFixed(1)+'px) rotateY('+(-u*9).toFixed(2)+'deg) rotateX('+(u*10).toFixed(2)+'deg)';
+      p.style.opacity=clamp01(a*3).toFixed(3);
+      p.sh.style.opacity=(u*.3).toFixed(3);
+    }
+  }
+}
+
+/* Same warp field as the portal dive — it only stretches while the scroll is actually
+   moving, so the arrival has speed behind it and a parked stack is still. */
+const cv=document.getElementById('warp'),cx=cv.getContext('2d');
+let stars=[],DW=0,DH=0,dpr=Math.min(2,devicePixelRatio||1);
+function seed(){
+  DW=innerWidth;DH=innerHeight;cv.width=DW*dpr;cv.height=DH*dpr;
+  cv.style.width=DW+'px';cv.style.height=DH+'px';cx.setTransform(dpr,0,0,dpr,0,0);
+  stars=[];for(let i=0;i<130;i++)stars.push({a:Math.random()*Math.PI*2,r:20+Math.random()*Math.max(DW,DH)*.75,b:.12+Math.random()*.5});
+}
+seed();addEventListener('resize',seed);
+function warp(speed){
+  cx.clearRect(0,0,DW,DH);
+  const cxx=DW*.52,cyy=DH*.46,len=Math.min(180,speed*2100);
+  for(const s of stars){
+    s.r+=speed*220;if(s.r>Math.max(DW,DH)*.85)s.r=20+Math.random()*60;
+    const ca=Math.cos(s.a),sa=Math.sin(s.a);
+    const x=cxx+ca*s.r,y=cyy+sa*s.r;
+    if(len<1.2){cx.fillStyle='rgba(236,230,217,'+(s.b*.45).toFixed(3)+')';cx.fillRect(x,y,1.3,1.3);continue;}
+    cx.strokeStyle='rgba(236,230,217,'+(s.b*Math.min(1,len/90)).toFixed(3)+')';
+    cx.lineWidth=1.1;cx.beginPath();cx.moveTo(x,y);cx.lineTo(x-ca*len,y-sa*len);cx.stroke();
+  }
+}
+
+/* ---- shared demo harness ---- */
+const N=DATA.length;let f=0,tgt=0,auto=false,last=0,prevF=0;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+addEventListener('wheel',e=>{e.preventDefault();auto=false;tgt=clamp(tgt+e.deltaY*.0024,0,N-1);},{passive:false});
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){auto=false;tgt=clamp(Math.round(tgt)+1,0,N-1);}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){auto=false;tgt=clamp(Math.round(tgt)-1,0,N-1);}
+  else if(e.key===' '){e.preventDefault();auto=!auto;}
+});
+const track=document.getElementById('track'),fill=document.getElementById('fill'),pos=document.getElementById('pos');
+let dragging=false;
+const scrub=e=>{const r=track.getBoundingClientRect();tgt=clamp((e.clientX-r.left)/r.width*(N-1),0,N-1);};
+track.addEventListener('pointerdown',e=>{dragging=true;auto=false;track.setPointerCapture(e.pointerId);scrub(e);});
+track.addEventListener('pointermove',e=>{if(dragging)scrub(e);});
+addEventListener('pointerup',()=>{dragging=false;});
+function loop(now){
+  const dt=clamp((now-(last||now))/16.667,0,3);last=now;
+  if(auto){tgt+=.0075*dt;if(tgt>N-1)tgt=0;}
+  f+=(tgt-f)*(1-Math.pow(1-.11,dt));
+  render(f);
+  warp(Math.abs(f-prevF)/Math.max(dt,.001));prevF=f;
+  fill.style.transform='scaleX('+(f/(N-1)).toFixed(4)+')';
+  const b=clamp(Math.floor(f),0,N-2);
+  pos.textContent=(b+1)+' → '+(b+2)+' · t '+clamp(f-b,0,1).toFixed(2);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

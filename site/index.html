@@ -7,7 +7,7 @@
 </head>
 <body>
 <x-dc>
-<helmet data-dc-atomics><link rel="stylesheet" href="./nocturne.css"><link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css"><script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
+<helmet data-dc-atomics><link rel="stylesheet" href="./nocturne.css"><link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css"><script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js" integrity="sha384-jqpi9VmOdhyLoLURgjCn7EpnG9BbnHW57ibIZoeaIU+erWDH3k8fQQg0xH2ySjnw" crossorigin="anonymous"></script><script src="https://unpkg.com/lenis@1.3.26/dist/lenis-snap.min.js" integrity="sha384-oq0TWGBcl0kQ4r07ikUsxvFYrNOoNpeM/mZPXt5FVZJuDS/l0bjZRlBqgKM3fEcg" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
 :root{
   --color-bg:#0c0b0a;--color-surface:#17140f;--color-hover:#1f1a14;--color-divider:#2c261d;
   --color-text:#ece6d9;--color-neutral-100:#ece6d9;--color-neutral-200:#d9d0bd;--color-neutral-300:#a39a87;
@@ -43,8 +43,14 @@ a:hover{color:var(--color-accent-400)}
   .wk-row>*:nth-child(2),.wk-row>*:nth-child(3),.wk-row>*:nth-child(4){grid-column:2!important;justify-self:start!important}
   .wk-row>*:nth-child(5){display:none!important}
   .two{grid-template-columns:1fr!important;gap:44px!important}
-  .rail-card{width:min(82vw,430px)!important;height:auto!important;min-height:58vh!important}
-  .rail-card h3{font-size:clamp(24px,6.4vw,40px)!important}
+  /* The panel drops to one column: the numeral stops being a column of its own and sits
+     behind the copy, which is the only way the headline keeps a readable measure. */
+  .mth-in{display:block!important;padding:clamp(96px,15vh,140px) 20px clamp(40px,7vh,72px)!important}
+  .mth-in>div{max-width:none!important;height:100%;justify-content:center}
+  /* Bottom-right on a phone: it fills the space the shortened copy leaves and keeps clear
+     of the meter, which occupies the corner it would otherwise take. */
+  .mth-num{position:absolute!important;right:16px!important;top:auto!important;bottom:clamp(24px,6vh,64px)!important;font-size:clamp(92px,28vw,160px)!important;opacity:.55}
+  .rail-meter>span{width:20px!important}
   .wrap{flex-wrap:wrap!important;gap:20px!important}
   .hdr-nav{gap:16px!important;font-size:10px!important}
   .hdr-cta{padding:8px 12px!important;font-size:10px!important;letter-spacing:.08em!important}
@@ -139,19 +145,44 @@ a:hover{color:var(--color-accent-400)}
   </div>
 </section>
 
-<section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:250vh">
-  <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;perspective:1250px;perspective-origin:50% 50%">
-    <div class="pg" style="display:flex;justify-content:space-between;padding:0 56px var(--space-8);font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>03 — How I work</span><span>Scroll →</span></div>
-    <div class="pg" ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform;transform-style:preserve-3d">
-      <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
-        <div class="rail-card" style="flex:none;width:min(46vw,560px);height:56vh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8);border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-sm);transform-style:preserve-3d;backface-visibility:hidden;will-change:transform,opacity">
-          <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-accent-300)">{{ r.k }}</span>
-          <div style="display:flex;flex-direction:column;gap:var(--space-6)">
-            <h3 style="margin:0;font:400 clamp(30px,4vw,54px)/1.02 var(--font-heading);letter-spacing:-.035em">{{ r.t }}</h3>
-            <p style="margin:0;max-width:400px;font:300 16px/1.55 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty">{{ r.d }}</p>
+<!-- Four full-screen panels on one pinned stage, one viewport of scroll each, locked by
+     lenis/snap's slideshow preset so a gesture lands on a panel and never between two.
+     Each hand-off is a different move, and the move is the method it introduces: the
+     replay panel is scrubbed in under a playhead, the sandbox panel is sealed into a box
+     and released out of it, and the measure panel comes up under a rule once the previous
+     one has shipped. A shared transition would say all four disciplines are the same. -->
+<section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:400vh">
+  <div ref="{{ railRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden">
+    <!-- The stage floor. Both hand-offs that open a gap between panels — the sandbox box and
+         the measuring rule — would otherwise expose the page behind them, and the section
+         would read as a hole rather than as a room the panels are shown in. -->
+    <span aria-hidden="true" style="position:absolute;inset:0;z-index:1;background:linear-gradient(168deg,rgba(16,14,11,.93),rgba(10,9,8,.96))"></span>
+    <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
+      <article class="mth" style="position:absolute;inset:0;visibility:hidden;background:radial-gradient(ellipse 92% 74% at {{ r.g }},var(--color-accent-900),transparent 64%),linear-gradient(168deg,rgba(23,20,15,.95),rgba(11,10,9,.97));will-change:clip-path,opacity">
+        <div class="mth-in" style="position:absolute;inset:0;display:flex;align-items:center;gap:clamp(20px,5vw,88px);justify-content:space-between;padding:clamp(96px,14vh,150px) 56px clamp(56px,9vh,92px);will-change:transform">
+          <div style="flex:1 1 auto;min-width:0;max-width:760px;display:flex;flex-direction:column;gap:clamp(16px,2.2vh,28px)">
+            <span style="font:400 11px/1 var(--font-body);letter-spacing:.22em;text-transform:uppercase;color:var(--color-accent-300)">{{ r.k }}</span>
+            <h3 style="margin:0;font:300 clamp(40px,7.2vw,126px)/0.94 var(--font-heading);letter-spacing:-.05em;color:var(--color-neutral-100);text-wrap:balance">{{ r.t }}</h3>
+            <span style="height:1px;width:min(100%,300px);background:linear-gradient(90deg,var(--color-accent),transparent)"></span>
+            <p style="margin:0;max-width:54ch;font:300 clamp(15px,1.25vw,19px)/1.62 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">{{ r.d }}</p>
           </div>
+          <span class="mth-num" aria-hidden="true" style="flex:none;font:300 clamp(96px,17vw,288px)/0.7 var(--font-heading);letter-spacing:-.07em;color:transparent;-webkit-text-stroke:1px rgba(236,230,217,.13)">{{ r.n }}</span>
         </div>
-      </sc-for>
+      </article>
+    </sc-for>
+
+    <!-- One instrument per hand-off. Each is inert until its own transition is running. -->
+    <span ref="{{ mthHeadRef }}" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:2px;opacity:0;z-index:4;pointer-events:none;will-change:transform,opacity;background:linear-gradient(180deg,transparent,var(--color-accent-300) 16%,var(--color-neutral-100) 50%,var(--color-accent-300) 84%,transparent);box-shadow:0 0 28px 3px var(--red-glow)"></span>
+    <span ref="{{ mthBoxRef }}" aria-hidden="true" style="position:absolute;inset:0;opacity:0;z-index:4;pointer-events:none;border:1px solid var(--color-accent-600);box-shadow:inset 0 0 44px rgba(156,31,34,.22),0 0 30px rgba(156,31,34,.16)"></span>
+    <span ref="{{ mthRuleRef }}" aria-hidden="true" style="position:absolute;left:0;right:0;top:100%;height:1px;opacity:0;z-index:4;pointer-events:none;will-change:transform,opacity;background:linear-gradient(90deg,transparent,var(--color-accent-600) 10%,var(--color-neutral-100) 50%,var(--color-accent-600) 90%,transparent)"><span style="position:absolute;left:0;right:0;bottom:1px;height:9px;background:repeating-linear-gradient(90deg,rgba(236,230,217,.4) 0 1px,transparent 1px 48px)"></span></span>
+
+    <div class="pg" style="position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:clamp(84px,12vh,130px) 56px 0;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500);pointer-events:none">
+      <span>03 — How I work</span>
+      <span class="rail-meter" ref="{{ railMeterRef }}" style="display:flex;align-items:center;gap:7px">
+        <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
+          <span style="position:relative;display:block;width:30px;height:2px;background:var(--color-neutral-700)"><span style="position:absolute;inset:0;background:var(--color-accent-300);box-shadow:var(--glow-red-sm);transform:scaleX(var(--on,0));transform-origin:0 50%"></span></span>
+        </sc-for>
+      </span>
     </div>
   </div>
 </section>
@@ -232,7 +263,8 @@ class Component extends DCLogic {
   constructor(p){
     super(p);
     ['root','star','tint','cursor','prog','loader','count','bar','clock','marq','band',
-     'heroPin','heroCore','heroEnd','orb','hole','scrollHint','rail','rigPanel','rigField','rigMeta','contact']
+     'heroPin','heroCore','heroEnd','orb','hole','scrollHint','rail','railMeter','mthHead','mthBox','mthRule',
+     'rigPanel','rigField','rigMeta','contact']
       .forEach(k=>{this[k+'Ref']=React.createRef();});
   }
   componentDidMount(){
@@ -268,6 +300,7 @@ class Component extends DCLogic {
     if(this._tick&&window.gsap)window.gsap.ticker.remove(this._tick);
     cancelAnimationFrame(this._raf);
     if(this._io)this._io.disconnect();
+    if(this._snapper)try{this._snapper.destroy();}catch(e){}
     if(this.lenis)this.lenis.destroy();
     window.removeEventListener('mousemove',this._om);
     window.removeEventListener('resize',this._or);
@@ -390,6 +423,26 @@ class Component extends DCLogic {
       });
     },200);
   }
+  // lenis/snap's documented slideshow preset: type "lock" spends one gesture on exactly one
+  // panel. Only the four panel offsets are registered, and the 100% distance threshold is
+  // what keeps the lock local — everywhere further than a screen from a panel, the page
+  // scrolls freely as before.
+  snapPanels(){
+    if(this.reduced||!this.lenis||!window.Snap||!this._mthN||this._mthTop==null)return;
+    if(!this._snapper){
+      try{
+        this._snapper=new window.Snap(this.lenis,{
+          type:'lock',distanceThreshold:'100%',debounce:0,
+          lerp:Math.max(.1,this.scrollLerp()*1.4)
+        });
+      }catch(e){this._snapper=null;console.error('[portfolio] snap init',e);return;}
+      this._snapOff=[];
+    }
+    this._snapOff.forEach(off=>{try{off();}catch(e){}});
+    this._snapOff=[];
+    const vh=window.innerHeight||1;
+    for(let i=0;i<this._mthN;i++)this._snapOff.push(this._snapper.add(Math.round(this._mthTop+i*vh)));
+  }
   heroLines(){
     const root=this.rootRef.current||document;
     const spans=Array.from(root.querySelectorAll('[data-line] > span'));
@@ -480,17 +533,16 @@ class Component extends DCLogic {
     this._collapseRange=Math.min(this._heroRange,vh);
     this._zoomRange=Math.max(0,this._heroRange-this._collapseRange);
     const rail=this.railRef.current;
-    if(rail&&rail.parentElement&&rail.parentElement.parentElement){
-      const sec=rail.parentElement.parentElement;
-      this._railTop=sec.offsetTop;
-      this._railRange=Math.max(1,sec.offsetHeight-vh);
-      this._railDist=Math.max(0,rail.scrollWidth-vw+112);
-      // Card centres in rail space, so the arc can be built around where a card actually
-      // sits on screen rather than around its index. Cached because reading offsetLeft
-      // mid-frame, right after the transforms have been written, forces a layout flush.
-      const kd=rail.children;
-      this._railCx=Array.from(kd,k=>k.offsetLeft+k.offsetWidth/2);
-      this._railPitch=this._railCx.length>1?Math.max(1,this._railCx[1]-this._railCx[0]):Math.max(1,vw*.5);
+    if(rail&&rail.parentElement){
+      this._mthTop=rail.parentElement.offsetTop;
+      // One viewport of scroll per panel, so a snap point is just top + i screens. Deriving
+      // the panel index straight from that keeps the snap targets and the transition
+      // progress reading off the same number instead of two that can drift apart.
+      this._mth=Array.from(rail.querySelectorAll('.mth'));
+      this._mthN=this._mth.length;
+      const mt=this.railMeterRef.current;
+      this._railMeter=mt?Array.from(mt.children):null;
+      this.snapPanels();
     }
     const rp=this.rigPanelRef.current;
     if(rp&&rp.parentElement&&rp.parentElement.parentElement){
@@ -674,27 +726,89 @@ class Component extends DCLogic {
       }
     }
 
-    const rail=this.railRef.current;
-    if(rail&&this._railRange){
-      const rp=cl((sy-this._railTop)/this._railRange,0,1);
-      this._railP=this._railP==null?rp:this._railP+(rp-this._railP)*this.grip(.22,dt);
-      if(Math.abs(rp-this._railP)>.0008)this._easing=true;
-      const rx=-this._railP*this._railDist;
-      // The rail banks into the scroll the way a camera leans when its dolly accelerates.
-      const bank=this.reduced?0:cl(-v*.05,-3.4,3.4);
-      rail.style.transform='translate3d('+rx.toFixed(1)+'px,0,0) rotateX('+bank.toFixed(2)+'deg)';
-      const kids=rail.children,cxs=this._railCx;
-      for(let i=0;i<kids.length;i++){
-        if(this.reduced||!cxs||cxs[i]==null){kids[i].style.transform='';continue;}
-        // Distance from the middle of the screen in card-widths — taken from where the card
-        // actually lands, not from its index, so the arc is centred on what you're reading.
-        const u=cl((cxs[i]+rx-vw*.5)/this._railPitch,-2.4,2.4),au=Math.abs(u);
-        // Cards ride an arc, not a line: the one under the eye is nearest and square on,
-        // its neighbours turn away and fall back into the dark.
-        const z=(100-au*au*(150+push*70))*Z;
-        kids[i].style.transform='translate3d(0,0,'+z.toFixed(1)+'px) rotateY('+(-u*23*Z).toFixed(2)+'deg) rotateX('+((5-Math.min(au,1)*5)*Z).toFixed(2)+'deg)';
-        kids[i].style.opacity=(1-Math.min(au,1.9)*.4).toFixed(3);
+    if(this._mth&&this._mthN>1&&this._mthTop!=null){
+      // lenis-snap can finish loading after the first measure, so keep asking until it takes.
+      if(!this._snapper)this.snapPanels();
+      const n=this._mthN;
+      const raw=cl((sy-this._mthTop)/vh,0,n-1);
+      this._mthF=this._mthF==null?raw:this._mthF+(raw-this._mthF)*this.grip(.28,dt);
+      if(Math.abs(raw-this._mthF)>.0006)this._easing=true;
+      const f=this._mthF;
+      // b is the hand-off being played and t is how far through it we are. Clamping b to the
+      // last gap means the final panel is held by a completed transition rather than by a
+      // separate case.
+      const b=cl(Math.floor(f),0,n-2),t=cl(f-b,0,1),e=t*t*(3-2*t);
+      const pn=this._mth;
+      for(let i=0;i<n;i++){
+        const live=i===b||i===b+1;
+        pn[i].style.visibility=live?'visible':'hidden';
+        if(live)pn[i].style.zIndex=i===b?'2':'3';
       }
+      const out=pn[b],inn=pn[b+1];
+      const oc=out.firstElementChild,ic=inn.firstElementChild;
+      const head=this.mthHeadRef.current,box=this.mthBoxRef.current,rule=this.mthRuleRef.current;
+      // Every instrument is silenced first, so a hand-off only ever has to speak for itself.
+      if(head)head.style.opacity='0';
+      if(box)box.style.opacity='0';
+      if(rule)rule.style.opacity='0';
+      // Sharp in, sharp out: an instrument is only present while its own hand-off is moving.
+      const flash=Math.min(1,t*7)*Math.min(1,(1-t)*7);
+      if(this.reduced){
+        out.style.clipPath='none';out.style.opacity=(1-e).toFixed(3);
+        inn.style.clipPath='none';inn.style.opacity=e.toFixed(3);
+        oc.style.transform='none';ic.style.transform='none';
+        oc.style.opacity='1';ic.style.opacity='1';
+      }else if(b===0){
+        // Into "make the work replayable": the next panel is not slid over the last one, it
+        // is scrubbed in under a playhead, the way a trace is re-read rather than replaced.
+        out.style.clipPath='inset(0 0 0 '+(e*100).toFixed(2)+'%)';out.style.opacity='1';
+        inn.style.clipPath='inset(0 '+(100-e*100).toFixed(2)+'% 0 0)';inn.style.opacity='1';
+        // The copy lags its own panel edge, so the head reads as writing the panel in.
+        oc.style.transform='translate3d('+(-e*54).toFixed(1)+'px,0,0)';oc.style.opacity='1';
+        ic.style.transform='translate3d('+((1-e)*58).toFixed(1)+'px,0,0)';ic.style.opacity='1';
+        if(head){head.style.opacity=flash.toFixed(3);head.style.transform='translate3d('+(e*vw).toFixed(1)+'px,0,0)';}
+      }else if(b===1){
+        // Into "sandbox before you trust": the panel is sealed into a box before the next one
+        // is allowed out of it. Nothing crosses the wall — the box closes, then it opens.
+        const a=cl(t/.5,0,1),c=cl((t-.5)/.5,0,1);
+        const ae=a*a*(3-2*a),ce=c*c*(3-2*c),BY=27,BX=31;
+        // The copy scales with the wall rather than being cropped by it, so what sits in the
+        // box is a whole run shrunk to fit — which is the point of a sandbox — instead of a
+        // panel sliced through the middle of a word.
+        out.style.clipPath='inset('+(ae*BY).toFixed(2)+'% '+(ae*BX).toFixed(2)+'%)';out.style.opacity='1';
+        oc.style.transform='scale('+(1-ae*.62).toFixed(4)+')';oc.style.opacity=(1-ae*.45).toFixed(3);
+        inn.style.clipPath='inset('+((1-ce)*BY).toFixed(2)+'% '+((1-ce)*BX).toFixed(2)+'%)';inn.style.opacity='1';
+        ic.style.transform='scale('+(.38+ce*.62).toFixed(4)+')';ic.style.opacity='1';
+        if(box){
+          const wy=(t<.5?ae:1-ce),wx=wy;
+          box.style.top=box.style.bottom=(wy*BY).toFixed(2)+'%';
+          box.style.left=box.style.right=(wx*BX).toFixed(2)+'%';
+          box.style.opacity=flash.toFixed(3);
+        }
+      }else{
+        // Into "ship, then measure": the panel is sent away down the same corridor the rest
+        // of the page travels, and only once it has gone does the rule come up under the next.
+        // Two beats, in the order the method names them. First the panel ships: it goes down
+        // the same corridor the rest of the page travels and is nearly gone before anything
+        // replaces it. Only then does the rule come up, and it is a hard edge rather than a
+        // fade, so the outgoing headline is never sitting on top of the incoming one.
+        // The rule starts before the ship has finished, or the middle of the hand-off is a
+        // screen of nothing. The shipped panel stays lit enough to read as a slab going away
+        // down the corridor rather than as something that simply switched off.
+        const s=cl(t/.5,0,1),m=cl((t-.18)/.82,0,1);
+        const se=s*s*(3-2*s),me=m*m*(3-2*m);
+        out.style.clipPath='inset(0 0 '+(me*100).toFixed(2)+'% 0)';out.style.opacity='1';
+        oc.style.transform='perspective(1500px) translate3d(0,'+(-se*220).toFixed(1)+'px,'+(-se*1000*Z).toFixed(1)+'px)';
+        oc.style.opacity=(1-se*.55).toFixed(3);
+        inn.style.clipPath='inset('+((1-me)*100).toFixed(2)+'% 0 0 0)';inn.style.opacity='1';
+        ic.style.transform='translate3d(0,'+((1-me)*120).toFixed(1)+'px,0)';ic.style.opacity='1';
+        if(rule){
+          rule.style.opacity=(Math.min(1,m*8)*Math.min(1,(1-m)*8)).toFixed(3);
+          rule.style.transform='translate3d(0,'+(-me*vh).toFixed(1)+'px,0)';
+        }
+      }
+      const mtr=this._railMeter;
+      if(mtr)for(let i=0;i<mtr.length;i++)mtr[i].style.setProperty('--on',cl(1-Math.abs(i-f),0,1).toFixed(3));
     }
 
     const panel=this.rigPanelRef.current;
@@ -997,7 +1111,8 @@ class Component extends DCLogic {
       rootRef:this.rootRef,starRef:this.starRef,tintRef:this.tintRef,cursorRef:this.cursorRef,progRef:this.progRef,
       loaderRef:this.loaderRef,countRef:this.countRef,barRef:this.barRef,clockRef:this.clockRef,
       marqRef:this.marqRef,bandRef:this.bandRef,heroPinRef:this.heroPinRef,heroCoreRef:this.heroCoreRef,
-      orbRef:this.orbRef,holeRef:this.holeRef,scrollHintRef:this.scrollHintRef,railRef:this.railRef,
+      orbRef:this.orbRef,holeRef:this.holeRef,scrollHintRef:this.scrollHintRef,railRef:this.railRef,railMeterRef:this.railMeterRef,
+      mthHeadRef:this.mthHeadRef,mthBoxRef:this.mthBoxRef,mthRuleRef:this.mthRuleRef,
       rigPanelRef:this.rigPanelRef,rigFieldRef:this.rigFieldRef,rigMetaRef:this.rigMetaRef,contactRef:this.contactRef,
       projects:[
         {num:'01',name:'Rig',desc:'Runtime and review loop for coding agents',stack:'Python · TS · AWS',year:'2025'},
@@ -1005,11 +1120,14 @@ class Component extends DCLogic {
         {num:'03',name:'Racing-line Optimizer',desc:'Minimum-lap-time solver for Formula Manipal Driverless',stack:'Python · NumPy · ROS',year:'2024'},
         {num:'04',name:'PR Review Agent',desc:'Diff-aware reviewer that argues with itself first',stack:'LLM · GitHub API',year:'2024'}
       ],
+      // g moves the field glow a quarter turn per panel, so consecutive panels never share a
+      // lit corner. It is what makes the wipe and the box read as two different screens
+      // rather than the same one redrawn.
       rail:[
-        {k:'Method 01',t:'Start at the assumption',d:'Most agent failures are specification failures. I write the assumption down first, then build the smallest thing that can falsify it.'},
-        {k:'Method 02',t:'Make the work replayable',d:'Every step an agent takes is recorded with the context that produced it, so a reviewer reads intent instead of reconstructing it from a diff.'},
-        {k:'Method 03',t:'Sandbox before you trust',d:'Execution is isolated by default. Nothing an agent runs can reach production until a human has seen the trace it produced.'},
-        {k:'Method 04',t:'Ship, then measure',d:'Systems earn their complexity. If a layer cannot show what it caught last week, it comes back out.'}
+        {n:'01',k:'Specification',g:'20% 26%',t:'Start at the assumption',d:'Most agent failures are specification failures. I write the assumption down first, then build the smallest thing that can falsify it.'},
+        {n:'02',k:'Traceability',g:'78% 24%',t:'Make the work replayable',d:'Every step an agent takes is recorded with the context that produced it, so a reviewer reads intent instead of reconstructing it from a diff.'},
+        {n:'03',k:'Isolation',g:'26% 74%',t:'Sandbox before you trust',d:'Execution is isolated by default. Nothing an agent runs can reach production until a human has seen the trace it produced.'},
+        {n:'04',k:'Evidence',g:'74% 70%',t:'Ship, then measure',d:'Systems earn their complexity. If a layer cannot show what it caught last week, it comes back out.'}
       ],
       rigPoints:[
         {i:'01',t:'Sandboxed execution layer with replayable step traces.'},
