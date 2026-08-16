@@ -30,6 +30,11 @@ jobs:
           mkdir -p _site
           cp site/index.html site/support.js site/nocturne.css _site/
           cp -R explorations _site/explorations
+          # Homepage is the scroll-timeline build. The previous Lenis-based
+          # homepage stays reachable at /classic.html. To roll back, delete
+          # the two lines below.
+          cp _site/index.html _site/classic.html
+          cp explorations/timeline-mockup.html _site/index.html
           touch _site/.nojekyll
 
       - name: Setup Pages
