@@ -99,7 +99,7 @@ a:hover{color:var(--color-accent-400)}
         <div class="wrap" style="display:flex;gap:44px;font:500 11px/1.6 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72)">
           <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">04</div>shipped systems</div>
           <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">03</div>certifications</div>
-          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">FMD</div>driverless</div>
+          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">01</div>driverless</div>
         </div>
       </div>
     </div>
@@ -228,7 +228,7 @@ a:hover{color:var(--color-accent-400)}
     <div style="display:flex;flex-direction:column;gap:var(--space-8)">
       <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">05 — About</span>
       <p data-split="1" style="margin:0;font:300 clamp(24px,3.1vw,40px)/1.32 var(--font-heading);letter-spacing:-.022em;text-wrap:pretty">I'm a computer science student at MIT Manipal who spends most of his time on autonomous systems — agents that ship code, cars that drive themselves, satellites that know where they are.</p>
-      <p data-depth="drift" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;">Formula Manipal Driverless recruit, working on racing-line optimization. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
+      <p data-depth="drift" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;">Building a racing-line optimizer for a student driverless racing team. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
       <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;padding-top:var(--space-2)">
         <sc-for list="{{ tags }}" as="t" hint-placeholder-count="6">
           <span style="padding:9px 16px;border:1px solid var(--color-neutral-800);border-radius:100px;white-space:nowrap;flex:none;font:400 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">{{ t }}</span>
@@ -1117,7 +1117,7 @@ class Component extends DCLogic {
       projects:[
         {num:'01',name:'Rig',desc:'Runtime and review loop for coding agents',stack:'Python · TS · AWS',year:'2025'},
         {num:'02',name:'Nova Genesis Orbital Guard',desc:'Satellite tracking and conjunction alerts',stack:'Python · TLE · Three.js',year:'2025'},
-        {num:'03',name:'Racing-line Optimizer',desc:'Minimum-lap-time solver for Formula Manipal Driverless',stack:'Python · NumPy · ROS',year:'2024'},
+        {num:'03',name:'Racing-line Optimizer',desc:'Minimum-lap-time solver for a student driverless racing team',stack:'Python · NumPy · ROS',year:'2024'},
         {num:'04',name:'PR Review Agent',desc:'Diff-aware reviewer that argues with itself first',stack:'LLM · GitHub API',year:'2024'}
       ],
       // g moves the field glow a quarter turn per panel, so consecutive panels never share a
@@ -1139,7 +1139,6 @@ class Component extends DCLogic {
         {n:'Machine Learning Specialization',o:'DeepLearning.AI'},
         {n:'Google Data Analytics',o:'Google'},
         {n:'Cloud Practitioner',o:'AWS'},
-        {n:'Driverless recruit',o:'Formula Manipal'},
         {n:'Head Delegate',o:'MUN circuit'}
       ]
     };

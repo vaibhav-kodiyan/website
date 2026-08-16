@@ -307,7 +307,7 @@ body[data-end="1"] header,body[data-end="1"] #topbar{opacity:0;pointer-events:no
         <div class="stats ap" data-ap="0 0 .066" data-ap-intro="3">
           <div><i>04</i>shipped systems</div>
           <div><i>03</i>certifications</div>
-          <div><i>FMD</i>driverless</div>
+          <div><i>01</i>driverless</div>
         </div>
       </div>
     </div>
@@ -369,7 +369,7 @@ body[data-end="1"] header,body[data-end="1"] #topbar{opacity:0;pointer-events:no
            in frame — the chapter's own best view is worth reading over. -->
       <span class="eyebrow ap" data-ap-mode="right" data-ap=".742 .765 .870">05 — About</span>
       <h2 class="display ap" data-ap-mode="right" data-ap=".745 .775 .870">I'm a computer science student at MIT Manipal who spends most of his time on autonomous systems — agents that ship code, cars that drive themselves, satellites that know where they are.</h2>
-      <p class="body ap" data-ap-mode="right" data-ap=".775 .80 .871">Formula Manipal Driverless recruit, working on racing-line optimization. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
+      <p class="body ap" data-ap-mode="right" data-ap=".775 .80 .871">Building a racing-line optimizer for a student driverless racing team. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
       <div class="tags ap" data-ap-mode="right" data-ap=".79 .815 .872">
         <span>Agents</span><span>LLM infra</span><span>Autonomous driving</span><span>Orbital mechanics</span><span>Python</span><span>TypeScript</span><span>AWS</span>
       </div>
@@ -377,7 +377,6 @@ body[data-end="1"] header,body[data-end="1"] #topbar{opacity:0;pointer-events:no
         <div>Machine Learning Specialization <em>DeepLearning.AI</em></div>
         <div>Google Data Analytics <em>Google</em></div>
         <div>Cloud Practitioner <em>AWS</em></div>
-        <div>Driverless recruit <em>Formula Manipal</em></div>
         <div>Head Delegate <em>MUN circuit</em></div>
       </div>
     </div>
@@ -1535,7 +1534,7 @@ function drawReview(u, p, T){
 var PROJECTS = [
   { num:'01', name:'Rig',                        desc:'Runtime and review loop for coding agents',            stack:'Python · TS · AWS',        year:'2025' },
   { num:'02', name:'Nova Genesis Orbital Guard', desc:'Satellite tracking and conjunction alerts',            stack:'Python · TLE · Three.js',  year:'2025' },
-  { num:'03', name:'Racing-line Optimizer',      desc:'Minimum-lap-time solver for Formula Manipal Driverless',stack:'Python · NumPy · ROS',    year:'2024' },
+  { num:'03', name:'Racing-line Optimizer',      desc:'Minimum-lap-time solver for a student driverless racing team',stack:'Python · NumPy · ROS',    year:'2024' },
   { num:'04', name:'PR Review Agent',            desc:'Diff-aware reviewer that argues with itself first',    stack:'LLM · GitHub API',         year:'2024' }
 ];
 /* Spaced so the camera passes one card per swing of the slalom, and angled so
@@ -1625,7 +1624,7 @@ function drawShipped(u, p, T){
 }
 
 /* — 06 trajectory — a racing line optimising itself over a track outline ——
-   Placeholder geometry: real FMD data would replace the control points. */
+   Placeholder geometry: real racing-line data would replace the control points. */
 var TRACK = (function(){
   var pts=[], n=132;
   for(var i=0;i<n;i++){
@@ -2011,7 +2010,7 @@ addEventListener('focusin', function(e){
   addLabel('<span class="k">sandbox</span><span class="n">Contained execution</span><span class="s">nothing leaves without a trace</span>',
     470, -280, 3600, 0.335, 0.515, 22, 0);
   /* One on the track, honest about what it is. */
-  addLabel('<span class="k">trajectory</span><span class="n">Racing-line optimiser</span><span class="s">placeholder geometry · FMD data pending</span>',
+  addLabel('<span class="k">trajectory</span><span class="n">Racing-line optimiser</span><span class="s">placeholder geometry · real data pending</span>',
     -700, FLOOR_Y-40, 5900, 0.755, 0.875, 22, 0, true);
 })();
 /* The two review labels are screen-anchored, so they are plain DOM. */
