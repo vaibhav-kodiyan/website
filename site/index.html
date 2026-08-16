@@ -34,6 +34,22 @@ a:hover{color:var(--color-accent-400)}
   @keyframes spin{to{transform:none}}
   @keyframes wipe{to{transform:none}}
 }
+/* Layout in this document is written inline, so the narrow-screen pass has to outrank it.
+   It only reflows the things that cannot fit a phone: the page gutter, the four-column
+   index row, the side-by-side blocks, and the rail card. */
+@media (max-width:860px){
+  .pg{padding-left:20px!important;padding-right:20px!important}
+  .wk-row{grid-template-columns:30px 1fr!important;gap:6px 12px!important;padding:24px 0!important}
+  .wk-row>*:nth-child(2),.wk-row>*:nth-child(3),.wk-row>*:nth-child(4){grid-column:2!important;justify-self:start!important}
+  .wk-row>*:nth-child(5){display:none!important}
+  .two{grid-template-columns:1fr!important;gap:44px!important}
+  .rail-card{width:min(82vw,430px)!important;height:auto!important;min-height:58vh!important}
+  .rail-card h3{font-size:clamp(24px,6.4vw,40px)!important}
+  .wrap{flex-wrap:wrap!important;gap:20px!important}
+  .hdr-nav{gap:16px!important;font-size:10px!important}
+  .hdr-cta{padding:8px 12px!important;font-size:10px!important;letter-spacing:.08em!important}
+  header.pg{padding-left:16px!important;padding-right:16px!important}
+}
 </style></helmet>
 
 <div ref="{{ rootRef }}" style="position:relative;width:100%;background:var(--color-bg)">
@@ -45,7 +61,7 @@ a:hover{color:var(--color-accent-400)}
 
 <div style="position:fixed;left:0;right:0;top:0;height:1px;z-index:9998;pointer-events:none;background:var(--color-divider)"><div ref="{{ progRef }}" style="height:100%;transform:scaleX(0);transform-origin:0 50%;background:linear-gradient(90deg,transparent,var(--color-accent),var(--color-accent-300))"></div></div>
 
-<div ref="{{ loaderRef }}" style="position:fixed;inset:0;z-index:9000;background:var(--color-bg);display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8) 56px;animation:wipe 1.15s cubic-bezier(.83,0,.17,1) 2.2s forwards">
+<div class="pg" ref="{{ loaderRef }}" style="position:fixed;inset:0;z-index:9000;background:var(--color-bg);display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8) 56px;animation:wipe 1.15s cubic-bezier(.83,0,.17,1) 2.2s forwards">
   <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.18em;color:var(--color-neutral-500);text-transform:uppercase"><span>Vaibhav Kodiyan</span><span>Agentic Engineer</span></div>
   <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
     <div style="font:300 clamp(44px,8vw,120px)/0.92 var(--font-heading);letter-spacing:-.045em">break assumptions<br><span style="color:var(--color-accent)">not production.</span></div>
@@ -54,15 +70,15 @@ a:hover{color:var(--color-accent-400)}
   <div style="height:1px;background:var(--color-divider);position:relative"><div ref="{{ barRef }}" style="position:absolute;inset:0 100% 0 0;background:var(--color-accent)"></div></div>
 </div>
 
-<header style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) 56px;background:linear-gradient(#0c0b0ae6,#0c0b0a00)">
-  <nav style="display:flex;gap:34px;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-400)">
+<header class="pg" style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) 56px;background:linear-gradient(#0c0b0ae6,#0c0b0a00)">
+  <nav class="hdr-nav" style="display:flex;gap:34px;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-400)">
     <a href="#work" style="color:inherit" style-hover="color:var(--color-accent-300)">Work</a><a href="#rig" style="color:inherit" style-hover="color:var(--color-accent-300)">Rig</a><a href="#about" style="color:inherit" style-hover="color:var(--color-accent-300)">About</a><a href="#contact" style="color:inherit" style-hover="color:var(--color-accent-300)">Contact</a>
   </nav>
-  <a href="#contact" style="display:flex;align-items:center;gap:10px;padding:9px 18px;border:1px solid var(--color-accent-700);border-radius:100px;font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-text);white-space:nowrap;flex:none;transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)" style-hover="border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-sm)"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)"></span>Open to work</a>
+  <a href="#contact" class="hdr-cta" style="display:flex;align-items:center;gap:10px;padding:9px 18px;border:1px solid var(--color-accent-700);border-radius:100px;font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-text);white-space:nowrap;flex:none;transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)" style-hover="border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-sm)"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)"></span>Open to work</a>
 </header>
 
 <section data-screen-label="Hero" style="position:relative;z-index:2;height:280vh">
-  <div ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
+  <div class="pg" ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
 
     <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:115vmax;height:115vmax;transform:translate(-50%,-50%);pointer-events:none;will-change:transform,opacity">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,150,55,.2) 0%,rgba(196,90,28,.13) 16%,rgba(90,32,8,.08) 38%,rgba(40,16,4,.04) 58%,transparent 78%)"></div>
@@ -74,7 +90,7 @@ a:hover{color:var(--color-accent-400)}
       <h1 style="margin:0;font:300 clamp(60px,12.5vw,188px)/0.86 var(--font-heading);letter-spacing:-.055em;color:var(--color-neutral-100)"><span data-line="1" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">VAIBHAV</span></span><span data-line="2" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">KODIYAN</span></span></h1>
       <div style="display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;padding-top:var(--space-6);border-top:1px solid var(--color-divider)">
         <p style="margin:0;max-width:430px;font:500 17px/1.5 var(--font-body);color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72);text-wrap:pretty">I build agents that write, review and ship code. Currently making <span style="color:var(--color-accent-300)">Rig</span> at Qaynel Agentic Solutions — infrastructure for coding agents that don't need babysitting.</p>
-        <div style="display:flex;gap:44px;font:500 11px/1.6 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72)">
+        <div class="wrap" style="display:flex;gap:44px;font:500 11px/1.6 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72)">
           <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">04</div>shipped systems</div>
           <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">03</div>certifications</div>
           <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">FMD</div>driverless</div>
@@ -96,15 +112,15 @@ a:hover{color:var(--color-accent-400)}
   </div>
 </div>
 
-<section id="work" data-screen-label="Work" style="position:relative;z-index:2;padding:150px 56px 120px;perspective:1200px">
+<section id="work" class="pg" data-screen-label="Work" style="position:relative;z-index:2;padding:150px 56px 120px;perspective:1200px">
   <div style="max-width:1180px;margin:0 auto">
-    <div data-row="1" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:56px">
+    <div class="wrap" data-depth="drift" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:56px">
       <h2 style="margin:0;font:400 clamp(34px,5vw,66px)/1 var(--font-heading);letter-spacing:-.04em">Selected work</h2>
       <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">02 — Index</span>
     </div>
-    <div style="display:flex;flex-direction:column;transform-style:preserve-3d">
+    <div style="display:flex;flex-direction:column;transform-style:preserve-3d;perspective:1400px;perspective-origin:50% 50%">
       <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
-        <a href="#rig" data-row="1" style="position:relative;display:grid;grid-template-columns:56px 1fr 260px 120px;gap:28px;align-items:center;padding:34px 24px;border-top:1px solid var(--color-divider);color:var(--color-text);transition:background .5s cubic-bezier(.16,1,.3,1)" style-hover="background:var(--color-hover)">
+        <a href="#rig" class="wk-row" data-depth="plate" style="position:relative;display:grid;grid-template-columns:56px 1fr 260px 120px;gap:28px;align-items:center;padding:34px 24px;border-top:1px solid var(--color-divider);color:var(--color-text);transform-style:preserve-3d;backface-visibility:hidden;transition:background .5s cubic-bezier(.16,1,.3,1)" style-hover="background:var(--color-hover)">
           <span style="font:400 11px/1 var(--font-body);color:var(--color-neutral-600)">{{ p.num }}</span>
           <div style="display:flex;flex-direction:column;gap:8px">
             <span style="font:400 clamp(26px,3.2vw,44px)/1 var(--font-heading);letter-spacing:-.03em">{{ p.name }}</span>
@@ -112,7 +128,7 @@ a:hover{color:var(--color-accent-400)}
           </div>
           <span style="font:400 11px/1.7 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-300)">{{ p.stack }}</span>
           <span style="justify-self:end;font:400 11px/1 var(--font-body);color:var(--color-neutral-500)">{{ p.year }} ↗</span>
-          <div style="position:absolute;right:150px;top:50%;width:190px;height:120px;margin-top:-60px;border-radius:var(--radius-md);overflow:hidden;opacity:0;transform:translateY(14px) rotate(-4deg);transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1);pointer-events:none;background:var(--color-surface);box-shadow:var(--shadow-sm)" style-hover="opacity:1;transform:translateY(0) rotate(-2deg)">
+          <div style="position:absolute;right:150px;top:50%;width:190px;height:120px;margin-top:-60px;border-radius:var(--radius-md);overflow:hidden;opacity:0;transform:translate3d(0,14px,0) rotate(-4deg);transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s cubic-bezier(.16,1,.3,1);pointer-events:none;background:var(--color-surface);box-shadow:var(--shadow-sm)" style-hover="opacity:1;transform:translate3d(0,0,72px) rotate(-2deg);box-shadow:var(--shadow-md),0 24px 60px rgba(0,0,0,.6)">
             <div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,var(--color-accent-800),transparent 62%),repeating-linear-gradient(135deg,transparent 0 7px,#ffffff08 7px 8px)"></div>
             <div style="position:absolute;left:12px;bottom:10px;font:400 9px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-400)">preview · placeholder</div>
           </div>
@@ -124,11 +140,11 @@ a:hover{color:var(--color-accent-400)}
 </section>
 
 <section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:250vh">
-  <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;perspective:1600px">
-    <div style="display:flex;justify-content:space-between;padding:0 56px var(--space-8);font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>03 — How I work</span><span>Scroll →</span></div>
-    <div ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform;transform-style:preserve-3d">
+  <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;perspective:1250px;perspective-origin:50% 50%">
+    <div class="pg" style="display:flex;justify-content:space-between;padding:0 56px var(--space-8);font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>03 — How I work</span><span>Scroll →</span></div>
+    <div class="pg" ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform;transform-style:preserve-3d">
       <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
-        <div style="flex:none;width:min(46vw,560px);height:56vh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8);border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-sm);transform-style:preserve-3d;will-change:transform">
+        <div class="rail-card" style="flex:none;width:min(46vw,560px);height:56vh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8);border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-sm);transform-style:preserve-3d;backface-visibility:hidden;will-change:transform,opacity">
           <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-accent-300)">{{ r.k }}</span>
           <div style="display:flex;flex-direction:column;gap:var(--space-6)">
             <h3 style="margin:0;font:400 clamp(30px,4vw,54px)/1.02 var(--font-heading);letter-spacing:-.035em">{{ r.t }}</h3>
@@ -161,13 +177,13 @@ a:hover{color:var(--color-accent-400)}
   </div>
 </section>
 
-<section data-screen-label="Rig detail" style="position:relative;z-index:2;padding:130px 56px">
-  <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:70px">
-    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-6);">
+<section class="pg" data-screen-label="Rig detail" style="position:relative;z-index:2;padding:130px 56px">
+  <div class="two" style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:70px">
+    <div data-depth="drift" style="display:flex;flex-direction:column;gap:var(--space-6);">
       <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">The problem</h4>
       <p style="margin:0;font:300 20px/1.55 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">Coding agents fail quietly. They pass tests, open a PR, and leave a reviewer to reconstruct intent from a diff. Rig makes the agent show its work: every action is a replayable step with the context that produced it.</p>
     </div>
-    <div data-row="1" style="display:flex;flex-direction:column;gap:var(--space-4);">
+    <div data-depth="drift" style="display:flex;flex-direction:column;gap:var(--space-4);">
       <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">What I built</h4>
       <sc-for list="{{ rigPoints }}" as="pt" hint-placeholder-count="3">
         <div style="display:flex;gap:16px;padding:var(--space-4) 0;border-bottom:1px solid var(--color-divider)"><span style="font:400 11px/1.6 var(--font-body);color:var(--color-accent)">{{ pt.i }}</span><span style="font:300 16px/1.5 var(--font-body);color:var(--color-neutral-300)">{{ pt.t }}</span></div>
@@ -176,19 +192,19 @@ a:hover{color:var(--color-accent-400)}
   </div>
 </section>
 
-<section id="about" data-screen-label="About" style="position:relative;z-index:2;padding:110px 56px 140px">
-  <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr .85fr;gap:80px;align-items:start">
+<section id="about" class="pg" data-screen-label="About" style="position:relative;z-index:2;padding:110px 56px 140px">
+  <div class="two" style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr .85fr;gap:80px;align-items:start">
     <div style="display:flex;flex-direction:column;gap:var(--space-8)">
       <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">05 — About</span>
       <p data-split="1" style="margin:0;font:300 clamp(24px,3.1vw,40px)/1.32 var(--font-heading);letter-spacing:-.022em;text-wrap:pretty">I'm a computer science student at MIT Manipal who spends most of his time on autonomous systems — agents that ship code, cars that drive themselves, satellites that know where they are.</p>
-      <p data-row="1" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;">Formula Manipal Driverless recruit, working on racing-line optimization. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
+      <p data-depth="drift" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;">Formula Manipal Driverless recruit, working on racing-line optimization. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
       <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;padding-top:var(--space-2)">
         <sc-for list="{{ tags }}" as="t" hint-placeholder-count="6">
           <span style="padding:9px 16px;border:1px solid var(--color-neutral-800);border-radius:100px;white-space:nowrap;flex:none;font:400 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">{{ t }}</span>
         </sc-for>
       </div>
     </div>
-    <div data-row="1" style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider);">
+    <div data-depth="drift" style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider);">
       <sc-for list="{{ certs }}" as="c" hint-placeholder-count="3">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:var(--space-6) 0;border-bottom:1px solid var(--color-divider)"><span style="font:300 16px/1.3 var(--font-body)">{{ c.n }}</span><span style="font:400 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-500);white-space:nowrap">{{ c.o }}</span></div>
       </sc-for>
@@ -196,7 +212,7 @@ a:hover{color:var(--color-accent-400)}
   </div>
 </section>
 
-<section id="contact" data-screen-label="Contact" style="position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:120px 56px 40px;overflow:hidden">
+<section id="contact" class="pg" data-screen-label="Contact" style="position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:120px 56px 40px;overflow:hidden">
   <div ref="{{ contactRef }}" style="max-width:1180px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:var(--space-8);will-change:transform">
     <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">06 — Contact</span>
     <a href="#contact" data-magnet="1" data-split="1" style="display:block;font:300 clamp(48px,10vw,146px)/0.92 var(--font-heading);letter-spacing:-.05em;color:var(--color-text);transition:color .45s cubic-bezier(.16,1,.3,1)" style-hover="color:var(--color-accent-300)">Let's build something unreasonable.</a>
@@ -204,7 +220,7 @@ a:hover{color:var(--color-accent-400)}
       <a href="#contact">Email ↗</a><a href="#contact">GitHub ↗</a><a href="#contact">LinkedIn ↗</a><a href="#contact">Résumé ↗</a>
     </div>
   </div>
-  <div style="max-width:1180px;margin:0 auto;width:100%;display:flex;justify-content:space-between;padding-top:var(--space-8);border-top:1px solid var(--color-divider);font:400 10px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-600)">
+  <div class="wrap" style="max-width:1180px;margin:0 auto;width:100%;display:flex;justify-content:space-between;padding-top:var(--space-8);border-top:1px solid var(--color-divider);font:400 10px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-600)">
     <span>© 2026 Vaibhav Kodiyan</span><span>break assumptions not production</span><span ref="{{ clockRef }}">IST</span>
   </div>
 </section>
@@ -256,7 +272,7 @@ class Component extends DCLogic {
     window.removeEventListener('mousemove',this._om);
     window.removeEventListener('resize',this._or);
   }
-  componentDidUpdate(){try{this.split();}catch(e){}}
+  componentDidUpdate(){this._dirtyLayout=true;try{this.split();}catch(e){}}
 
   scrollLerp(){
     const d=this.props.scrollDuration!=null?+this.props.scrollDuration:1.35;
@@ -469,6 +485,12 @@ class Component extends DCLogic {
       this._railTop=sec.offsetTop;
       this._railRange=Math.max(1,sec.offsetHeight-vh);
       this._railDist=Math.max(0,rail.scrollWidth-vw+112);
+      // Card centres in rail space, so the arc can be built around where a card actually
+      // sits on screen rather than around its index. Cached because reading offsetLeft
+      // mid-frame, right after the transforms have been written, forces a layout flush.
+      const kd=rail.children;
+      this._railCx=Array.from(kd,k=>k.offsetLeft+k.offsetWidth/2);
+      this._railPitch=this._railCx.length>1?Math.max(1,this._railCx[1]-this._railCx[0]):Math.max(1,vw*.5);
     }
     const rp=this.rigPanelRef.current;
     if(rp&&rp.parentElement&&rp.parentElement.parentElement){
@@ -478,6 +500,25 @@ class Component extends DCLogic {
     }
     const m=this.marqRef.current;
     this._marqHalf=m?(m.scrollWidth||0)/2:0;
+    // Depth staging is driven from layout position, never from the element's own rect.
+    // These elements travel hundreds of pixels along Z, and a rect reading would feed
+    // that motion straight back into the number that produced it.
+    const root=this.rootRef.current||document;
+    let pi=0;
+    this._deep=Array.from(root.querySelectorAll('[data-depth]'),el=>{
+      let y=0,n=el;while(n){y+=n.offsetTop;n=n.offsetParent;}
+      const plate=el.dataset.depth==='plate';
+      return{el,y,h:el.offsetHeight,plate,pi:plate?pi++:0,d:null};
+    });
+    // The plates share one vanishing point, and it belongs to the viewer, not to the list.
+    // Left at the box's own centre it would scroll up the screen with the box, and the rows
+    // would converge on a point that keeps moving — depth without a camera behind it.
+    const p0=this._deep.find(it=>it.plate);
+    this._plateBox=p0?p0.el.parentElement:null;
+    if(this._plateBox){let y=0,n=this._plateBox;while(n){y+=n.offsetTop;n=n.offsetParent;}this._plateBoxY=y;}
+    this._poy=null;
+    const ct=this.contactRef.current;
+    if(ct&&ct.parentElement){const s=ct.parentElement;let y=0,n=s;while(n){y+=n.offsetTop;n=n.offsetParent;}this._contactY=y;}
     this._dirtyLayout=false;
   }
   paint(){
@@ -521,12 +562,23 @@ class Component extends DCLogic {
       const m=this.marqRef.current;
       if(m)m.style.transform='translate3d('+this.marqX.toFixed(1)+'px,0,0)';
     }
-    if(!moving&&!heroLive&&!heroEasing&&this._settled)return;
-    this._settled=!moving&&!heroLive&&!heroEasing;
+    // The corridor below keeps easing after the scroll has stopped. Sleeping on the first
+    // still frame would strand a fanned-out index or a half-turned card exactly where the
+    // reader let go, so the loop stays awake until those have landed too.
+    const wasEasing=!!this._easing;
+    if(!moving&&!heroLive&&!heroEasing&&!wasEasing&&this._settled)return;
+    this._settled=!moving&&!heroLive&&!heroEasing&&!wasEasing;
+    this._easing=false;
     this._lsy=sy;
     const vh=this._vh,vw=this._vw;
     const Z=this.props.zoomIntensity!=null?this.props.zoomIntensity:1;
     const follow=1-Math.pow(1-.14,dt);
+    // How fast the page is actually travelling, 0 at rest → 1 in a flick. Related to intent
+    // but not the same thing: intent reads the input device, this reads the result.
+    const spd=Math.min(1,Math.abs(v)/34);
+    this._push=this._push==null?spd:this._push+(spd-this._push)*this.grip(.1,dt);
+    if(Math.abs(spd-this._push)>.004)this._easing=true;
+    const push=this.reduced?0:this._push;
 
     this.cx+=(this.mx-this.cx)*follow;this.cy+=(this.my-this.cy)*follow;
     const c=this.cursorRef.current;
@@ -583,29 +635,65 @@ class Component extends DCLogic {
     if(bd&&!this.reduced&&this.props.velocitySkew!==false)
       bd.style.transform='skewY('+this.skew.toFixed(3)+'deg)';
 
-    if(!this._rows||this._rowsN!==(this.rootRef.current?this.rootRef.current.querySelectorAll('[data-row]').length:0)){
-      this._rows=Array.from((this.rootRef.current||document).querySelectorAll('[data-row]'));
-      this._rowsN=this._rows.length;
-    }
-    for(const el of this._rows){
-      const r=el.getBoundingClientRect();
-      if(r.bottom<-80||r.top>vh+80)continue;
-      const d=cl(((r.top+r.height/2)-vh/2)/vh,-1,1);
-      const a=Math.abs(d);
-      el.style.transform='translate3d(0,'+(d*12+v*.34).toFixed(1)+'px,0) rotateX('+(-d*10).toFixed(2)+'deg) rotateY('+(d*7+v*.05).toFixed(2)+'deg) scale('+(1-a*.035*Z).toFixed(4)+')';
-      el.style.opacity=(1-a*.26).toFixed(3);
+    // Past the horizon the page stops sliding and starts travelling. Everything below the
+    // hero lives in one corridor: content arrives out of deep Z, squares up flat at the
+    // reading line, and passes the camera on the way out. Speed stretches the far end of
+    // the corridor, so covering ground reads as covering distance.
+    if(this._deep&&!this.reduced){
+      // Rewritten only when it has actually moved: unlike a transform, perspective-origin
+      // repaints the whole 3D context it governs.
+      if(this._plateBox){
+        const poy=Math.round((sy+vh*.5-this._plateBoxY)/4)*4;
+        if(poy!==this._poy){this._poy=poy;this._plateBox.style.perspectiveOrigin='50% '+poy+'px';}
+      }
+      for(const it of this._deep){
+        const cy=it.y+it.h*.5-sy;
+        if(cy<-vh*.8||cy>vh*1.8)continue;
+        // -1 = overhead and leaving, 0 = at the reading line, +1 = still far down the corridor.
+        // The middle band of the screen is deliberately dead: depth belongs to arriving and
+        // leaving, and anything sitting where it is meant to be read stays flat and legible.
+        const off=(cy-vh*.5)/vh;
+        const d=cl(Math.sign(off)*Math.max(0,Math.abs(off)-.18)/.3,-1,1);
+        // Each plate follows with a little less grip than the one above it, so a flick fans
+        // the index like a dealt deck — and it closes again the moment the scroll settles.
+        it.d=it.d==null?d:it.d+(d-it.d)*(it.plate?this.grip(.2-it.pi*.019,dt):1);
+        if(Math.abs(d-it.d)>.002)this._easing=true;
+        const q=it.d,a=Math.abs(q);
+        if(it.plate){
+          // Below the line a row is still lying in the disk, seen from above; above the line
+          // it has tipped up and is passing over the camera.
+          const z=q>0?-q*q*(320+push*190)*Z:a*a*140*Z;
+          it.el.style.transform='translate3d(0,0,'+z.toFixed(1)+'px) rotateX('+(q*22*Z).toFixed(2)+'deg)';
+          it.el.style.opacity=(1-Math.pow(a,1.5)*.72).toFixed(3);
+        }else{
+          // Same corridor, quieter: prose has to stay readable a beat longer than an index row.
+          const z=(q>0?-q*q*(150+push*110):a*a*70)*Z;
+          it.el.style.transform='perspective(1300px) translate3d(0,'+(q*10).toFixed(1)+'px,'+z.toFixed(1)+'px) rotateX('+(q*7*Z).toFixed(2)+'deg)';
+          it.el.style.opacity=(1-a*.42).toFixed(3);
+        }
+      }
     }
 
     const rail=this.railRef.current;
     if(rail&&this._railRange){
       const rp=cl((sy-this._railTop)/this._railRange,0,1);
       this._railP=this._railP==null?rp:this._railP+(rp-this._railP)*this.grip(.22,dt);
-      rail.style.transform='translate3d('+(-this._railP*this._railDist).toFixed(1)+'px,0,0)';
-      const kids=rail.children,n=kids.length||1;
+      if(Math.abs(rp-this._railP)>.0008)this._easing=true;
+      const rx=-this._railP*this._railDist;
+      // The rail banks into the scroll the way a camera leans when its dolly accelerates.
+      const bank=this.reduced?0:cl(-v*.05,-3.4,3.4);
+      rail.style.transform='translate3d('+rx.toFixed(1)+'px,0,0) rotateX('+bank.toFixed(2)+'deg)';
+      const kids=rail.children,cxs=this._railCx;
       for(let i=0;i<kids.length;i++){
-        const u=i-this._railP*(n-1);
-        const au=Math.abs(u);
-        kids[i].style.transform='rotateY('+(-u*18).toFixed(2)+'deg) rotateX(7deg) translateZ('+((1-Math.min(au,1.4))*48).toFixed(1)+'px) scale('+(1-Math.min(au,.12)*.08).toFixed(4)+')';
+        if(this.reduced||!cxs||cxs[i]==null){kids[i].style.transform='';continue;}
+        // Distance from the middle of the screen in card-widths — taken from where the card
+        // actually lands, not from its index, so the arc is centred on what you're reading.
+        const u=cl((cxs[i]+rx-vw*.5)/this._railPitch,-2.4,2.4),au=Math.abs(u);
+        // Cards ride an arc, not a line: the one under the eye is nearest and square on,
+        // its neighbours turn away and fall back into the dark.
+        const z=(100-au*au*(150+push*70))*Z;
+        kids[i].style.transform='translate3d(0,0,'+z.toFixed(1)+'px) rotateY('+(-u*23*Z).toFixed(2)+'deg) rotateX('+((5-Math.min(au,1)*5)*Z).toFixed(2)+'deg)';
+        kids[i].style.opacity=(1-Math.min(au,1.9)*.4).toFixed(3);
       }
     }
 
@@ -613,10 +701,14 @@ class Component extends DCLogic {
     if(panel&&this._rigRange){
       const rp=cl((sy-this._rigTop)/this._rigRange,0,1);
       this._rigP=this._rigP==null?rp:this._rigP+(rp-this._rigP)*this.grip(.22,dt);
+      if(Math.abs(rp-this._rigP)>.0008)this._easing=true;
       const e=this._rigP<.5?(this._rigP/.5):1;
       const out=cl((this._rigP-.82)/.18,0,1);
-      const s=(.46+.54*e)*(1-out*.06);
-      panel.style.transform='perspective(1400px) rotateX('+(8-e*8).toFixed(2)+'deg) scale('+s.toFixed(4)+')';
+      // The case study is a slab coming down the same corridor: it arrives out of depth,
+      // squares up, and starts receding again rather than simply shrinking on the spot.
+      const s=(this.reduced?.46+.54*e:.66+.34*e)*(1-out*.05);
+      const z=this.reduced?0:(-(1-e)*300-out*110)*Z;
+      panel.style.transform='perspective(1500px) translate3d(0,0,'+z.toFixed(1)+'px) rotateX('+((9-e*9)*Z).toFixed(2)+'deg) scale('+s.toFixed(4)+')';
       panel.style.borderRadius=((1-e)*18).toFixed(1)+'px';
       const f=this.rigFieldRef.current;
       if(f)f.style.transform='rotate('+(this._rigP*22).toFixed(2)+'deg) scale('+(1.1+this._rigP*.25)+')';
@@ -625,13 +717,15 @@ class Component extends DCLogic {
     }
 
     const ct=this.contactRef.current;
-    if(ct){
-      const r=ct.getBoundingClientRect();
-      if(r.top<vh+40){
-        const cp=cl(1-(r.top/vh),0,1);
-        this._cp=this._cp==null?cp:this._cp+(cp-this._cp)*this.grip(.2,dt);
-        ct.style.transform='scale('+(1.16-0.16*this._cp).toFixed(4)+')';
-      }
+    // Measured off layout, not off the element's own rect: it is travelling along Z, and a
+    // rect reading would feed that travel back in — and it has to land at exactly flat,
+    // because this is where the page stops.
+    if(ct&&!this.reduced&&this._contactY!=null&&this._contactY-sy<vh+40){
+      const cp=cl((vh-(this._contactY-sy))/(vh*.62),0,1);
+      this._cp=this._cp==null?cp:this._cp+(cp-this._cp)*this.grip(.2,dt);
+      if(Math.abs(cp-this._cp)>.0008)this._easing=true;
+      // The end of the corridor. It comes at you rather than zooming out of nothing.
+      ct.style.transform='perspective(1300px) translate3d(0,0,'+(-(1-this._cp)*380*Z).toFixed(1)+'px) rotateX('+((1-this._cp)*6*Z).toFixed(2)+'deg)';
     }
 
     // Peaks just before the text clears, then eases back to nothing so the field is at rest
@@ -709,7 +803,9 @@ class Component extends DCLogic {
     // in the fallback face for the rest of the session.
     if(!this._fontsWired&&document.fonts&&document.fonts.ready){
       this._fontsWired=true;
-      document.fonts.ready.then(()=>{if(!this._dead)this.buildAtlas();}).catch(()=>{});
+      // The webfont also moves every line of the page, and the corridor stages off measured
+      // layout positions — so re-measure once the real metrics are in.
+      document.fonts.ready.then(()=>{if(!this._dead){this.buildAtlas();this._dirtyLayout=true;}}).catch(()=>{});
     }
     if(!this._streams||resize){
       const N=this.reduced?7:14;
