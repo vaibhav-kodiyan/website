@@ -513,7 +513,7 @@ var ANCHORS = { work:'shipped', rig:'sandbox', about:'trajectory', contact:'cont
    same raw coordinate; stretch bands convert raw ↔ progress so pacing can be
    retuned without renumbering a single keyframe. */
 var Scroll = (function(){
-  var totalScrollPx = 21000, touchScrollPx = 3600, lerpSpeed = 0.10, keyStep = 0.12;
+  var totalScrollPx = 21000, touchScrollPx = 2000, lerpSpeed = 0.10, keyStep = 0.12;
   var bands = [
     { name:'instruction', start:0,    end:0.12, factor:1.55 },  /* the fall is worth the wheel */
     { name:'repo',        start:0.12, end:0.30, factor:1.05 },
@@ -578,12 +578,23 @@ var Scroll = (function(){
     return p;
   }
 
-  /* Three input paths, one integrator. */
+  /* Three input paths, one integrator. Mouse wheels report deltaY in fixed,
+     chunky notches; trackpads report fine continuous pixels. Chrome/Safari
+     expose both deltaY and the legacy wheelDeltaY, and for a trackpad the
+     two are always exactly related (wheelDeltaY === deltaY * -3) because
+     both are derived from the same raw pixel value — a physical wheel's
+     notch is quantized independently, so the relation doesn't hold. That
+     lets a real mouse get a speed boost without touching trackpad feel. */
+  var mouseWheelFactor = 1.9;
+  function isTrackpadWheel(e){
+    return e.wheelDeltaY !== undefined && e.wheelDeltaY === e.deltaY * -3;
+  }
   addEventListener('wheel', function(e){
     e.preventDefault();
     var d = e.deltaY;
     if(e.deltaMode === 1) d *= 18;
     else if(e.deltaMode === 2) d *= innerHeight;
+    else if(!isTrackpadWheel(e)) d *= mouseWheelFactor;
     push(d);
   }, { passive:false });
 
