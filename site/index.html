@@ -48,17 +48,13 @@ a:hover{color:var(--color-accent-400)}
 <div ref="{{ loaderRef }}" style="position:fixed;inset:0;z-index:9000;background:var(--color-bg);display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8) 56px;animation:wipe 1.15s cubic-bezier(.83,0,.17,1) 2.2s forwards">
   <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.18em;color:var(--color-neutral-500);text-transform:uppercase"><span>Vaibhav Kodiyan</span><span>Agentic Engineer</span></div>
   <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
-    <div style="font:300 clamp(44px,8vw,120px)/0.92 var(--font-heading);letter-spacing:-.045em">break assumptions<br><span style="color:var(--color-accent);text-shadow:var(--glow-red-sm)">not production.</span></div>
+    <div style="font:300 clamp(44px,8vw,120px)/0.92 var(--font-heading);letter-spacing:-.045em">break assumptions<br><span style="color:var(--color-accent)">not production.</span></div>
     <div ref="{{ countRef }}" style="font:300 clamp(36px,6vw,84px)/1 var(--font-heading);color:var(--color-neutral-300);letter-spacing:-.04em;font-variant-numeric:tabular-nums">000</div>
   </div>
   <div style="height:1px;background:var(--color-divider);position:relative"><div ref="{{ barRef }}" style="position:absolute;inset:0 100% 0 0;background:var(--color-accent)"></div></div>
 </div>
 
 <header style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) 56px;background:linear-gradient(#0c0b0ae6,#0c0b0a00)">
-  <div style="display:flex;align-items:center;gap:var(--space-4)">
-    <div style="width:20px;height:20px;border:1px solid var(--color-accent);border-radius:50%;position:relative"><div style="position:absolute;inset:6px;background:var(--color-accent);border-radius:50%"></div></div>
-    <span style="font:500 13px/1 var(--font-heading);letter-spacing:.12em">VK</span>
-  </div>
   <nav style="display:flex;gap:34px;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-400)">
     <a href="#work" style="color:inherit" style-hover="color:var(--color-accent-300)">Work</a><a href="#rig" style="color:inherit" style-hover="color:var(--color-accent-300)">Rig</a><a href="#about" style="color:inherit" style-hover="color:var(--color-accent-300)">About</a><a href="#contact" style="color:inherit" style-hover="color:var(--color-accent-300)">Contact</a>
   </nav>
@@ -68,21 +64,20 @@ a:hover{color:var(--color-accent-400)}
 <section data-screen-label="Hero" style="position:relative;z-index:2;height:200vh">
   <div ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
 
-    <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:min(56vw,700px);aspect-ratio:1;margin:-28vw 0 0 -28vw;max-width:700px;max-height:700px;pointer-events:none;will-change:transform,opacity">
-      <canvas ref="{{ holeRef }}" style="position:absolute;inset:-42%;width:184%;height:184%"></canvas>
-      <div style="position:absolute;inset:-14%;border:1px solid var(--color-border-gold);border-radius:50%;animation:spin 48s linear infinite;opacity:.35"></div>
-      <div style="position:absolute;inset:-28%;border:1px dashed var(--color-neutral-800);border-radius:50%;animation:spin 110s linear infinite reverse;opacity:.35"></div>
+    <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:115vmax;height:115vmax;transform:translate(-50%,-50%);pointer-events:none;will-change:transform,opacity">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,150,55,.2) 0%,rgba(196,90,28,.13) 16%,rgba(90,32,8,.08) 38%,rgba(40,16,4,.04) 58%,transparent 78%)"></div>
+      <canvas ref="{{ holeRef }}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
     </div>
 
     <div ref="{{ heroCoreRef }}" style="position:relative;display:flex;flex-direction:column;gap:var(--space-8);max-width:1180px;margin:0 auto;width:100%;will-change:transform,opacity">
       <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>01 — Agentic Engineer</span><span>CSE '29 · MIT Manipal</span></div>
-      <h1 style="margin:0;font:300 clamp(60px,12.5vw,188px)/0.86 var(--font-heading);letter-spacing:-.055em;color:var(--color-neutral-100);text-shadow:0 0 70px #000000"><span data-line="1" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">VAIBHAV</span></span><span data-line="2" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">KODIYAN</span></span></h1>
+      <h1 style="margin:0;font:300 clamp(60px,12.5vw,188px)/0.86 var(--font-heading);letter-spacing:-.055em;color:var(--color-neutral-100)"><span data-line="1" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">VAIBHAV</span></span><span data-line="2" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">KODIYAN</span></span></h1>
       <div style="display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;padding-top:var(--space-6);border-top:1px solid var(--color-divider)">
-        <p style="margin:0;max-width:430px;font:300 17px/1.5 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty">I build agents that write, review and ship code. Currently making <span style="color:var(--color-accent-300)">Rig</span> at Qaynel Agentic Solutions — infrastructure for coding agents that don't need babysitting.</p>
-        <div style="display:flex;gap:44px;font:400 11px/1.6 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-500)">
-          <div><div style="color:var(--color-text);font-size:26px;letter-spacing:-.02em">04</div>shipped systems</div>
-          <div><div style="color:var(--color-text);font-size:26px;letter-spacing:-.02em">03</div>certifications</div>
-          <div><div style="color:var(--color-text);font-size:26px;letter-spacing:-.02em">FMD</div>driverless</div>
+        <p style="margin:0;max-width:430px;font:500 17px/1.5 var(--font-body);color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72);text-wrap:pretty">I build agents that write, review and ship code. Currently making <span style="color:var(--color-accent-300)">Rig</span> at Qaynel Agentic Solutions — infrastructure for coding agents that don't need babysitting.</p>
+        <div style="display:flex;gap:44px;font:500 11px/1.6 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72)">
+          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">04</div>shipped systems</div>
+          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">03</div>certifications</div>
+          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">FMD</div>driverless</div>
         </div>
       </div>
     </div>
@@ -129,11 +124,11 @@ a:hover{color:var(--color-accent-400)}
 </section>
 
 <section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:320vh">
-  <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center">
+  <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;perspective:1600px">
     <div style="display:flex;justify-content:space-between;padding:0 56px var(--space-8);font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>03 — How I work</span><span>Scroll →</span></div>
-    <div ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform">
+    <div ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform;transform-style:preserve-3d">
       <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
-        <div style="flex:none;width:min(46vw,560px);height:56vh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8);border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-sm)">
+        <div style="flex:none;width:min(46vw,560px);height:56vh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8);border-radius:var(--radius-lg);background:linear-gradient(160deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-sm);transform-style:preserve-3d;will-change:transform">
           <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-accent-300)">{{ r.k }}</span>
           <div style="display:flex;flex-direction:column;gap:var(--space-6)">
             <h3 style="margin:0;font:400 clamp(30px,4vw,54px)/1.02 var(--font-heading);letter-spacing:-.035em">{{ r.t }}</h3>
@@ -256,6 +251,26 @@ class Component extends DCLogic {
   }
   componentDidUpdate(){try{this.split();}catch(e){}}
 
+  scrollLerp(){
+    const d=this.props.scrollDuration!=null?+this.props.scrollDuration:1.35;
+    return Math.max(0.025,Math.min(0.12,0.065/Math.max(0.35,d)));
+  }
+  // How hard is the user pushing right now? 0 = a nudge, 1 = a flick.
+  // Measured as smoothed input speed in px/s so it reads the same whether the
+  // device sends few big deltas (wheel) or many small ones (trackpad, touch).
+  intent(delta){
+    const now=performance.now();
+    const gap=this._inT?now-this._inT:100;
+    this._inT=now;
+    const dt=Math.min(.4,Math.max(.008,gap/1000));
+    const rate=Math.abs(delta)/dt;
+    const prev=this._rate||0;
+    // fast attack, slower release: builds within a flick, holds through its lulls
+    const k=1-Math.pow(.001,dt/(rate>prev?.07:.2));
+    this._rate=prev+(rate-prev)*k;
+    this._q=Math.max(0,Math.min(1,(this._rate-650)/2400));
+    return this._q;
+  }
   engine(){
     if(this._engineOn)return;this._engineOn=true;
     cancelAnimationFrame(this._raf);this._raf=0;
@@ -269,18 +284,43 @@ class Component extends DCLogic {
     this._raf=requestAnimationFrame(loop);
     try{
       if(window.Lenis&&!this.lenis){
+        const lerp=this.scrollLerp();
         this.lenis=new window.Lenis({
-          duration:this.props.scrollDuration!=null?this.props.scrollDuration:1.35,
-          easing:t=>1-Math.pow(1-t,4),
-          smoothWheel:true,syncTouch:false,
-          anchors:true,allowNestedScroll:true,stopInertiaOnNavigate:true
+          lerp,
+          smoothWheel:true,
+          syncTouch:true,
+          syncTouchLerp:Math.max(0.04,lerp*0.85),
+          touchInertiaExponent:1.85,
+          wheelMultiplier:0.82,
+          touchMultiplier:1.05,
+          anchors:true,allowNestedScroll:true,stopInertiaOnNavigate:true,
+          // Adaptive feel: a gentle scroll stays slow and heavily smoothed,
+          // a hard one covers more ground and tracks the input more tightly.
+          virtualScroll:(e)=>{
+            const raw=e.deltaY;
+            if(!raw)return true;
+            const q=this.intent(raw);
+            let d=Math.abs(raw);
+            if(d>240)d=240+(d-240)*.5;
+            e.deltaY=Math.sign(raw)*d*(1+q*q*.85);
+            const L=this.lenis;
+            if(L&&L.options){
+              const lp=Math.min(.19,this.scrollLerp()*(1+q*2.6));
+              L.options.lerp=lp;
+              L.options.syncTouchLerp=Math.max(.04,lp*.9);
+            }
+            return true;
+          }
         });
-        this.lenis.on('scroll',e=>{this.velocity+=(e.velocity-this.velocity)*.45;this.armSnap();});
+        this.lenis.on('scroll',e=>{
+          if(!(e.userData&&e.userData.initiator==='snap'))this._snapping=false;
+          this.armSnap();
+        });
       }
     }catch(e){this.lenis=null;console.error('[portfolio] lenis init',e);}
   }
   armSnap(){
-    if(this.props.snapHero===false||this.reduced||!this.lenis)return;
+    if(this.props.snapHero===false||this.reduced||!this.lenis||this._snapping)return;
     clearTimeout(this._snapT);
     this._snapT=setTimeout(()=>{
       const el=this.heroPinRef.current;if(!el)return;
@@ -289,19 +329,26 @@ class Component extends DCLogic {
       if(sy<=4||sy>=range-4)return;
       const p=sy/range;
       if(p>0.12&&p<0.88)return;
-      this.lenis.scrollTo(p<0.5?0:range,{duration:1.2,easing:t=>1-Math.pow(1-t,4)});
-    },220);
+      this._snapping=true;
+      this.lenis.scrollTo(p<0.5?0:range,{
+        lerp:this.scrollLerp(),
+        userData:{initiator:'snap'},
+        onComplete:()=>{this._snapping=false;}
+      });
+    },280);
   }
   heroLines(){
     const root=this.rootRef.current||document;
     const spans=Array.from(root.querySelectorAll('[data-line] > span'));
     const g=window.gsap;
     if(!g||this.reduced){
-      spans.forEach((s,i)=>{s.style.transition='transform 1.35s cubic-bezier(.16,1,.3,1) '+(this.reduced?0:2.45+i*.12)+'s';s.style.transform='none';});
+      spans.forEach((s,i)=>{s.style.transition='transform 1.35s cubic-bezier(.16,1,.3,1) '+(this.reduced?0:2.45+i*.12)+'s';s.style.transform='none';if(s.parentElement)s.parentElement.style.overflow='visible';});
       return;
     }
     const wait=Math.max(0,2.45-(performance.now()-this._t0)/1000);
-    g.to(spans,{y:'0%',duration:1.35,ease:'expo.out',stagger:.12,delay:wait});
+    const reveal=()=>spans.forEach(s=>{if(s.parentElement)s.parentElement.style.overflow='visible';});
+    g.to(spans,{y:'0%',duration:1.35,ease:'expo.out',stagger:.12,delay:wait,onComplete:reveal});
+    setTimeout(reveal,4800);
   }
   split(){
     const root=this.rootRef.current;if(!root)return;
@@ -379,25 +426,33 @@ class Component extends DCLogic {
     const now=performance.now();
     const dt=this._lastPaint?Math.min(2.4,(now-this._lastPaint)/16.667):1;
     this._lastPaint=now;
+    const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
     const L=this.lenis;
     const sy=L?(L.animatedScroll!=null?L.animatedScroll:(L.scroll||0)):(window.scrollY||0);
-    const v=this.velocity||0;this.velocity=v*Math.pow(0.92,dt);
+    const src=L&&L.velocity!=null?L.velocity:0;
+    this.velocity+=(src-(this.velocity||0))*(1-Math.pow(1-.38,dt));
+    const v=this.velocity||0;
     const moving=Math.abs(sy-(this._lsy||0))>0.15||Math.abs(v)>0.04||Math.abs(this.mx-this.cx)>0.4||Math.abs(this.my-this.cy)>0.4;
-    const heroLive=sy<(this._heroRange||window.innerHeight)*1.05;
     if(this._dirtyLayout||!this._vh)this.measure();
+    const heroLive=sy<(this._heroRange||window.innerHeight)*1.05;
+    const pRaw=cl(sy/(this._heroRange||1),0,1);
+    const pEase=1-Math.pow(1-pRaw,1.35);
+    // The collapse eases behind the scroll, so it can still be mid-flight after the
+    // scroll has already left the hero. Staying awake until it lands is what keeps a
+    // fast flick from stranding the orb halfway open.
+    const heroEasing=this._p!=null&&Math.abs(pEase-this._p)>1e-4;
     if(!this.reduced){
-      this.marqX-=(.5+Math.min(Math.abs(v)*1.6,22))*dt;
+      this.marqX-=(.5+Math.min(Math.abs(v)*2.6,32))*dt;
       const half=this._marqHalf||0;
       if(half&&this.marqX<=-half)this.marqX+=half;
       const m=this.marqRef.current;
       if(m)m.style.transform='translate3d('+this.marqX.toFixed(1)+'px,0,0)';
     }
-    if(!moving&&!heroLive&&this._settled)return;
-    this._settled=!moving&&!heroLive;
+    if(!moving&&!heroLive&&!heroEasing&&this._settled)return;
+    this._settled=!moving&&!heroLive&&!heroEasing;
     this._lsy=sy;
     const vh=this._vh,vw=this._vw;
     const Z=this.props.zoomIntensity!=null?this.props.zoomIntensity:1;
-    const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
     const follow=1-Math.pow(1-.14,dt);
 
     this.cx+=(this.mx-this.cx)*follow;this.cy+=(this.my-this.cy)*follow;
@@ -406,22 +461,28 @@ class Component extends DCLogic {
 
     const gp=cl(sy/Math.max(1,this._sh-vh),0,1);
     const pr=this.progRef.current;if(pr)pr.style.transform='scaleX('+gp.toFixed(4)+')';
-    const tn=this.tintRef.current;if(tn)tn.style.opacity=(gp*0.55).toFixed(3);
+    const tn=this.tintRef.current;if(tn)tn.style.opacity=(gp*0.55+Math.min(Math.abs(v)*.006,.1)).toFixed(3);
 
-    const pRaw=cl(sy/this._heroRange,0,1);
-    const pEase=1-Math.pow(1-pRaw,1.35);
-    this._p=this._p==null?pEase:this._p+(pEase-this._p)*(1-Math.pow(1-.28,dt));
+    this._p=this._p==null?pEase:this._p+(pEase-this._p)*(1-Math.pow(1-.16,dt));
+    if(Math.abs(pEase-this._p)<1e-4)this._p=pEase;
     const p=this._p;
     const o=this.orbRef.current;
-    if(o&&heroLive){
+    // Keep writing past the hero window until p has actually landed, so the orb always
+    // ends up fully collapsed instead of frozen at whatever it reached on the way out.
+    if(o&&(heroLive||this._orbP!==p)){
       const rx=((this.cy/vh)-.5)*-10,ry=((this.cx/vw)-.5)*14;
-      o.style.transform='perspective(1200px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) rotate('+(p*72+v*.18).toFixed(2)+'deg) scale('+(1+Math.pow(p,1.85)*8.2*Z).toFixed(4)+')';
-      o.style.opacity=(1-cl((p-.8)/.2,0,1)).toFixed(3);
-      if(p<0.93)this.paintHole(p,dt);
+      const oa=1-cl((p-.8)/.2,0,1);
+      o.style.transform='translate(-50%,-50%) perspective(1200px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) rotate('+(p*48+v*.38).toFixed(2)+'deg) scale('+(1+Math.pow(p,1.7)*2.15*Z+Math.min(Math.abs(v)*.0022,.12)).toFixed(4)+')';
+      o.style.opacity=oa.toFixed(3);
+      // Redraw for as long as any of it shows; wipe the canvas once it doesn't, so a
+      // stale frame can't reappear when the orb fades back in on the way up.
+      if(oa>.002)this.paintHole(p,dt);
+      else if(this._hctx)this._hctx.clearRect(0,0,this._hw,this._hh);
+      this._orbP=p;
     }
     const hc=this.heroCoreRef.current;
     if(hc){
-      hc.style.transform='translate3d(0,'+(-p*90).toFixed(1)+'px,0) scale('+(1-p*.28*Z).toFixed(4)+')';
+      hc.style.transform='translate3d(0,'+(-p*90+v*.42).toFixed(1)+'px,0) scale('+(1-p*.28*Z).toFixed(4)+')';
       hc.style.opacity=(1-cl(p/.42,0,1)).toFixed(3);
       hc.style.pointerEvents=p>.35?'none':'auto';
     }
@@ -429,12 +490,12 @@ class Component extends DCLogic {
     if(he){
       const inn=cl((p-.34)/.2,0,1);
       he.style.opacity=inn.toFixed(3);
-      he.style.transform='translate3d(0,'+((1-inn)*40).toFixed(1)+'px,0) scale('+(0.94+inn*.06+cl((p-.7)/.3,0,1)*.1).toFixed(4)+')';
+      he.style.transform='translate3d(0,'+((1-inn)*40+v*.28).toFixed(1)+'px,0) scale('+(0.94+inn*.06+cl((p-.7)/.3,0,1)*.1).toFixed(4)+')';
     }
     const sh=this.scrollHintRef.current;
     if(sh)sh.style.opacity=(1-cl(p*4,0,1)).toFixed(3);
 
-    const sk=cl(v*.028,-3.2,3.2);this.skew+=(sk-this.skew)*(1-Math.pow(1-.1,dt));
+    const sk=cl(v*.07,-5.4,5.4);this.skew+=(sk-this.skew)*(1-Math.pow(1-.07,dt));
     const bd=this.bandRef.current;
     if(bd&&!this.reduced&&this.props.velocitySkew!==false)
       bd.style.transform='skewY('+this.skew.toFixed(3)+'deg)';
@@ -448,25 +509,31 @@ class Component extends DCLogic {
       if(r.bottom<-80||r.top>vh+80)continue;
       const d=cl(((r.top+r.height/2)-vh/2)/vh,-1,1);
       const a=Math.abs(d);
-      el.style.transform='translate3d(0,'+(d*12).toFixed(1)+'px,0) scale('+(1-a*.035*Z).toFixed(4)+')';
+      el.style.transform='translate3d(0,'+(d*12+v*.34).toFixed(1)+'px,0) rotateX('+(-d*10).toFixed(2)+'deg) rotateY('+(d*7+v*.05).toFixed(2)+'deg) scale('+(1-a*.035*Z).toFixed(4)+')';
       el.style.opacity=(1-a*.26).toFixed(3);
     }
 
     const rail=this.railRef.current;
     if(rail&&this._railRange){
       const rp=cl((sy-this._railTop)/this._railRange,0,1);
-      this._railP=this._railP==null?rp:this._railP+(rp-this._railP)*(1-Math.pow(1-.3,dt));
+      this._railP=this._railP==null?rp:this._railP+(rp-this._railP)*(1-Math.pow(1-.18,dt));
       rail.style.transform='translate3d('+(-this._railP*this._railDist).toFixed(1)+'px,0,0)';
+      const kids=rail.children,n=kids.length||1;
+      for(let i=0;i<kids.length;i++){
+        const u=i-this._railP*(n-1);
+        const au=Math.abs(u);
+        kids[i].style.transform='rotateY('+(-u*18).toFixed(2)+'deg) rotateX(7deg) translateZ('+((1-Math.min(au,1.4))*48).toFixed(1)+'px) scale('+(1-Math.min(au,.12)*.08).toFixed(4)+')';
+      }
     }
 
     const panel=this.rigPanelRef.current;
     if(panel&&this._rigRange){
       const rp=cl((sy-this._rigTop)/this._rigRange,0,1);
-      this._rigP=this._rigP==null?rp:this._rigP+(rp-this._rigP)*(1-Math.pow(1-.3,dt));
+      this._rigP=this._rigP==null?rp:this._rigP+(rp-this._rigP)*(1-Math.pow(1-.18,dt));
       const e=this._rigP<.5?(this._rigP/.5):1;
       const out=cl((this._rigP-.82)/.18,0,1);
       const s=(.46+.54*e)*(1-out*.06);
-      panel.style.transform='scale('+s.toFixed(4)+')';
+      panel.style.transform='perspective(1400px) rotateX('+(8-e*8).toFixed(2)+'deg) scale('+s.toFixed(4)+')';
       panel.style.borderRadius=((1-e)*18).toFixed(1)+'px';
       const f=this.rigFieldRef.current;
       if(f)f.style.transform='rotate('+(this._rigP*22).toFixed(2)+'deg) scale('+(1.1+this._rigP*.25)+')';
@@ -479,12 +546,12 @@ class Component extends DCLogic {
       const r=ct.getBoundingClientRect();
       if(r.top<vh+40){
         const cp=cl(1-(r.top/vh),0,1);
-        this._cp=this._cp==null?cp:this._cp+(cp-this._cp)*(1-Math.pow(1-.28,dt));
+        this._cp=this._cp==null?cp:this._cp+(cp-this._cp)*(1-Math.pow(1-.16,dt));
         ct.style.transform='scale('+(1.16-0.16*this._cp).toFixed(4)+')';
       }
     }
 
-    this.paintStars(sy,gp);
+    this.paintStars(sy,gp,v);
   }
   clock(){
     const tick=()=>{const el=this.clockRef.current;if(!el)return;
@@ -507,28 +574,30 @@ class Component extends DCLogic {
     cv.width=w*dpr;cv.height=h*dpr;
     const ctx=cv.getContext('2d',{alpha:false});ctx.setTransform(dpr,0,0,dpr,0,0);
     this._ctx=ctx;this._w=w;this._h=h;
-    const n=this.reduced?40:90;
+    const n=this.reduced?40:130;
     if(!this._pts||resize)this._pts=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random(),r:Math.random()*1.4+.2}));
     const g=ctx.createRadialGradient(w*.5,h*.45,0,w*.5,h*.45,Math.max(w,h)*.8);
     g.addColorStop(0,'#141110');g.addColorStop(.55,'#0c0b0a');g.addColorStop(1,'#000000');
     this._bg=g;
   }
-  paintStars(sy,gp){
+  paintStars(sy,gp,v){
     const ctx=this._ctx;if(!ctx||this.props.starfield===false)return;
     const w=this._w,h=this._h;
     ctx.fillStyle=this._bg;ctx.fillRect(0,0,w,h);
+    const stretch=1+Math.min(Math.abs(v||0)*0.07,2.8);
+    const kick=(v||0)*0.95;
     for(const p of this._pts){
-      const y=(p.y-sy*p.z*.22)%h,yy=y<0?y+h:y;
+      const y=(p.y-sy*p.z*.22-kick*p.z)%h,yy=y<0?y+h:y;
       ctx.globalAlpha=.2+p.z*.7;
       ctx.fillStyle=p.z>.92?'#c99a3c':(p.z>.55?'#8f8672':'#ece6d9');
       const r=p.r*(.5+p.z)*(1+gp*.35);
-      ctx.fillRect(p.x-r,yy-r,r*2,r*2);
+      ctx.fillRect(p.x-r,yy-r*stretch,r*2,r*2*stretch);
     }
     ctx.globalAlpha=1;
   }
   initHole(resize){
     const cv=this.holeRef.current;if(!cv)return;
-    const dpr=Math.min(1.25,window.devicePixelRatio||1);
+    const dpr=Math.min(1.1,window.devicePixelRatio||1);
     const w=cv.clientWidth||400,h=cv.clientHeight||400;
     cv.width=w*dpr;cv.height=h*dpr;
     const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -547,6 +616,19 @@ class Component extends DCLogic {
           a:.78+.22*(1-Math.abs(lane)*.3)
         };
       });
+      const wraps=this.reduced?8:18;
+      for(let i=0;i<wraps;i++){
+        const u=(i+.5)/wraps;
+        sheet.push({
+          lane:0,ang:(i/wraps)*6.283+Math.random()*.12,wrap:true,
+          orbit:.62+u*.38,
+          wind:1.4+Math.random()*1.2,
+          str:this._randStream(),
+          off:Math.random()*160,
+          spd:.26+Math.random()*.5,
+          a:.5+.28*u
+        });
+      }
       this._streams=sheet;
       this._holeT=0;
     }
@@ -565,40 +647,42 @@ class Component extends DCLogic {
   paintHole(p,dt){
     const ctx=this._hctx;if(!ctx||!this._streams)return;
     const w=this._hw,h=this._hh,cx=w/2,cy=h/2,dpr=this._hdpr;
-    const maxR=Math.min(w,h)*.38;
+    const maxR=Math.min(w,h)*.5;
     ctx.clearRect(0,0,w,h);
-    const tilt=-.12,aspect=.9;
+    const tilt=-.08,aspect=.92;
     const pt=(rx,ry,a)=>{const lx=rx*Math.cos(a),ly=ry*Math.sin(a);return{x:cx+lx*Math.cos(tilt)-ly*Math.sin(tilt),y:cy+lx*Math.sin(tilt)+ly*Math.cos(tilt)};};
-    const horizon=maxR*(.18+p*.5);
-    const outerR=maxR*1.18;
-    const fallBoost=1+p*2.2;
-    const fontSize=Math.max(8,maxR*.03);
+    const horizon=maxR*(.3+p*.22);
+    const outerR=maxR*1.01;
+    const fallBoost=1+p*2.2+Math.min(Math.abs(this.velocity||0)*0.08,3.2);
+    const fontSize=Math.max(9,maxR*.016);
     this._holeT+=.46*fallBoost*(dt||1);
     const spin=this._holeT*.0055;
     const pos=(s,t)=>{
-      const rad=horizon+(outerR-horizon)*Math.pow(1-t,1.08);
       if(s.wrap){
-        const ang=s.ang+spin+s.wind*t;
+        const rad=outerR*s.orbit*(1-t*.12);
+        const ang=s.ang+spin*(.45+s.orbit)+s.wind*t*.35;
         return pt(rad,rad*aspect,ang);
       }
-      const tSp=Math.max(0,(t-.16)/.84);
+      const rad=horizon+(outerR-horizon)*Math.pow(1-t,1.08);
+      const tSp=Math.max(0,(t-.12)/.88);
       const ang=s.ang+spin+s.wind*Math.pow(tSp,.9);
       const polar=pt(rad,rad*aspect,ang);
-      const mix=Math.min(1,Math.pow(t/.48,1.12));
-      const curtainX=cx+maxR*(.78+(1-t)*.72);
-      const curtainY=cy+s.lane*maxR*(.48+(1-t)*.7);
+      const mix=Math.min(1,Math.pow(t/.62,1.05));
+      const curtainX=cx+maxR*(1.02+(1-t)*.28);
+      const curtainY=cy+s.lane*maxR*(.72+(1-t)*.38);
       return{x:curtainX*(1-mix)+polar.x*mix,y:curtainY*(1-mix)+polar.y*mix};
     };
 
-    const haze=ctx.createRadialGradient(cx,cy,horizon*.4,cx,cy,maxR*1.85);
-    haze.addColorStop(0,'rgba(255,155,60,'+(.22+p*.1).toFixed(2)+')');
-    haze.addColorStop(.4,'rgba(176,82,28,'+(.08+p*.04).toFixed(2)+')');
+    const haze=ctx.createRadialGradient(cx,cy,horizon*.35,cx,cy,maxR*1.35);
+    haze.addColorStop(0,'rgba(255,155,60,'+(.28+p*.1).toFixed(2)+')');
+    haze.addColorStop(.32,'rgba(176,82,28,'+(.14+p*.04).toFixed(2)+')');
+    haze.addColorStop(.62,'rgba(120,55,18,'+(.07).toFixed(2)+')');
     haze.addColorStop(1,'rgba(0,0,0,0)');
     ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);ctx.restore();
 
     ctx.textAlign='left';ctx.textBaseline='middle';
     ctx.font='500 '+fontSize+'px "JetBrains Mono",ui-monospace,monospace';
-    const steps=this.reduced?10:18;
+    const steps=this.reduced?12:26;
     const chunk=4;
     for(const s of this._streams){
       const flow=this._holeT*s.spd+s.off;
@@ -615,7 +699,7 @@ class Component extends DCLogic {
         let cr,cg,cb;
         if(t<.5){const k=t/.5;cr=250-18*k;cg=248-38*k;cb=242-70*k;}
         else{const k=(t-.5)/.5;cr=232+23*k;cg=210-62*k;cb=172-122*k;}
-        const alpha=Math.min(.96,(s.wrap?.55:1)*s.a*(.78+t*.22)*(t<.05?t/.05:1));
+        const alpha=Math.min(.96,(s.wrap?.85:1)*s.a*(.78+t*.22)*(t<.05?t/.05:1));
         if(alpha<.06)continue;
         const stretch=1+t*t*2.2,sc=.68+(1-t)*.55;
         ctx.globalCompositeOperation=t>.62?'lighter':'source-over';
