@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel transitions · options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0b0a;--surface:#17140f;--divider:#2c261d;--text:#ece6d9;--n300:#a39a87;--n500:#5f584a;--n700:#342d21;
+  --accent:#9c1f22;--accent300:#b8342f;
+  --font:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 55% at 50% 0%,#1a0e0d,transparent 62%)}
+main{max-width:1080px;margin:0 auto;padding:clamp(48px,9vh,110px) clamp(20px,4vw,56px) 120px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:24px;flex-wrap:wrap;
+  font:400 11px/1 var(--font);letter-spacing:.2em;text-transform:uppercase;color:var(--n500)}
+h1{margin:26px 0 14px;font:300 clamp(34px,5.4vw,68px)/1 var(--font);letter-spacing:-.045em}
+.lede{margin:0 0 12px;max-width:64ch;font:300 16px/1.62 var(--font);color:var(--n300);text-wrap:pretty}
+.how{margin:0 0 56px;max-width:64ch;font:300 13px/1.7 var(--font);color:var(--n500)}
+.how kbd{font:400 11px/1 var(--font);border:1px solid var(--n700);border-radius:3px;padding:3px 6px;color:var(--n300)}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:1px;background:var(--divider);border-block:1px solid var(--divider)}
+li{background:var(--bg)}
+a.row{display:grid;grid-template-columns:64px 1fr 210px;gap:clamp(14px,2.5vw,32px);align-items:center;
+  padding:30px clamp(4px,1.4vw,20px);color:var(--text);text-decoration:none;transition:background .35s cubic-bezier(.16,1,.3,1)}
+a.row:hover,a.row:focus-visible{background:#17140f}
+a.row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.n{font:300 30px/1 var(--font);letter-spacing:-.03em;color:var(--n700)}
+a.row:hover .n{color:var(--accent300)}
+.t{display:flex;flex-direction:column;gap:8px;min-width:0}
+.t b{font:400 clamp(19px,2.4vw,27px)/1.1 var(--font);letter-spacing:-.02em;font-weight:400}
+.t span{font:300 13.5px/1.55 var(--font);color:var(--n300);text-wrap:pretty}
+.m{display:flex;flex-direction:column;gap:7px;font:400 10px/1.4 var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--n500)}
+.m i{font-style:normal;color:var(--n300)}
+@media (max-width:720px){
+  a.row{grid-template-columns:38px 1fr;padding:24px 0}
+  .m{grid-column:2;flex-direction:row;flex-wrap:wrap;gap:6px 18px}
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><span>Vaibhav Kodiyan · how I work</span><span>Eight options</span></div>
+  <h1>Panel transitions</h1>
+  <p class="lede">Eight ways for one method panel to hand off to the next. Same four panels, same palette and type in every one, so the only thing that differs is the move. Pick one and I'll build it into the section.</p>
+  <p class="lede">The last two are the newest — both keep the whole set on screen at once, so the four points read as one argument rather than four slides.</p>
+  <p class="how">Each page is standalone — open it directly, no server needed. <kbd>scroll</kbd> or drag the bar to scrub, <kbd>←</kbd> <kbd>→</kbd> to step one panel, <kbd>space</kbd> to autoplay. Park mid-transition to inspect the geometry; the readout shows which hand-off and how far through it you are.</p>
+
+  <ol>
+    <li><a class="row" href="./01-cube-roll.html">
+      <span class="n">01</span>
+      <span class="t"><b>Cube roll</b><span>Four panels are four faces of one cube. The scroll rolls it, so the next panel comes up from below on a hard edge and the whole screen is a single rigid object.</span></span>
+      <span class="m"><span>Depth · <i>whole-screen</i></span><span>Reads as · <i>mechanism</i></span><span>Cost · <i>low</i></span></span>
+    </a></li>
+
+    <li><a class="row" href="./02-hinge-doors.html">
+      <span class="n">02</span>
+      <span class="t"><b>Hinge doors</b><span>The panel splits down the middle and both halves swing open toward you on edge hinges, catching light on their inner faces. The next panel is held one screen back and comes forward through the gap.</span></span>
+      <span class="m"><span>Depth · <i>toward camera</i></span><span>Reads as · <i>reveal</i></span><span>Cost · <i>low</i></span></span>
+    </a></li>
+
+    <li><a class="row" href="./03-slat-flip.html">
+      <span class="n">03</span>
+      <span class="t"><b>Slat flip</b><span>The screen is nine vertical blades. Each turns edge-on and comes back carrying the next panel, staggered left to right, so the change crosses the screen as a wave rather than arriving all at once.</span></span>
+      <span class="m"><span>Depth · <i>per-blade</i></span><span>Reads as · <i>wave</i></span><span>Cost · <i>medium</i></span></span>
+    </a></li>
+
+    <li><a class="row" href="./04-portal-dive.html">
+      <span class="n">04</span>
+      <span class="t"><b>Portal dive</b><span>The next panel is a lit window far out in the dark. The camera flies through the current one — which scales past and out of frame — and lands on it as it opens to full bleed. Star streaks stretch with the speed.</span></span>
+      <span class="m"><span>Depth · <i>camera dolly</i></span><span>Reads as · <i>falling in</i></span><span>Cost · <i>medium</i></span></span>
+    </a></li>
+
+    <li><a class="row" href="./05-deck-throw.html">
+      <span class="n">05</span>
+      <span class="t"><b>Deck throw</b><span>The panels are a physical stack of slabs receding into depth. The top one tips, lifts and is thrown past the camera; the deck steps forward. The only option with visible depth while parked, not just mid-move.</span></span>
+      <span class="m"><span>Depth · <i>at rest too</i></span><span>Reads as · <i>objects</i></span><span>Cost · <i>low</i></span></span>
+    </a></li>
+
+    <li><a class="row" href="./06-tile-shatter.html">
+      <span class="n">06</span>
+      <span class="t"><b>Tile shatter</b><span>A four-by-three grid. Outgoing tiles tumble toward the camera along their own radius from the centre while the incoming ones arrive out of depth on the opposite tilt. The most maximal of the six.</span></span>
+      <span class="m"><span>Depth · <i>per-tile</i></span><span>Reads as · <i>burst</i></span><span>Cost · <i>high</i></span></span>
+    </a></li>
+
+    <li><a class="row" href="./07-stack-build.html">
+      <span class="n">07</span>
+      <span class="t"><b>Stack build</b><span>The Lenis move. Each card is dealt in from the lower right, oversized and tilted, and lands on a stack that never clears — every point already made stays on screen, receding toward a vanishing point up-left and ghosting through the card in front.</span></span>
+      <span class="m"><span>Depth · <i>at rest too</i></span><span>Reads as · <i>an argument</i></span><span>Cost · <i>low</i></span></span>
+    </a></li>
+
+    <li><a class="row" href="./08-corridor-dive.html">
+      <span class="n">08</span>
+      <span class="t"><b>Corridor dive</b><span>The portal dive made continuous. All four panels hang at their own depth down one corridor and the camera flies through them, so the ones you have not reached are already visible ahead through the one you are reading. Star streaks stretch with the speed.</span></span>
+      <span class="m"><span>Depth · <i>camera dolly</i></span><span>Reads as · <i>one shaft</i></span><span>Cost · <i>medium</i></span></span>
+    </a></li>
+  </ol>
+</main>
+</body>
+</html>
