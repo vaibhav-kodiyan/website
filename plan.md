@@ -329,7 +329,7 @@ SEGMENTS = [
   { name:'sandbox',     start:0.30, end:0.52 },  // Rig. Execution in a contained cell.
   { name:'review',      start:0.52, end:0.58 },  // SIGNATURE. The loop catches what the model missed.
   { name:'shipped',     start:0.58, end:0.74 },  // the diff lands; selected work
-  { name:'trajectory',  start:0.74, end:0.88 },  // FMD racing line — the other autonomy
+  { name:'trajectory',  start:0.74, end:0.88 },  // racing-line optimizer — the other autonomy
   { name:'contact',     start:0.88, end:1    },
 ]
 ```
@@ -352,7 +352,7 @@ No models. Everything procedural — points, lines, instanced quads, one shader 
 | `sandbox` | A contained volume — an agent stepping through actions, each step leaving a trace | Instanced quads on a reflective plane, `infinityFloor` grid shader, volumetric cone. Cheapest scene in the set. |
 | `review` | **Signature.** The diff arrives whole and correct-looking; the review pass sweeps it; one hunk fails and the sweep stops on it | Custom fragment shader on a full-screen quad. The scan line is a uniform driven by progress. |
 | `shipped` | Horizontal card rail of the work index over a flowing light ribbon | `cardSystem` pattern — but 2D, over the existing `.wk-row` markup. |
-| `trajectory` | A racing line optimising itself over a track outline, curvature-coloured | Line geometry, progress drives the optimiser's iteration count. Real data if the FMD numbers exist. |
+| `trajectory` | A racing line optimising itself over a track outline, curvature-coloured | Line geometry, progress drives the optimiser's iteration count. Real data if the racing-line numbers exist. |
 | `contact` | Aperture close to a letterbox band | `#transition-overlay` scaleY (§2.12), exactly edolus's ending. |
 
 Post-FX presets per chapter (§2.9) using the existing tokens — `--color-accent #9c1f22` and
@@ -487,7 +487,7 @@ fight it.
    can start before this is settled.
 2. **Audio** — edolus's four-stem score is a large part of why it lands. Muted-by-default with
    a visible toggle is the only version defensible on a portfolio. Or skip entirely.
-3. **`trajectory` chapter** — worth building only with real FMD racing-line data. Invented
+3. **`trajectory` chapter** — worth building only with real racing-line data. Invented
    telemetry on a page about not faking work would be the wrong note.
 4. **Loader** — a percentage counter earns its keep when the load is the pitch. Under a 3 s
    budget it may be better to have no loader at all.
