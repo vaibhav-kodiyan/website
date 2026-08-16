@@ -2078,8 +2078,8 @@ var Ambience = (function(){
   var RISE = 0.5, FALL = 2.2;     /* seconds of fade in, and of the step down */
   var PREF = 'vk-sound';
   var GEST = ['pointerdown','keydown','wheel','touchstart'];
-  var pass = 0, lastT = 0, armed = false, muted = false;
-  try{ muted = localStorage.getItem(PREF) === 'off'; }catch(e){}
+  var pass = 0, lastT = 0, armed = false, muted = true;
+  try{ muted = localStorage.getItem(PREF) !== 'on'; }catch(e){}
 
   el.loop = true;                 /* looping in the element keeps the seam tight */
   el.volume = 0;
