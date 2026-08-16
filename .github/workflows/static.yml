@@ -28,16 +28,8 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p _site
-          cp site/index.html site/support.js site/nocturne.css _site/
-          cp -R explorations _site/explorations
-          # The homepage reads audio/ from the root; /explorations/ reaches the
-          # same folder with ../, so one copy serves both.
+          cp site/index.html _site/index.html
           cp -R audio _site/audio
-          # Homepage is the scroll-timeline build. The previous Lenis-based
-          # homepage stays reachable at /classic.html. To roll back, delete
-          # the two lines below.
-          cp _site/index.html _site/classic.html
-          cp explorations/timeline-mockup.html _site/index.html
           touch _site/.nojekyll
 
       - name: Setup Pages

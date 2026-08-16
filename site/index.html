@@ -1,13 +1,16 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet data-dc-atomics><link rel="stylesheet" href="./nocturne.css"><link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css"><script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js" integrity="sha384-jqpi9VmOdhyLoLURgjCn7EpnG9BbnHW57ibIZoeaIU+erWDH3k8fQQg0xH2ySjnw" crossorigin="anonymous"></script><script src="https://unpkg.com/lenis@1.3.26/dist/lenis-snap.min.js" integrity="sha384-oq0TWGBcl0kQ4r07ikUsxvFYrNOoNpeM/mZPXt5FVZJuDS/l0bjZRlBqgKM3fEcg" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vaibhav Kodiyan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Tokens — lifted verbatim from site/index.html. Nothing here is new colour.
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root{
   --color-bg:#0c0b0a;--color-surface:#17140f;--color-hover:#1f1a14;--color-divider:#2c261d;
   --color-text:#ece6d9;--color-neutral-100:#ece6d9;--color-neutral-200:#d9d0bd;--color-neutral-300:#a39a87;
@@ -18,1132 +21,2227 @@
   --color-border-gold:#8a6a2a;
   --color-section-glow:rgba(156,31,34,.16);
   --red-glow:rgba(156,31,34,.45);--gold-glow:rgba(166,121,31,.35);
-  --glow-red-sm:0 0 10px var(--red-glow);--glow-red-md:0 0 20px var(--red-glow),0 0 4px var(--red-glow);--glow-gold-sm:0 0 10px var(--gold-glow);
+  --glow-red-sm:0 0 10px var(--red-glow);--glow-red-md:0 0 20px var(--red-glow),0 0 4px var(--red-glow);
   --font-body:"JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --font-heading:"JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --gutter:clamp(20px,4.2vw,56px);
 }
-html{overflow-x:hidden}
-html,body{margin:0;padding:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
 *{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;
+  background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
 a{color:var(--color-accent);text-decoration:none}
-a:hover{color:var(--color-accent-400)}
-:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes wipe{to{transform:translateY(-101%)}}
-@media (prefers-reduced-motion:reduce){
-  @keyframes spin{to{transform:none}}
-  @keyframes wipe{to{transform:none}}
-}
-/* Layout in this document is written inline, so the narrow-screen pass has to outrank it.
-   It only reflows the things that cannot fit a phone: the page gutter, the four-column
-   index row, the side-by-side blocks, and the rail card. */
+a:hover{color:var(--color-accent-300)}
+:focus-visible{outline:2px solid var(--color-accent);outline-offset:3px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ── The stage. There is no document scroll; everything is one fixed viewport. ── */
+#stage{position:fixed;inset:0;z-index:0}
+#scene{position:absolute;inset:0;z-index:0;display:block}
+#grade{position:absolute;inset:0;z-index:1;pointer-events:none}
+
+/* ── Chapters. All seven exist in the DOM at all times; visibility is a pure
+      function of progress, which is what makes scrubbing backwards exact. ── */
+.ch{position:absolute;inset:0;z-index:3;pointer-events:none;padding:0 var(--gutter)}
+.ch>*{pointer-events:none}
+.ch a,.ch button{pointer-events:auto}
+.ap{opacity:0;will-change:opacity,transform,clip-path}
+
+/* Type roles. One family, three jobs, separated by weight and tracking. */
+.eyebrow{font:400 11px/1 var(--font-body);letter-spacing:.22em;text-transform:uppercase;color:var(--color-neutral-500)}
+.eyebrow.acc{color:var(--color-accent-300)}
+.display{margin:0;font-weight:300;font-family:var(--font-heading);letter-spacing:-.05em;line-height:.9;color:var(--color-neutral-100)}
+.body{margin:0;font:300 clamp(14px,1.15vw,17px)/1.6 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty}
+.rule{height:1px;background:linear-gradient(90deg,var(--color-accent),transparent)}
+
+/* ── Diegetic labels (§2.7): DOM text pinned to a projected world point. ── */
+#labels{position:absolute;inset:0;z-index:2;pointer-events:none;contain:strict}
+.dlabel{position:absolute;left:0;top:0;opacity:0;visibility:hidden;will-change:transform,opacity;white-space:nowrap;
+  font:400 10px/1.5 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-400)}
+.dlabel .k{color:var(--color-accent-600)}
+.dlabel .n{display:block;font-size:15px;letter-spacing:-.01em;text-transform:none;color:var(--color-neutral-100)}
+.dlabel .s{display:block;letter-spacing:.1em;color:var(--color-neutral-500)}
+.dlabel::before{content:"";position:absolute;left:-14px;top:6px;width:9px;height:1px;background:var(--color-accent-700)}
+.dlabel.lft{text-align:right}
+.dlabel.lft::before{left:auto;right:-14px}
+
+/* ── Chrome ── */
+#topbar{position:fixed;left:0;right:0;top:0;height:1px;z-index:80;background:var(--color-divider)}
+#topbar>i{display:block;height:100%;transform:scaleX(0);transform-origin:0 50%;
+  background:linear-gradient(90deg,transparent,var(--color-accent),var(--color-accent-300))}
+header{position:fixed;top:0;left:0;right:0;z-index:70;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:clamp(18px,2.6vh,30px) var(--gutter);
+  background:linear-gradient(#0c0b0ae6,#0c0b0a00);pointer-events:none}
+header>*{pointer-events:auto}
+#mark{font:400 12px/1.5 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-100)}
+#mark small{display:block;font-size:10px;letter-spacing:.22em;color:var(--color-neutral-500)}
+#cta{display:inline-flex;align-items:center;gap:10px;padding:9px 18px;border:1px solid var(--color-accent-700);
+  border-radius:100px;font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--color-text);white-space:nowrap;transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)}
+#cta:hover{border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-sm);color:var(--color-text)}
+#cta i{width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)}
+
+/* ── The sound toggle ──────────────────────────────────────────────────────
+   The track belongs to the arrival, so its control lives with the header
+   chrome rather than in the frame. The bars are a level meter, not an icon:
+   they run while the track runs, sit small through the quiet second pass, and
+   flatten under a slash when muted. */
+#hdrRight{display:flex;align-items:center;gap:12px}
+#sound{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:3px;
+  width:32px;height:32px;flex:none;border:1px solid var(--color-neutral-700);border-radius:50%;
+  transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)}
+#sound:hover{border-color:var(--color-accent-700);background:var(--color-hover)}
+#sound i{width:2px;height:3px;background:var(--color-neutral-400);
+  transition:height .45s cubic-bezier(.16,1,.3,1),background .45s cubic-bezier(.16,1,.3,1)}
+#sound[data-on="1"]{border-color:var(--color-accent-700)}
+#sound[data-on="1"] i{background:var(--color-accent-300);animation:eq .78s ease-in-out infinite alternate}
+#sound[data-on="1"] i:nth-child(1){animation-duration:.62s}
+#sound[data-on="1"] i:nth-child(2){animation-duration:.94s;animation-delay:-.3s}
+#sound[data-on="1"] i:nth-child(3){animation-duration:.74s;animation-delay:-.15s}
+#sound[data-on="1"][data-low="1"] i{background:var(--color-accent-600);animation-name:eqLow}
+#sound[data-on="0"]::after{content:"";position:absolute;left:6px;right:6px;top:50%;height:1px;
+  background:var(--color-neutral-300);transform:rotate(-45deg)}
+/* A browser that refused the autoplay is not an error state — it is an
+   invitation, so the control asks once rather than reporting a failure. */
+#sound[data-blocked="1"]{animation:soundWait 2.6s ease-in-out infinite}
+@keyframes eq{from{height:3px}to{height:13px}}
+@keyframes eqLow{from{height:2px}to{height:6px}}
+@keyframes soundWait{0%,100%{border-color:var(--color-neutral-700);box-shadow:none}
+  50%{border-color:var(--color-accent);box-shadow:var(--glow-red-sm)}}
+@media (prefers-reduced-motion:reduce){#sound i,#sound[data-blocked="1"]{animation:none}}
+
+/* The chapter index. The numbers are the structure: these are the real segment
+   bounds the engine reads, not decoration, and clicking one jumps the timeline. */
+#index{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:70;
+  display:flex;flex-direction:column;gap:1px;padding:14px var(--gutter) 14px 46px;
+  background:linear-gradient(90deg,transparent,#0c0b0ad9 42%)}
+.ix{display:grid;grid-template-columns:auto 46px auto;align-items:center;gap:12px;
+  padding:6px 0;background:none;text-align:right;
+  font:400 10px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-600);
+  transition:color .5s cubic-bezier(.16,1,.3,1)}
+.ix b{font-weight:400;font-variant-numeric:tabular-nums;color:var(--color-neutral-700);transition:color .5s cubic-bezier(.16,1,.3,1)}
+.ix u{position:relative;display:block;height:1px;text-decoration:none;background:var(--color-neutral-800)}
+.ix u i{position:absolute;inset:0;transform:scaleX(0);transform-origin:0 50%;background:var(--color-accent-300);box-shadow:var(--glow-red-sm)}
+.ix:hover{color:var(--color-neutral-300)}
+.ix[data-on="1"]{color:var(--color-neutral-100)}
+.ix[data-on="1"] b{color:var(--color-accent-300)}
+
+#hint{position:fixed;right:var(--gutter);bottom:clamp(14px,2.2vh,22px);z-index:70;
+  font:400 10px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-600)}
+
+/* The marquee is the hero band from the current site, kept as ambient life:
+   it runs on its own clock and never reads progress (§2.3). */
+#band{position:fixed;left:0;right:0;bottom:clamp(44px,6.4vh,58px);z-index:60;overflow:hidden;white-space:nowrap;
+  padding:13px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);
+  background:#0c0b0acc;opacity:0}
+#band>div{display:inline-flex;gap:52px;font:400 11px/1 var(--font-body);letter-spacing:.26em;
+  text-transform:uppercase;color:var(--color-neutral-500);will-change:transform}
+#band em{font-style:normal;color:var(--color-accent)}
+
+/* Transitions are a div (§2.12) — but scaled as a pure function of progress, so a
+   boundary wipes identically whichever direction you cross it from. */
+#wipe{position:fixed;inset:0;z-index:90;pointer-events:none;background:var(--color-bg);
+  transform:scaleY(0);transform-origin:50% 100%}
+
+#cursor{position:fixed;top:0;left:0;width:22px;height:22px;margin:-11px 0 0 -11px;z-index:9999;
+  border:1px solid var(--color-accent-600);border-radius:50%;pointer-events:none;mix-blend-mode:difference;
+  will-change:transform,width,height;transition:width .4s cubic-bezier(.16,1,.3,1),height .4s cubic-bezier(.16,1,.3,1),margin .4s cubic-bezier(.16,1,.3,1)}
+
+/* ── Loader → gate → header handoff (§2.5, §2.13, §2.14) ── */
+#gate{position:fixed;inset:0;z-index:9500;background:var(--color-bg);display:flex;flex-direction:column;
+  justify-content:space-between;padding:clamp(18px,2.6vh,30px) var(--gutter) clamp(24px,4vh,44px);
+  transition:opacity .7s cubic-bezier(.83,0,.17,1),visibility .7s}
+#gate[hidden]{display:flex;opacity:0;visibility:hidden;pointer-events:none}
+#gateTop{display:flex;justify-content:space-between;gap:16px}
+#gateMid{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap}
+#gateName{font:300 clamp(38px,8.4vw,124px)/.9 var(--font-heading);letter-spacing:-.055em}
+#gateName span{color:var(--color-accent)}
+#gatePct{font:300 clamp(30px,5.4vw,76px)/1 var(--font-heading);letter-spacing:-.04em;color:var(--color-neutral-500);font-variant-numeric:tabular-nums}
+#gateBar{position:relative;height:1px;background:var(--color-divider);margin-top:26px}
+#gateBar>i{position:absolute;inset:0 100% 0 0;background:var(--color-accent);transition:right .25s linear}
+
+/* ── The end card (§ after the aperture shuts) ──
+   Not a chapter: the timeline is over, so this is plain DOM on plain black. */
+#endcard{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;
+  background:var(--color-bg);opacity:0;visibility:hidden;pointer-events:none}
+#toTop{display:inline-flex;flex-direction:column;align-items:center;gap:18px;
+  padding:26px 34px;border:1px solid var(--color-accent-700);border-radius:2px;
+  font:400 11px/1 var(--font-body);letter-spacing:.24em;text-transform:uppercase;color:var(--color-neutral-100);
+  pointer-events:auto;
+  transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)}
+#toTop svg{width:38px;height:38px;fill:none;stroke:var(--color-accent-300);stroke-width:1;
+  stroke-linecap:square;animation:lift 2.6s cubic-bezier(.16,1,.3,1) infinite;
+  transition:transform .5s cubic-bezier(.16,1,.3,1)}
+@keyframes lift{0%,100%{transform:translateY(0);opacity:.75}45%{transform:translateY(-7px);opacity:1}}
+@media (prefers-reduced-motion:reduce){#toTop svg{animation:none}}
+#toTop:hover{border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-md)}
+#toTop:hover svg{transform:translateY(-6px)}
+/* At the very end the chrome has nothing left to index, so it leaves too. */
+#index,#hint,header,#topbar{transition:opacity .55s cubic-bezier(.16,1,.3,1)}
+body[data-end="1"] #index,body[data-end="1"] #hint,
+body[data-end="1"] header,body[data-end="1"] #topbar{opacity:0;pointer-events:none}
+
+/* Text scramble (§2.8): the ghost holds the final glyph's width so the line
+   never reflows while the characters are still churning. */
+.ts-char{position:relative;display:inline-block}
+.ts-ghost{visibility:hidden}
+.ts-over{position:absolute;left:0;top:0;color:var(--color-accent-600)}
+
+/* ── Per-chapter layout. Each chapter parks its copy somewhere different, so the
+      set never reads as one template with the words swapped. ── */
+#ch-instruction{display:flex;flex-direction:column;justify-content:center}
+.hero{max-width:1180px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:clamp(20px,3.4vh,38px)}
+.hero-top{display:flex;justify-content:space-between;gap:16px}
+.hero h1{font-size:clamp(44px,11.6vw,178px);line-height:.86}
+.hero-foot{display:grid;grid-template-columns:1fr auto;gap:clamp(20px,4vw,48px);align-items:end;
+  padding-top:clamp(14px,2.4vh,26px);border-top:1px solid var(--color-divider)}
+.hero-foot p{max-width:44ch;font-size:clamp(14px,1.2vw,17px);color:var(--color-neutral-200)}
+.hero-foot p b{font-weight:300;color:var(--color-accent-300)}
+.stats{display:flex;gap:clamp(18px,3vw,44px);font:400 10px/1.7 var(--font-body);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--color-neutral-500)}
+.stats i{display:block;font:300 26px/1 var(--font-heading);letter-spacing:-.02em;font-style:normal;color:var(--color-neutral-100)}
+
+#ch-repo{display:flex;align-items:flex-end;padding-bottom:clamp(70px,13vh,140px)}
+#ch-sandbox{display:flex;align-items:flex-end;padding-bottom:clamp(70px,13vh,140px)}
+.method{max-width:min(620px,52vw);display:flex;flex-direction:column;gap:clamp(10px,1.6vh,18px)}
+.method h2{font-size:clamp(28px,4.6vw,64px);line-height:.96}
+.method .rule{width:min(100%,280px)}
+
+#ch-review{display:flex;flex-direction:column;justify-content:space-between;
+  padding-top:clamp(84px,14vh,150px);padding-bottom:clamp(60px,10vh,110px)}
+.rev-head{display:flex;justify-content:space-between;gap:16px;align-items:baseline}
+.rev-foot{max-width:640px;display:flex;flex-direction:column;gap:12px}
+.rev-foot h2{font-size:clamp(24px,3.4vw,46px);line-height:1.02}
+.verdict{display:inline-flex;align-items:center;gap:12px;align-self:flex-start;padding:9px 16px;
+  border:1px solid var(--color-accent);border-radius:2px;background:rgba(110,20,24,.22);
+  font:400 10px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-100);
+  box-shadow:var(--glow-red-md)}
+.verdict i{width:5px;height:5px;background:var(--color-accent-300);box-shadow:0 0 8px var(--color-accent-300)}
+
+#ch-shipped{display:flex;flex-direction:column;justify-content:flex-start;padding-top:clamp(84px,14vh,150px)}
+.ship-head{display:flex;justify-content:space-between;gap:16px;align-items:baseline;max-width:1180px;margin:0 auto;width:100%}
+.ship-head h2{font-size:clamp(26px,3.6vw,52px)}
+
+#ch-trajectory{display:flex;align-items:center;justify-content:flex-end;
+  padding-top:clamp(72px,11vh,120px);padding-bottom:clamp(56px,8vh,90px)}
+/* The right gutter belongs to the chapter index, so this column is pushed clear
+   of it with a margin — padding inside a fixed width was eating the measure and
+   setting the paragraph one or two words to the line. */
+.about{width:min(600px,46vw);margin-right:clamp(56px,16vw,250px);
+  max-height:100%;display:flex;flex-direction:column;gap:clamp(9px,1.5vh,18px)}
+.about h2{font-size:clamp(18px,1.85vw,27px);line-height:1.3;letter-spacing:-.02em}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tags span{padding:6px 12px;border:1px solid var(--color-neutral-800);border-radius:100px;
+  font:400 10px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)}
+.certs{display:flex;flex-direction:column;border-top:1px solid var(--color-divider)}
+.certs div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:9px 0;
+  border-bottom:1px solid var(--color-divider);font:300 13px/1.3 var(--font-body)}
+.certs em{font-style:normal;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-500)}
+
+#ch-contact{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.contact{max-width:1000px;display:flex;flex-direction:column;align-items:center;gap:clamp(16px,3vh,32px)}
+.contact h2{font-size:clamp(30px,7vw,104px);line-height:.94}
+.contact h2 span{color:var(--color-accent-300)}
+.links{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(16px,3vw,30px);
+  font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase}
+.links a{color:var(--color-neutral-300)}
+.links a:hover{color:var(--color-accent-300)}
+.colophon{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(14px,3vw,34px);
+  font:400 10px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-600)}
+
+/* ── Narrow screens. The index collapses to bars, the copy takes the full gutter,
+      and the two side-parked chapters come back to the bottom of the frame. ── */
 @media (max-width:860px){
-  .pg{padding-left:20px!important;padding-right:20px!important}
-  .wk-row{grid-template-columns:30px 1fr!important;gap:6px 12px!important;padding:24px 0!important}
-  .wk-row>*:nth-child(2),.wk-row>*:nth-child(3),.wk-row>*:nth-child(4){grid-column:2!important;justify-self:start!important}
-  .wk-row>*:nth-child(5){display:none!important}
-  .two{grid-template-columns:1fr!important;gap:44px!important}
-  /* The panel drops to one column: the numeral stops being a column of its own and sits
-     behind the copy, which is the only way the headline keeps a readable measure. */
-  .mth-in{display:block!important;padding:clamp(96px,15vh,140px) 20px clamp(40px,7vh,72px)!important}
-  .mth-in>div{max-width:none!important;height:100%;justify-content:center}
-  /* Bottom-right on a phone: it fills the space the shortened copy leaves and keeps clear
-     of the meter, which occupies the corner it would otherwise take. */
-  .mth-num{position:absolute!important;right:16px!important;top:auto!important;bottom:clamp(24px,6vh,64px)!important;font-size:clamp(92px,28vw,160px)!important;opacity:.55}
-  .rail-meter>span{width:20px!important}
-  .wrap{flex-wrap:wrap!important;gap:20px!important}
-  .hdr-nav{gap:16px!important;font-size:10px!important}
-  .hdr-cta{padding:8px 12px!important;font-size:10px!important;letter-spacing:.08em!important}
-  header.pg{padding-left:16px!important;padding-right:16px!important}
+  #cursor{display:none}
+  .ix{grid-template-columns:auto 26px;gap:8px;font-size:0}
+  .ix b{font-size:9px}
+  .ix span{display:none}
+  #index{padding-right:14px}
+  .method{max-width:none;width:100%}
+  #ch-trajectory{align-items:flex-end;justify-content:flex-start;padding-bottom:clamp(64px,12vh,120px)}
+  .about{width:100%;margin-right:0}
+  .certs div:nth-child(n+4){display:none}
+  #ch-repo,#ch-sandbox{padding-bottom:clamp(64px,12vh,120px)}
+  .hero-foot{grid-template-columns:1fr;gap:18px}
+  .hero-foot p{max-width:none}
+  .hero-top{flex-direction:column;gap:5px}
+  .hero h1{font-size:clamp(40px,13vw,90px)}
+  .about h2{font-size:clamp(19px,5.2vw,26px)}
+  .contact h2{font-size:clamp(28px,9vw,54px)}
+  .rev-foot{max-width:none}
+  #hint{display:none}
+  /* The header carries three things now and a phone is 360px wide: the mark and
+     the pill both give up the tracking they do not need at this size. */
+  #mark{font-size:10px;letter-spacing:.12em}
+  #mark small{font-size:9px;letter-spacing:.12em}
+  #hdrRight{gap:8px}
+  #sound{width:28px;height:28px}
+  #cta{padding:8px 12px;font-size:10px;letter-spacing:.08em;gap:7px}
 }
-</style></helmet>
+@media (max-height:560px){
+  .hero{gap:14px}
+  .stats i{font-size:20px}
+  #band{display:none}
+}
+</style>
+</head>
+<body>
 
-<div ref="{{ rootRef }}" style="position:relative;width:100%;background:var(--color-bg)">
+<div id="stage">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <canvas id="grade" aria-hidden="true"></canvas>
+  <div id="labels" aria-hidden="true"></div>
 
-<canvas ref="{{ starRef }}" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;contain:strict"></canvas>
-<div ref="{{ tintRef }}" style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 60%,var(--color-section-glow),transparent 62%),linear-gradient(180deg,transparent,var(--color-accent-900))"></div>
+  <!-- ══ 01 · instruction — 0 → 0.12 ══ -->
+  <section class="ch" id="ch-instruction" aria-label="Introduction">
+    <div class="hero">
+      <!-- The hero does not wait for the wheel. Its in-window is time, not
+           progress (data-ap-intro is the stagger order); the third number is
+           still where each line leaves as the fall begins. -->
+      <div class="hero-top ap" data-ap="0 0 .052" data-ap-intro="0">
+        <span class="eyebrow">01 — Agentic Engineer</span>
+      </div>
+      <h1 class="display ap" data-ap="0 0 .058" data-ap-intro="1" data-scramble="1">VAIBHAV<br>KODIYAN</h1>
+      <div class="hero-foot">
+        <p class="body ap" data-ap="0 0 .062" data-ap-intro="2">I build agents that write, review and ship code. Currently making <b>Rig</b> at Qaynel Agentic Solutions — infrastructure for coding agents that don't need babysitting.</p>
+        <div class="stats ap" data-ap="0 0 .066" data-ap-intro="3">
+          <div><i>04</i>shipped systems</div>
+          <div><i>03</i>certifications</div>
+          <div><i>01</i>driverless</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<div ref="{{ cursorRef }}" style="position:fixed;top:0;left:0;width:22px;height:22px;margin:-11px 0 0 -11px;border:1px solid var(--color-accent-600);border-radius:50%;z-index:9999;pointer-events:none;mix-blend-mode:difference;will-change:transform,width,height;transition:width .4s cubic-bezier(.16,1,.3,1),height .4s cubic-bezier(.16,1,.3,1),margin .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1)"></div>
+  <!-- ══ 02 · repo — 0.12 → 0.30 ══ -->
+  <section class="ch" id="ch-repo" aria-label="How I work — specification and traceability">
+    <div class="method">
+      <span class="eyebrow acc ap" data-ap-mode="left" data-ap=".125 .155">Specification</span>
+      <h2 class="display ap" data-ap-mode="left" data-ap=".13 .16">Start at the assumption</h2>
+      <span class="rule ap" data-ap=".135 .165"></span>
+      <p class="body ap" data-ap-mode="left" data-ap=".14 .17">Most agent failures are specification failures. I write the assumption down first, then build the smallest thing that can falsify it.</p>
+      <span class="eyebrow acc ap" data-ap-mode="left" data-ap=".215 .245" style="margin-top:clamp(14px,3vh,34px)">Traceability</span>
+      <h2 class="display ap" data-ap-mode="left" data-ap=".22 .25">Make the work replayable</h2>
+      <span class="rule ap" data-ap=".225 .255"></span>
+      <p class="body ap" data-ap-mode="left" data-ap=".23 .26">Every step an agent takes is recorded with the context that produced it, so a reviewer reads intent instead of reconstructing it from a diff.</p>
+    </div>
+  </section>
 
-<div style="position:fixed;left:0;right:0;top:0;height:1px;z-index:9998;pointer-events:none;background:var(--color-divider)"><div ref="{{ progRef }}" style="height:100%;transform:scaleX(0);transform-origin:0 50%;background:linear-gradient(90deg,transparent,var(--color-accent),var(--color-accent-300))"></div></div>
+  <!-- ══ 03 · sandbox — 0.30 → 0.52 ══ -->
+  <section class="ch" id="ch-sandbox" aria-label="Rig — sandboxed execution">
+    <div class="method">
+      <span class="eyebrow acc ap" data-ap-mode="clip" data-ap=".305 .335">04 — Case study · Qaynel Agentic Solutions</span>
+      <h2 class="display ap" data-ap-mode="clip" data-ap=".31 .34" style="font-size:clamp(46px,10vw,150px)">Rig</h2>
+      <span class="rule ap" data-ap=".315 .345"></span>
+      <p class="body ap" data-ap-mode="clip" data-ap=".32 .35">A runtime for coding agents: sandboxed execution, repo-aware context, and review loops that catch what the model missed. Nothing an agent runs can reach production until a human has seen the trace it produced.</p>
+      <p class="body ap" data-ap-mode="clip" data-ap=".44 .47" style="color:var(--color-neutral-400)"><span style="color:var(--color-accent-600)">Evidence —</span> systems earn their complexity. If a layer cannot show what it caught last week, it comes back out.</p>
+    </div>
+  </section>
 
-<div class="pg" ref="{{ loaderRef }}" style="position:fixed;inset:0;z-index:9000;background:var(--color-bg);display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-8) 56px;animation:wipe 1.15s cubic-bezier(.83,0,.17,1) 2.2s forwards">
-  <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.18em;color:var(--color-neutral-500);text-transform:uppercase"><span>Vaibhav Kodiyan</span><span>Agentic Engineer</span></div>
-  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
-    <div style="font:300 clamp(44px,8vw,120px)/0.92 var(--font-heading);letter-spacing:-.045em">break assumptions<br><span style="color:var(--color-accent)">not production.</span></div>
-    <div ref="{{ countRef }}" style="font:300 clamp(36px,6vw,84px)/1 var(--font-heading);color:var(--color-neutral-300);letter-spacing:-.04em;font-variant-numeric:tabular-nums">000</div>
-  </div>
-  <div style="height:1px;background:var(--color-divider);position:relative"><div ref="{{ barRef }}" style="position:absolute;inset:0 100% 0 0;background:var(--color-accent)"></div></div>
+  <!-- ══ 04 · review — 0.52 → 0.58 · the signature chapter ══ -->
+  <section class="ch" id="ch-review" aria-label="Review — the loop catches what the model missed">
+    <div class="rev-head">
+      <span class="eyebrow acc ap" data-ap=".521 .534">Review pass · 41 hunks</span>
+      <span class="eyebrow ap" data-ap=".521 .534">tests green · PR open</span>
+    </div>
+    <div class="rev-foot">
+      <p class="body ap" data-ap=".523 .538" style="max-width:52ch">Coding agents fail quietly. They pass tests, open a PR, and leave a reviewer to reconstruct intent from a diff.</p>
+      <!-- Explicit out-starts: this chapter is 0.06 long, so the default
+           (chapter end − 0.018) would have started pulling the verdict out
+           before it had finished arriving. -->
+      <h2 class="display ap" data-ap-mode="scale" data-ap=".556 .570 .578">Rig makes the agent show its work.</h2>
+      <span class="verdict ap" data-ap-mode="scale" data-ap=".560 .574 .580"><i></i>Self-review pass · flagged before merge</span>
+    </div>
+  </section>
+
+  <!-- ══ 05 · shipped — 0.58 → 0.74 · copy rides on the cards, as diegetic labels ══ -->
+  <section class="ch" id="ch-shipped" aria-label="Selected work">
+    <div class="ship-head">
+      <h2 class="display ap" data-ap=".582 .605">Selected work</h2>
+      <span class="eyebrow ap" data-ap=".582 .605">02 — Index</span>
+    </div>
+  </section>
+
+  <!-- ══ 06 · trajectory — 0.74 → 0.88 ══ -->
+  <section class="ch" id="ch-trajectory" aria-label="About">
+    <div class="about">
+      <!-- Held to .870, which is where the climb finally has the whole circuit
+           in frame — the chapter's own best view is worth reading over. -->
+      <span class="eyebrow ap" data-ap-mode="right" data-ap=".742 .765 .870">05 — About</span>
+      <h2 class="display ap" data-ap-mode="right" data-ap=".745 .775 .870">I'm a computer science student at MIT Manipal who spends most of his time on autonomous systems — agents that ship code, cars that drive themselves, satellites that know where they are.</h2>
+      <p class="body ap" data-ap-mode="right" data-ap=".775 .80 .871">Built a racing-line optimizer for a driverless formula car around a track. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
+      <div class="tags ap" data-ap-mode="right" data-ap=".79 .815 .872">
+        <span>Agents</span><span>LLM infra</span><span>Autonomous driving</span><span>Orbital mechanics</span><span>Python</span><span>TypeScript</span><span>AWS</span>
+      </div>
+      <div class="certs ap" data-ap-mode="right" data-ap=".815 .845 .873">
+        <div>Machine Learning Specialization <em>DeepLearning.AI</em></div>
+        <div>Google Data Analytics <em>Google</em></div>
+        <div>Cloud Practitioner <em>AWS</em></div>
+        <div>Head Delegate <em>MUN circuit</em></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 07 · contact — 0.88 → 1 ══ -->
+  <section class="ch" id="ch-contact" aria-label="Contact">
+    <div class="contact">
+      <!-- Everything is in by 0.942 and starts leaving at 0.952, which is the
+           room the closing aperture needs: the sign-off has to be gone before
+           the two lit edges meet. -->
+      <span class="eyebrow ap" data-ap=".884 .900 .952">06 — Contact</span>
+      <h2 class="display ap" data-ap-mode="scale" data-ap=".886 .912 .954">Let's build something<br><span>unreasonable.</span></h2>
+      <div class="links ap" data-ap=".900 .925 .956">
+        <a href="#contact">Email ↗</a><a href="#contact">GitHub ↗</a><a href="#contact">LinkedIn ↗</a><a href="#contact">Résumé ↗</a>
+      </div>
+      <div class="colophon ap" data-ap=".918 .942 .958">
+        <span>© 2026 Vaibhav Kodiyan</span><span>break assumptions not production</span><span id="clock">IST</span>
+      </div>
+    </div>
+  </section>
+
+  <div id="wipe" aria-hidden="true"></div>
 </div>
 
-<header class="pg" style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:var(--space-6) 56px;background:linear-gradient(#0c0b0ae6,#0c0b0a00)">
-  <nav class="hdr-nav" style="display:flex;gap:34px;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-400)">
-    <a href="#work" style="color:inherit" style-hover="color:var(--color-accent-300)">Work</a><a href="#rig" style="color:inherit" style-hover="color:var(--color-accent-300)">Rig</a><a href="#about" style="color:inherit" style-hover="color:var(--color-accent-300)">About</a><a href="#contact" style="color:inherit" style-hover="color:var(--color-accent-300)">Contact</a>
-  </nav>
-  <a href="#contact" class="hdr-cta" style="display:flex;align-items:center;gap:10px;padding:9px 18px;border:1px solid var(--color-accent-700);border-radius:100px;font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-text);white-space:nowrap;flex:none;transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)" style-hover="border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-sm)"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)"></span>Open to work</a>
+<!-- The last frame. The aperture closes to nothing, the screen is black, and
+     the only thing left is the way back. -->
+<div id="endcard" aria-hidden="true">
+  <button id="toTop" type="button" tabindex="-1">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M12 5l-6 6M12 5l6 6"/></svg>
+    Scroll to the top
+  </button>
+</div>
+
+<div id="topbar" aria-hidden="true"><i></i></div>
+
+<header>
+  <div id="mark">Vaibhav Kodiyan<small>Agentic Engineer</small></div>
+  <div id="hdrRight">
+    <button id="sound" type="button" data-on="0" aria-label="Play the soundtrack"><i></i><i></i><i></i></button>
+    <a id="cta" href="#contact"><i></i>Open to work</a>
+  </div>
 </header>
 
-<section data-screen-label="Hero" style="position:relative;z-index:2;height:280vh">
-  <div class="pg" ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
+<audio id="track" preload="auto" playsinline>
+  <source src="audio/System%20Override.mp3" type="audio/mpeg">
+</audio>
 
-    <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:115vmax;height:115vmax;transform:translate(-50%,-50%);pointer-events:none;will-change:transform,opacity">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,150,55,.2) 0%,rgba(196,90,28,.13) 16%,rgba(90,32,8,.08) 38%,rgba(40,16,4,.04) 58%,transparent 78%)"></div>
-      <canvas ref="{{ holeRef }}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-    </div>
+<nav id="index" aria-label="Chapters"></nav>
 
-    <div ref="{{ heroCoreRef }}" style="position:relative;display:flex;flex-direction:column;gap:var(--space-8);max-width:1180px;margin:0 auto;width:100%;will-change:transform,opacity">
-      <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>01 — Agentic Engineer</span><span>CSE '29 · MIT Manipal</span></div>
-      <h1 style="margin:0;font:300 clamp(60px,12.5vw,188px)/0.86 var(--font-heading);letter-spacing:-.055em;color:var(--color-neutral-100)"><span data-line="1" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">VAIBHAV</span></span><span data-line="2" style="display:block;overflow:hidden;padding-bottom:.03em"><span style="display:inline-block;transform:translateY(110%)">KODIYAN</span></span></h1>
-      <div style="display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;padding-top:var(--space-6);border-top:1px solid var(--color-divider)">
-        <p style="margin:0;max-width:430px;font:500 17px/1.5 var(--font-body);color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72);text-wrap:pretty">I build agents that write, review and ship code. Currently making <span style="color:var(--color-accent-300)">Rig</span> at Qaynel Agentic Solutions — infrastructure for coding agents that don't need babysitting.</p>
-        <div class="wrap" style="display:flex;gap:44px;font:500 11px/1.6 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(12,11,10,.72);box-shadow:0 0 40px 24px rgba(12,11,10,.72)">
-          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">04</div>shipped systems</div>
-          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">03</div>certifications</div>
-          <div><div style="color:#fff;font-size:26px;letter-spacing:-.02em">01</div>driverless</div>
-        </div>
-      </div>
-    </div>
+<div id="hint" aria-hidden="true">Scroll · ↑↓ · click a chapter</div>
 
-    <div ref="{{ heroEndRef }}" style="position:absolute;left:56px;right:56px;top:50%;opacity:0;pointer-events:none;display:flex;justify-content:center;will-change:transform,opacity">
-      <p style="margin:0;max-width:900px;text-align:center;font:300 clamp(30px,4.6vw,68px)/1.12 var(--font-heading);letter-spacing:-.04em;color:var(--color-neutral-100);text-wrap:pretty">Break assumptions,<br><span style="color:var(--color-accent-300)">not production.</span></p>
-    </div>
+<div id="band" aria-hidden="true"><div id="bandTrack"></div></div>
+<div id="cursor" aria-hidden="true"></div>
 
-    <div ref="{{ scrollHintRef }}" style="position:absolute;left:50%;bottom:34px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font:400 10px/1 var(--font-body);letter-spacing:.24em;text-transform:uppercase;color:var(--color-neutral-600)"><span>Fall in</span><span style="width:1px;height:38px;background:linear-gradient(var(--color-accent),transparent)"></span></div>
+<div id="gate">
+  <div id="gateTop">
+    <span class="eyebrow">Vaibhav Kodiyan</span>
+    <span class="eyebrow">Agentic Engineer</span>
   </div>
-</section>
-
-<div ref="{{ bandRef }}" style="position:relative;z-index:2;padding:var(--space-4) 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);overflow:hidden;white-space:nowrap;background:var(--color-bg);will-change:transform">
-  <div ref="{{ marqRef }}" style="display:inline-flex;gap:52px;font:400 12px/1 var(--font-body);letter-spacing:.26em;text-transform:uppercase;color:var(--color-neutral-500);will-change:transform">
-    <span>break assumptions not production</span><span style="color:var(--color-accent)">✳</span><span>agent infrastructure</span><span style="color:var(--color-accent)">✳</span><span>autonomous systems</span><span style="color:var(--color-accent)">✳</span><span>break assumptions not production</span><span style="color:var(--color-accent)">✳</span><span>agent infrastructure</span><span style="color:var(--color-accent)">✳</span><span>autonomous systems</span><span style="color:var(--color-accent)">✳</span>
+  <div>
+    <div id="gateMid">
+      <div id="gateName">break assumptions<br><span>not production.</span></div>
+      <div id="gatePct">000</div>
+    </div>
+    <div id="gateBar"><i></i></div>
   </div>
 </div>
 
-<section id="work" class="pg" data-screen-label="Work" style="position:relative;z-index:2;padding:150px 56px 120px;perspective:1200px">
-  <div style="max-width:1180px;margin:0 auto">
-    <div class="wrap" data-depth="drift" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:56px">
-      <h2 style="margin:0;font:400 clamp(34px,5vw,66px)/1 var(--font-heading);letter-spacing:-.04em">Selected work</h2>
-      <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">02 — Index</span>
-    </div>
-    <div style="display:flex;flex-direction:column;transform-style:preserve-3d;perspective:1400px;perspective-origin:50% 50%">
-      <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
-        <a href="#rig" class="wk-row" data-depth="plate" style="position:relative;display:grid;grid-template-columns:56px 1fr 260px 120px;gap:28px;align-items:center;padding:34px 24px;border-top:1px solid var(--color-divider);color:var(--color-text);transform-style:preserve-3d;backface-visibility:hidden;transition:background .5s cubic-bezier(.16,1,.3,1)" style-hover="background:var(--color-hover)">
-          <span style="font:400 11px/1 var(--font-body);color:var(--color-neutral-600)">{{ p.num }}</span>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <span style="font:400 clamp(26px,3.2vw,44px)/1 var(--font-heading);letter-spacing:-.03em">{{ p.name }}</span>
-            <span style="font:300 14px/1.4 var(--font-body);color:var(--color-neutral-500)">{{ p.desc }}</span>
-          </div>
-          <span style="font:400 11px/1.7 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-300)">{{ p.stack }}</span>
-          <span style="justify-self:end;font:400 11px/1 var(--font-body);color:var(--color-neutral-500)">{{ p.year }} ↗</span>
-          <div style="position:absolute;right:150px;top:50%;width:190px;height:120px;margin-top:-60px;border-radius:var(--radius-md);overflow:hidden;opacity:0;transform:translate3d(0,14px,0) rotate(-4deg);transition:opacity .45s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s cubic-bezier(.16,1,.3,1);pointer-events:none;background:var(--color-surface);box-shadow:var(--shadow-sm)" style-hover="opacity:1;transform:translate3d(0,0,72px) rotate(-2deg);box-shadow:var(--shadow-md),0 24px 60px rgba(0,0,0,.6)">
-            <div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,var(--color-accent-800),transparent 62%),repeating-linear-gradient(135deg,transparent 0 7px,#ffffff08 7px 8px)"></div>
-            <div style="position:absolute;left:12px;bottom:10px;font:400 9px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-400)">preview · placeholder</div>
-          </div>
-        </a>
-      </sc-for>
-      <div style="border-top:1px solid var(--color-divider)"></div>
-    </div>
-  </div>
-</section>
+<script>
+(function(){
+'use strict';
 
-<!-- Four full-screen panels on one pinned stage, one viewport of scroll each, locked by
-     lenis/snap's slideshow preset so a gesture lands on a panel and never between two.
-     Each hand-off is a different move, and the move is the method it introduces: the
-     replay panel is scrubbed in under a playhead, the sandbox panel is sealed into a box
-     and released out of it, and the measure panel comes up under a rule once the previous
-     one has shipped. A shared transition would say all four disciplines are the same. -->
-<section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:400vh">
-  <div ref="{{ railRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden">
-    <!-- The stage floor. Both hand-offs that open a gap between panels — the sandbox box and
-         the measuring rule — would otherwise expose the page behind them, and the section
-         would read as a hole rather than as a room the panels are shown in. -->
-    <span aria-hidden="true" style="position:absolute;inset:0;z-index:1;background:linear-gradient(168deg,rgba(16,14,11,.93),rgba(10,9,8,.96))"></span>
-    <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
-      <article class="mth" style="position:absolute;inset:0;visibility:hidden;background:radial-gradient(ellipse 92% 74% at {{ r.g }},var(--color-accent-900),transparent 64%),linear-gradient(168deg,rgba(23,20,15,.95),rgba(11,10,9,.97));will-change:clip-path,opacity">
-        <div class="mth-in" style="position:absolute;inset:0;display:flex;align-items:center;gap:clamp(20px,5vw,88px);justify-content:space-between;padding:clamp(96px,14vh,150px) 56px clamp(56px,9vh,92px);will-change:transform">
-          <div style="flex:1 1 auto;min-width:0;max-width:760px;display:flex;flex-direction:column;gap:clamp(16px,2.2vh,28px)">
-            <span style="font:400 11px/1 var(--font-body);letter-spacing:.22em;text-transform:uppercase;color:var(--color-accent-300)">{{ r.k }}</span>
-            <h3 style="margin:0;font:300 clamp(40px,7.2vw,126px)/0.94 var(--font-heading);letter-spacing:-.05em;color:var(--color-neutral-100);text-wrap:balance">{{ r.t }}</h3>
-            <span style="height:1px;width:min(100%,300px);background:linear-gradient(90deg,var(--color-accent),transparent)"></span>
-            <p style="margin:0;max-width:54ch;font:300 clamp(15px,1.25vw,19px)/1.62 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">{{ r.d }}</p>
-          </div>
-          <span class="mth-num" aria-hidden="true" style="flex:none;font:300 clamp(96px,17vw,288px)/0.7 var(--font-heading);letter-spacing:-.07em;color:transparent;-webkit-text-stroke:1px rgba(236,230,217,.13)">{{ r.n }}</span>
-        </div>
-      </article>
-    </sc-for>
+/* ═════════════════════════════════════════════════════════════════════════════
+   The edolus architecture from docs/plan.md, running on this site's own
+   content and tokens. Procedural 2D canvas, no assets, no dependencies.
 
-    <!-- One instrument per hand-off. Each is inert until its own transition is running. -->
-    <span ref="{{ mthHeadRef }}" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:0;width:2px;opacity:0;z-index:4;pointer-events:none;will-change:transform,opacity;background:linear-gradient(180deg,transparent,var(--color-accent-300) 16%,var(--color-neutral-100) 50%,var(--color-accent-300) 84%,transparent);box-shadow:0 0 28px 3px var(--red-glow)"></span>
-    <span ref="{{ mthBoxRef }}" aria-hidden="true" style="position:absolute;inset:0;opacity:0;z-index:4;pointer-events:none;border:1px solid var(--color-accent-600);box-shadow:inset 0 0 44px rgba(156,31,34,.22),0 0 30px rgba(156,31,34,.16)"></span>
-    <span ref="{{ mthRuleRef }}" aria-hidden="true" style="position:absolute;left:0;right:0;top:100%;height:1px;opacity:0;z-index:4;pointer-events:none;will-change:transform,opacity;background:linear-gradient(90deg,transparent,var(--color-accent-600) 10%,var(--color-neutral-100) 50%,var(--color-accent-600) 90%,transparent)"><span style="position:absolute;left:0;right:0;bottom:1px;height:9px;background:repeating-linear-gradient(90deg,rgba(236,230,217,.4) 0 1px,transparent 1px 48px)"></span></span>
+   §-references below point at sections of docs/plan.md.
+   ═════════════════════════════════════════════════════════════════════════════ */
 
-    <div class="pg" style="position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:clamp(84px,12vh,130px) 56px 0;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500);pointer-events:none">
-      <span>03 — How I work</span>
-      <span class="rail-meter" ref="{{ railMeterRef }}" style="display:flex;align-items:center;gap:7px">
-        <sc-for list="{{ rail }}" as="r" hint-placeholder-count="4">
-          <span style="position:relative;display:block;width:30px;height:2px;background:var(--color-neutral-700)"><span style="position:absolute;inset:0;background:var(--color-accent-300);box-shadow:var(--glow-red-sm);transform:scaleX(var(--on,0));transform-origin:0 50%"></span></span>
-        </sc-for>
-      </span>
-    </div>
-  </div>
-</section>
+/* ?reduced=1 forces the accessible path on without touching OS settings, so the
+   version most reviewers never see can actually be reviewed. */
+var REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+           || /[?&]reduced=1/.test(location.search);
+var clamp = function(v,a,b){ return v<a?a:(v>b?b:v); };
+var lerp  = function(a,b,t){ return a+(b-a)*t; };
+var smooth= function(t){ t=clamp(t,0,1); return t*t*(3-2*t); };
+/* Deterministic noise, so every reload draws the same world. */
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0;
+  var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t;
+  return ((t^t>>>14)>>>0)/4294967296; }; }
 
-<section id="rig" data-screen-label="Rig case study" style="position:relative;z-index:2;height:230vh">
-  <div style="position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden">
-    <div ref="{{ rigPanelRef }}" style="position:relative;width:100vw;height:100vh;overflow:hidden;background:linear-gradient(180deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-md);will-change:transform,border-radius">
-      <div ref="{{ rigFieldRef }}" style="position:absolute;inset:-14%;background:radial-gradient(ellipse at 32% 40%,var(--color-accent-800),transparent 56%),radial-gradient(ellipse at 72% 62%,var(--color-section-glow),transparent 55%);opacity:.85"></div>
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(28px,4vw,58px)">
-        <div style="display:flex;justify-content:space-between;font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-400)"><span>04 — Case study</span><span>Qaynel Agentic Solutions</span></div>
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px">
-          <h3 style="margin:0;font:300 clamp(64px,12vw,180px)/0.84 var(--font-heading);letter-spacing:-.055em">Rig</h3>
-          <p style="margin:0 0 14px;max-width:360px;font:300 16px/1.5 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">A runtime for coding agents: sandboxed execution, repo-aware context, and review loops that catch what the model missed.</p>
-        </div>
-        <div ref="{{ rigMetaRef }}" style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--color-divider)">
-          <div style="padding:var(--space-6) var(--space-8) 0 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Role</div><div style="font:300 17px/1.3">Founding engineer</div></div>
-          <div style="padding:var(--space-6) var(--space-8) 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Stack</div><div style="font:300 17px/1.3">Python · TS · AWS</div></div>
-          <div style="padding:var(--space-6) var(--space-8) 0"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Year</div><div style="font:300 17px/1.3">2025 — now</div></div>
-          <div style="padding:var(--space-6) 0 0 var(--space-8)"><div style="font:400 10px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:10px">Status</div><div style="font:300 17px/1.3;color:var(--color-accent-300)">Private beta</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+/* ── §2.11 · EventBus ──────────────────────────────────────────────────────
+   Thirty lines. Nothing in this file holds a reference to anything else; every
+   part subscribes to a topic. Exposed on window so the whole experience can be
+   driven from the console — see the note at the bottom of this script. */
+var EventBus = (function(){
+  var map = {};
+  function on(t,fn){ (map[t]||(map[t]=[])).push(fn); return function(){ off(t,fn); }; }
+  function off(t,fn){ var a=map[t]; if(!a) return; var i=a.indexOf(fn); if(i>-1) a.splice(i,1); }
+  function once(t,fn){ var d=on(t,function(v){ d(); fn(v); }); return d; }
+  function emit(t,v){ var a=map[t]; if(!a) return;
+    for(var i=0,c=a.slice();i<c.length;i++){ try{ c[i](v); }catch(e){ console.error('[bus] '+t,e); } } }
+  return { on:on, off:off, once:once, emit:emit };
+})();
+window.EventBus = EventBus;
 
-<section class="pg" data-screen-label="Rig detail" style="position:relative;z-index:2;padding:130px 56px">
-  <div class="two" style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:70px">
-    <div data-depth="drift" style="display:flex;flex-direction:column;gap:var(--space-6);">
-      <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">The problem</h4>
-      <p style="margin:0;font:300 20px/1.55 var(--font-body);color:var(--color-neutral-300);text-wrap:pretty">Coding agents fail quietly. They pass tests, open a PR, and leave a reviewer to reconstruct intent from a diff. Rig makes the agent show its work: every action is a replayable step with the context that produced it.</p>
-    </div>
-    <div data-depth="drift" style="display:flex;flex-direction:column;gap:var(--space-4);">
-      <h4 style="margin:0;font:400 13px/1 var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--color-neutral-500)">What I built</h4>
-      <sc-for list="{{ rigPoints }}" as="pt" hint-placeholder-count="3">
-        <div style="display:flex;gap:16px;padding:var(--space-4) 0;border-bottom:1px solid var(--color-divider)"><span style="font:400 11px/1.6 var(--font-body);color:var(--color-accent)">{{ pt.i }}</span><span style="font:300 16px/1.5 var(--font-body);color:var(--color-neutral-300)">{{ pt.t }}</span></div>
-      </sc-for>
-    </div>
-  </div>
-</section>
+/* ── §2.4 / §4.1 · The chapter map ─────────────────────────────────────────
+   The whole narrative in seven rows. `review` gets 6% — deliberately the
+   shortest chapter and the one the site is about. */
+/* `focus` is where the chapter is fully present — the frame you would take a
+   screenshot of. A chapter *boundary* is a transition: half the set has left
+   and the other half has not arrived, so jumping to `start` lands a reader in
+   the one place the chapter has nothing to say. The index, the deep links and
+   Tab all go to `focus`; the numbers on the index rows stay the real bounds. */
+var SEGMENTS = [
+  { name:'instruction', start:0,    end:0.12, focus:0.042 },
+  { name:'repo',        start:0.12, end:0.30, focus:0.262 },
+  { name:'sandbox',     start:0.30, end:0.52, focus:0.478 },
+  { name:'review',      start:0.52, end:0.58, focus:0.5755 },
+  { name:'shipped',     start:0.58, end:0.74, focus:0.640 },
+  { name:'trajectory',  start:0.74, end:0.88, focus:0.866 },
+  { name:'contact',     start:0.88, end:1,    focus:0.945 }
+];
+function segAt(p){
+  for(var i=0;i<SEGMENTS.length;i++) if(p < SEGMENTS[i].end - 1e-9) return SEGMENTS[i];
+  return SEGMENTS[SEGMENTS.length-1];
+}
+/* Deep links keep working (§6.3): each hash maps to a segment start. */
+var ANCHORS = { work:'shipped', rig:'sandbox', about:'trajectory', contact:'contact' };
 
-<section id="about" class="pg" data-screen-label="About" style="position:relative;z-index:2;padding:110px 56px 140px">
-  <div class="two" style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr .85fr;gap:80px;align-items:start">
-    <div style="display:flex;flex-direction:column;gap:var(--space-8)">
-      <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">05 — About</span>
-      <p data-split="1" style="margin:0;font:300 clamp(24px,3.1vw,40px)/1.32 var(--font-heading);letter-spacing:-.022em;text-wrap:pretty">I'm a computer science student at MIT Manipal who spends most of his time on autonomous systems — agents that ship code, cars that drive themselves, satellites that know where they are.</p>
-      <p data-depth="drift" style="margin:0;max-width:560px;font:300 17px/1.6 var(--font-body);color:var(--color-neutral-400);text-wrap:pretty;">Building a racing-line optimizer for a student driverless racing team. Former Head Delegate on the MUN circuit, which is where I learned that the argument is usually about the assumption, not the conclusion.</p>
-      <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;padding-top:var(--space-2)">
-        <sc-for list="{{ tags }}" as="t" hint-placeholder-count="6">
-          <span style="padding:9px 16px;border:1px solid var(--color-neutral-800);border-radius:100px;white-space:nowrap;flex:none;font:400 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-400)">{{ t }}</span>
-        </sc-for>
-      </div>
-    </div>
-    <div data-depth="drift" style="display:flex;flex-direction:column;border-top:1px solid var(--color-divider);">
-      <sc-for list="{{ certs }}" as="c" hint-placeholder-count="3">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:var(--space-6) 0;border-bottom:1px solid var(--color-divider)"><span style="font:300 16px/1.3 var(--font-body)">{{ c.n }}</span><span style="font:400 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-neutral-500);white-space:nowrap">{{ c.o }}</span></div>
-      </sc-for>
-    </div>
-  </div>
-</section>
+/* ── §2.1 + §2.2 · ScrollManager ───────────────────────────────────────────
+   One float owns the experience. Wheel, touch and keys all integrate into the
+   same raw coordinate; stretch bands convert raw ↔ progress so pacing can be
+   retuned without renumbering a single keyframe. */
+var Scroll = (function(){
+  var totalScrollPx = 21000, touchScrollPx = 3600, lerpSpeed = 0.10, keyStep = 0.12;
+  var bands = [
+    { name:'instruction', start:0,    end:0.12, factor:1.55 },  /* the fall is worth the wheel */
+    { name:'repo',        start:0.12, end:0.30, factor:1.05 },
+    { name:'sandbox',     start:0.30, end:0.52, factor:1.15 },
+    { name:'review',      start:0.52, end:0.58, factor:3.40 },  /* 6% of story, ~15% of the wheel */
+    { name:'shipped',     start:0.58, end:0.74, factor:1.00 },
+    { name:'trajectory',  start:0.74, end:0.88, factor:0.92 },
+    { name:'contact',     start:0.88, end:1.00, factor:0.85 }
+  ];
+  /* Compile the bands into a piecewise-linear map, once. */
+  var total = 0, i;
+  for(i=0;i<bands.length;i++){ bands[i].len=(bands[i].end-bands[i].start)*bands[i].factor;
+    bands[i].raw0=total; total+=bands[i].len; }
+  for(i=0;i<bands.length;i++){ bands[i].raw0/=total; bands[i].rawLen=bands[i].len/total; }
 
-<section id="contact" class="pg" data-screen-label="Contact" style="position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:120px 56px 40px;overflow:hidden">
-  <div ref="{{ contactRef }}" style="max-width:1180px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:var(--space-8);will-change:transform">
-    <span style="font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)">06 — Contact</span>
-    <a href="#contact" data-magnet="1" data-split="1" style="display:block;font:300 clamp(48px,10vw,146px)/0.92 var(--font-heading);letter-spacing:-.05em;color:var(--color-text);transition:color .45s cubic-bezier(.16,1,.3,1)" style-hover="color:var(--color-accent-300)">Let's build something unreasonable.</a>
-    <div style="display:flex;gap:28px;flex-wrap:wrap;font:400 12px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase">
-      <a href="#contact">Email ↗</a><a href="#contact">GitHub ↗</a><a href="#contact">LinkedIn ↗</a><a href="#contact">Résumé ↗</a>
-    </div>
-  </div>
-  <div class="wrap" style="max-width:1180px;margin:0 auto;width:100%;display:flex;justify-content:space-between;padding-top:var(--space-8);border-top:1px solid var(--color-divider);font:400 10px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-600)">
-    <span>© 2026 Vaibhav Kodiyan</span><span>break assumptions not production</span><span ref="{{ clockRef }}">IST</span>
-  </div>
-</section>
+  function rawToProgress(r){
+    r = clamp(r,0,1);
+    for(var i=0;i<bands.length;i++){ var b=bands[i];
+      if(r <= b.raw0+b.rawLen || i===bands.length-1)
+        return b.start + (r-b.raw0)/b.rawLen*(b.end-b.start); }
+    return 1;
+  }
+  function progressToRaw(p){
+    p = clamp(p,0,1);
+    for(var i=0;i<bands.length;i++){ var b=bands[i];
+      if(p <= b.end || i===bands.length-1)
+        return b.raw0 + (p-b.start)/(b.end-b.start)*b.rawLen; }
+    return 1;
+  }
 
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;scrollDuration&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1.35,&quot;min&quot;:0.4,&quot;max&quot;:2.4,&quot;step&quot;:0.05,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;zoomIntensity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:1.6,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;snapHero&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;velocitySkew&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scroll feel&quot;},&quot;starfield&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scroll feel&quot;}}">
-class Component extends DCLogic {
-  constructor(p){
-    super(p);
-    ['root','star','tint','cursor','prog','loader','count','bar','clock','marq','band',
-     'heroPin','heroCore','heroEnd','orb','hole','scrollHint','rail','railMeter','mthHead','mthBox','mthRule',
-     'rigPanel','rigField','rigMeta','contact']
-      .forEach(k=>{this[k+'Ref']=React.createRef();});
-  }
-  componentDidMount(){
-    this.reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    this.velocity=0;this.marqX=0;this.skew=0;this._rate=0;this._q=0;this._t0=performance.now();
-    const run=(n,f)=>{try{f();}catch(e){console.error('[portfolio] '+n,e);}};
-    run('heroHeight',()=>{
-      // The hero owns two stages: the collapse (first 100vh of scroll) and the zoom-through
-      // that follows it. Reduced motion skips the second one, so hand that scroll back
-      // rather than leaving 120vh of nothing under the pin.
-      const pin=this.heroPinRef.current;
-      if(this.reduced&&pin&&pin.parentElement)pin.parentElement.style.height='200vh';
-    });
-    run('stars',()=>this.initStars());
-    run('hole',()=>this.initHole());
-    run('loader',()=>this.loader());
-    run('pointer',()=>this.pointer());
-    run('clock',()=>this.clock());
-    run('split',()=>this.split());
-    run('reveals',()=>this.reveals());
-    const wire=()=>{run('engine',()=>this.engine());run('heroLines',()=>this.heroLines());};
-    const tick=()=>{
-      if(this._dead)return;
-      const t=performance.now()-this._t0;
-      if(window.Lenis){clearInterval(this._poll);wire();return;}
-      if(!this._fell&&t>1200){this._fell=true;wire();}
-      if(t>8000)clearInterval(this._poll);
-    };
-    this._poll=setInterval(tick,50);tick();
-  }
-  componentWillUnmount(){
-    this._dead=true;clearInterval(this._poll);clearInterval(this._ci);
-    if(this._tick&&window.gsap)window.gsap.ticker.remove(this._tick);
-    cancelAnimationFrame(this._raf);
-    if(this._io)this._io.disconnect();
-    if(this._snapper)try{this._snapper.destroy();}catch(e){}
-    if(this.lenis)this.lenis.destroy();
-    window.removeEventListener('mousemove',this._om);
-    window.removeEventListener('resize',this._or);
-  }
-  componentDidUpdate(){this._dirtyLayout=true;try{this.split();}catch(e){}}
+  var target=0, current=0, vel=0, gate='locked', seg=null;
 
-  scrollLerp(){
-    const d=this.props.scrollDuration!=null?+this.props.scrollDuration:1.35;
-    return Math.max(0.045,Math.min(0.2,0.115/Math.max(0.35,d)));
+  /* The gate used to hold the timeline at 0 while the first 1200px of wheel
+     flew the hero in. The hero now arrives on its own clock the moment the
+     loader clears, so that hold would be 1200px of scrolling that does
+     nothing: the first gesture after load is real travel. */
+  function push(px){
+    if(gate!=='open') return;
+    target = clamp(target + px/totalScrollPx, 0, 1);
   }
-  // How hard is the user pushing right now? 0 = a nudge, 1 = a flick.
-  // Measured as smoothed input speed in px/s so it reads the same whether the
-  // device sends few big deltas (wheel) or many small ones (trackpad, touch).
-  intent(delta){
-    const now=performance.now();
-    const gap=this._inT?now-this._inT:100;
-    this._inT=now;
-    const dt=Math.min(.4,Math.max(.008,gap/1000));
-    const rate=Math.abs(delta)/dt;
-    const prev=this._rate||0;
-    // fast attack, slower release: builds within a flick, holds through its lulls
-    const k=1-Math.pow(.001,dt/(rate>prev?.055:.16));
-    // Capped just past saturation. Uncapped, a hard flick banks thousands of px/s of
-    // headroom that has to drain before intent starts falling at all, which holds the
-    // flick's settings for most of a second after the flick is over.
-    this._rate=Math.min(3000,prev+(rate-prev)*k);
-    return this.quickness();
+  function set(p, instant){
+    target = progressToRaw(p);
+    if(instant || REDUCED) current = target;
+    if(gate!=='open'){ gate='open'; EventBus.emit('gate:open'); }
   }
-  // Smoothstep, so intent arrives and leaves without a step change in feel. A hard
-  // threshold here gets felt directly, as the page changing its mind mid-gesture.
-  quickness(){
-    const q=Math.max(0,Math.min(1,((this._rate||0)-300)/2000));
-    return this._q=q*q*(3-2*q);
+  function update(dt){
+    /* Frame-rate independent, in exactly this form — a naive `+= d*0.1` is
+       tied to whatever framerate it was tuned on (§2.1). */
+    var k = 1 - Math.pow(1-lerpSpeed, 60*dt);
+    var pending = target - current;
+    current += pending * k;
+    if(Math.abs(target-current) < 1e-5) current = target;
+    /* Signed pending travel, lightly smoothed. This is the second float the
+       page runs on: how hard the reader is pushing, as opposed to where they
+       are. Camera bank, focal length, star streaks, card lean and copy drift
+       all read it, which is what stops the timeline feeling pre-baked. */
+    vel += (pending - vel) * (1 - Math.pow(1-0.22, 60*dt));
+    var p = rawToProgress(current);
+    EventBus.emit('scroll:progress', p);
+    var s = segAt(p);
+    if(s !== seg){ var prev=seg; seg=s; EventBus.emit('scene:changed',{ from:prev, to:s }); }
+    return p;
   }
-  // Every follow below is extra smoothing stacked on top of Lenis'. At a gentle
-  // scroll that lag is the point — it is the weight. During a flick it is only debt:
-  // the animation lands late and then snaps back. So the follow tightens with intent.
-  grip(base,dt){
-    const a=Math.min(.68,base*(1+(this._q||0)*2.2));
-    return 1-Math.pow(1-a,dt);
-  }
-  // Lenis re-reads options.lerp every time an input event starts a new animation, so
-  // the gesture itself is covered by writing it there. The in-flight animation is
-  // nudged as well: without that, the tail of a flick keeps the flick's tight lerp and
-  // arrives at a dead stop instead of gliding down into one.
-  tuneScroll(dt){
-    const L=this.lenis;if(!L||!L.options)return;
-    const lp=Math.min(.24,this.scrollLerp()*(1+(this._q||0)*1.9));
-    L.options.lerp=lp;
-    L.options.syncTouchLerp=Math.max(.05,lp*.9);
-    const a=L.animate;
-    if(a&&a.isRunning&&a.lerp)a.lerp+=(lp-a.lerp)*(1-Math.pow(1-.12,dt||1));
-  }
-  engine(){
-    if(this._engineOn)return;this._engineOn=true;
-    cancelAnimationFrame(this._raf);this._raf=0;
-    if(this._tick&&window.gsap&&window.gsap.ticker)window.gsap.ticker.remove(this._tick);
-    const loop=t=>{
-      if(this._dead)return;
-      if(this.lenis)this.lenis.raf(t);
-      this.paint();
-      this._raf=requestAnimationFrame(loop);
-    };
-    this._raf=requestAnimationFrame(loop);
-    try{
-      if(window.Lenis&&!this.lenis){
-        const lerp=this.scrollLerp();
-        this.lenis=new window.Lenis({
-          lerp,
-          smoothWheel:true,
-          syncTouch:true,
-          syncTouchLerp:Math.max(0.05,lerp*0.9),
-          touchInertiaExponent:1.85,
-          wheelMultiplier:1,
-          touchMultiplier:1.05,
-          anchors:true,allowNestedScroll:true,stopInertiaOnNavigate:true,
-          // Adaptive feel: a gentle scroll stays slow and heavily smoothed,
-          // a hard one covers more ground and tracks the input more tightly.
-          virtualScroll:(e)=>{
-            const raw=e.deltaY;
-            if(!raw)return true;
-            const q=this.intent(raw);
-            // Touch is left at 1:1. syncTouch means the page is meant to sit under the
-            // finger, and any multiplier there reads as the content slipping off it.
-            const touch=!!(e.event&&typeof e.event.type==='string'&&e.event.type.slice(0,5)==='touch');
-            let d=Math.abs(raw);
-            if(d>300)d=300+(d-300)*.72;
-            e.deltaY=Math.sign(raw)*d*(touch?1:1+q*.95);
-            this.tuneScroll(1);
-            return true;
-          }
-        });
-        this.lenis.on('scroll',e=>{
-          if(!(e.userData&&e.userData.initiator==='snap'))this._snapping=false;
-          this.armSnap();
-        });
-      }
-    }catch(e){this.lenis=null;console.error('[portfolio] lenis init',e);}
-  }
-  armSnap(){
-    if(this.props.snapHero===false||this.reduced||!this.lenis||this._snapping)return;
-    clearTimeout(this._snapT);
-    this._snapT=setTimeout(()=>{
-      const el=this.heroPinRef.current;if(!el)return;
-      const range=el.parentElement.offsetHeight-window.innerHeight;
-      const sy=this.lenis.animatedScroll||0;
-      if(sy<=4||sy>=range-4)return;
-      // Measured against each stage, not the whole pin: the head window stays as tight as
-      // it was before the zoom existed, and the tail only grabs a stalled zoom near the end.
-      const head=(this._collapseRange||range)*.12;
-      const tail=range-(this._zoomRange||range)*.12;
-      if(sy>head&&sy<tail)return;
-      this._snapping=true;
-      this.lenis.scrollTo(sy<=head?0:range,{
-        // Deliberately brisker than the resting scroll. A snap runs on its own after the
-        // user has let go, and at the resting lerp that unasked-for travel takes ~1s.
-        lerp:Math.max(.11,this.scrollLerp()*1.5),
-        userData:{initiator:'snap'},
-        onComplete:()=>{this._snapping=false;}
-      });
-    },200);
-  }
-  // lenis/snap's documented slideshow preset: type "lock" spends one gesture on exactly one
-  // panel. Only the four panel offsets are registered, and the 100% distance threshold is
-  // what keeps the lock local — everywhere further than a screen from a panel, the page
-  // scrolls freely as before.
-  snapPanels(){
-    if(this.reduced||!this.lenis||!window.Snap||!this._mthN||this._mthTop==null)return;
-    if(!this._snapper){
-      try{
-        this._snapper=new window.Snap(this.lenis,{
-          type:'lock',distanceThreshold:'100%',debounce:0,
-          lerp:Math.max(.1,this.scrollLerp()*1.4)
-        });
-      }catch(e){this._snapper=null;console.error('[portfolio] snap init',e);return;}
-      this._snapOff=[];
+
+  /* Three input paths, one integrator. */
+  addEventListener('wheel', function(e){
+    e.preventDefault();
+    var d = e.deltaY;
+    if(e.deltaMode === 1) d *= 18;
+    else if(e.deltaMode === 2) d *= innerHeight;
+    push(d);
+  }, { passive:false });
+
+  var ty=0, dragging=false;
+  addEventListener('touchstart', function(e){ ty = e.touches[0].clientY; dragging=true; }, { passive:true });
+  addEventListener('touchmove', function(e){
+    if(!dragging) return;
+    var y=e.touches[0].clientY;
+    push((ty-y) * (totalScrollPx/touchScrollPx));   /* a swipe buys proportionally more (§6.4) */
+    ty=y; e.preventDefault();
+  }, { passive:false });
+  addEventListener('touchend', function(){ dragging=false; }, { passive:true });
+
+  addEventListener('keydown', function(e){
+    var k=e.key;
+    if(k==='ArrowDown'||k==='PageDown'||k===' '){ e.preventDefault(); set(rawToProgress(target)+keyStep); }
+    else if(k==='ArrowUp'||k==='PageUp'){ e.preventDefault(); set(rawToProgress(target)-keyStep); }
+    else if(k==='Home'){ e.preventDefault(); set(0); }
+    else if(k==='End'){ e.preventDefault(); set(1); }
+  });
+
+  EventBus.on('scroll:setProgress', function(p){ set(p); });
+  EventBus.on('experience:entered', function(){ if(gate!=='open'){ gate='open'; EventBus.emit('gate:open'); } });
+
+  return { update:update, set:set, bands:bands,
+    raw:function(){ return current; }, progress:function(){ return rawToProgress(current); },
+    vel:function(){ return REDUCED ? 0 : vel; },
+    speed:function(){ return REDUCED ? 0 : clamp(Math.abs(vel)/0.025, 0, 1); },
+    gate:function(){ return gate; } };
+})();
+
+/* ── §2.8 · TextScramble ───────────────────────────────────────────────────
+   The ghost span reserves the *final* glyph's width, so a headline never
+   reflows while its characters are still churning. */
+var ALPHABET = '!<>-_\\/[]{}—=+*^?#________';
+function TextScramble(el){
+  /* Split on the markup's own line breaks — textContent would silently weld the
+     lines together and the headline would set as one word. */
+  var lines = el.innerHTML.split(/<br\s*\/?>/i).map(function(s){
+    var d=document.createElement('div'); d.innerHTML=s; return d.textContent; });
+  var chars = [], frame = 0, raf = 0, last = 0;
+  el.textContent = '';
+  for(var li=0; li<lines.length; li++){
+    if(li) el.appendChild(document.createElement('br'));
+    for(var i=0;i<lines[li].length;i++){
+      var ch = lines[li][i];
+      if(ch === ' '){ el.appendChild(document.createTextNode(' ')); continue; }
+      var wrap = document.createElement('span'); wrap.className='ts-char';
+      var ghost = document.createElement('span'); ghost.className='ts-ghost'; ghost.textContent=ch;
+      var over  = document.createElement('span'); over.className='ts-over';  over.textContent='';
+      wrap.appendChild(ghost); wrap.appendChild(over); el.appendChild(wrap);
+      var s = Math.floor(Math.random()*30);
+      chars.push({ over:over, ghost:ghost, to:ch, start:s, end:s+Math.floor(Math.random()*40) });
     }
-    this._snapOff.forEach(off=>{try{off();}catch(e){}});
-    this._snapOff=[];
-    const vh=window.innerHeight||1;
-    for(let i=0;i<this._mthN;i++)this._snapOff.push(this._snapper.add(Math.round(this._mthTop+i*vh)));
   }
-  heroLines(){
-    const root=this.rootRef.current||document;
-    const spans=Array.from(root.querySelectorAll('[data-line] > span'));
-    const g=window.gsap;
-    if(!g||this.reduced){
-      spans.forEach((s,i)=>{s.style.transition='transform 1.35s cubic-bezier(.16,1,.3,1) '+(this.reduced?0:2.45+i*.12)+'s';s.style.transform='none';if(s.parentElement)s.parentElement.style.overflow='visible';});
-      return;
-    }
-    const wait=Math.max(0,2.45-(performance.now()-this._t0)/1000);
-    const reveal=()=>spans.forEach(s=>{if(s.parentElement)s.parentElement.style.overflow='visible';});
-    g.to(spans,{y:'0%',duration:1.35,ease:'expo.out',stagger:.12,delay:wait,onComplete:reveal});
-    setTimeout(reveal,4800);
-  }
-  split(){
-    const root=this.rootRef.current;if(!root)return;
-    root.querySelectorAll('[data-split]').forEach(el=>{
-      if(el.dataset.splitDone==='1')return;
-      const txt=el.textContent;el.textContent='';
-      let i=0;
-      txt.split(/(\s+)/).forEach(word=>{
-        if(/^\s+$/.test(word)){el.appendChild(document.createTextNode(' '));return;}
-        const w=document.createElement('span');
-        w.style.cssText='display:inline-block;white-space:nowrap';
-        for(const ch of word){
-          const s=document.createElement('span');
-          s.textContent=ch;
-          // Kept as data so the reveal can be rescaled at the moment it fires, when how
-          // fast the reader is moving is finally known.
-          s.dataset.cd=(i*0.014).toFixed(3);
-          s.style.cssText='display:inline-block;opacity:0;transform:translateY(.45em) rotate(2deg);transition:opacity .85s cubic-bezier(.16,1,.3,1) '+(i*0.014)+'s,transform 1.05s cubic-bezier(.16,1,.3,1) '+(i*0.014)+'s';
-          w.appendChild(s);i++;
-        }
-        el.appendChild(w);
-      });
-      el.dataset.splitDone='1';
-      el.dataset.reveal='chars';
-      if(this._io)this._io.observe(el);
-    });
-  }
-  reveals(){
-    const root=this.rootRef.current||document;
-    // Compress the whole reveal — duration and stagger together — by how fast the reader
-    // is going. At the full stagger a flick leaves the paragraph still assembling itself
-    // a screen and a half after it has been scrolled past.
-    const showChars=el=>{
-      const rush=1-(this._q||0)*.66;
-      el.querySelectorAll('span span').forEach(s=>{
-        if(rush<.98&&s.dataset.cd){
-          const d=(+s.dataset.cd*rush).toFixed(3)+'s';
-          s.style.transition='opacity '+(.85*rush).toFixed(2)+'s cubic-bezier(.16,1,.3,1) '+d+
-                             ',transform '+(1.05*rush).toFixed(2)+'s cubic-bezier(.16,1,.3,1) '+d;
-        }
-        s.style.opacity='1';s.style.transform='none';
-      });
-    };
-    if(!window.IntersectionObserver||this.reduced){
-      root.querySelectorAll('[data-split]').forEach(showChars);return;
-    }
-    this._io=new IntersectionObserver(es=>es.forEach(e=>{
-      if(!e.isIntersecting)return;
-      showChars(e.target);this._io.unobserve(e.target);
-    }),{rootMargin:'0px 0px -12% 0px'});
-    root.querySelectorAll('[data-split]').forEach(el=>this._io.observe(el));
-  }
-  pointer(){
-    this.mx=window.innerWidth/2;this.my=window.innerHeight/2;this.cx=this.mx;this.cy=this.my;
-    this._om=e=>{
-      this.mx=e.clientX;this.my=e.clientY;
-      const c=this.cursorRef.current;if(!c)return;
-      const over=!!(e.target.closest&&e.target.closest('a,[data-magnet]'));
-      c.style.width=over?'46px':'22px';c.style.height=over?'46px':'22px';
-      c.style.margin=over?'-23px 0 0 -23px':'-11px 0 0 -11px';
-      c.style.background=over?'rgba(156,31,34,.14)':'transparent';
-    };
-    this._or=()=>{this.initStars(true);this.initHole(true);this._dirtyLayout=true;};
-    window.addEventListener('mousemove',this._om,{passive:true});
-    window.addEventListener('resize',this._or);
-  }
-  measure(){
-    const vh=window.innerHeight||1,vw=window.innerWidth||1;
-    this._vh=vh;this._vw=vw;
-    this._sh=document.documentElement.scrollHeight||1;
-    const hero=this.heroPinRef.current;
-    this._heroRange=hero&&hero.parentElement?Math.max(1,hero.parentElement.offsetHeight-vh):1;
-    // Stage one collapses the orb over one screen; whatever is left of the pin is the
-    // zoom-through. Deriving both from the measured height means the reduced-motion
-    // hero (which has no leftover) simply reports a zoom range of zero.
-    this._collapseRange=Math.min(this._heroRange,vh);
-    this._zoomRange=Math.max(0,this._heroRange-this._collapseRange);
-    const rail=this.railRef.current;
-    if(rail&&rail.parentElement){
-      this._mthTop=rail.parentElement.offsetTop;
-      // One viewport of scroll per panel, so a snap point is just top + i screens. Deriving
-      // the panel index straight from that keeps the snap targets and the transition
-      // progress reading off the same number instead of two that can drift apart.
-      this._mth=Array.from(rail.querySelectorAll('.mth'));
-      this._mthN=this._mth.length;
-      const mt=this.railMeterRef.current;
-      this._railMeter=mt?Array.from(mt.children):null;
-      this.snapPanels();
-    }
-    const rp=this.rigPanelRef.current;
-    if(rp&&rp.parentElement&&rp.parentElement.parentElement){
-      const sec=rp.parentElement.parentElement;
-      this._rigTop=sec.offsetTop;
-      this._rigRange=Math.max(1,sec.offsetHeight-vh);
-    }
-    const m=this.marqRef.current;
-    this._marqHalf=m?(m.scrollWidth||0)/2:0;
-    // Depth staging is driven from layout position, never from the element's own rect.
-    // These elements travel hundreds of pixels along Z, and a rect reading would feed
-    // that motion straight back into the number that produced it.
-    const root=this.rootRef.current||document;
-    let pi=0;
-    this._deep=Array.from(root.querySelectorAll('[data-depth]'),el=>{
-      let y=0,n=el;while(n){y+=n.offsetTop;n=n.offsetParent;}
-      const plate=el.dataset.depth==='plate';
-      return{el,y,h:el.offsetHeight,plate,pi:plate?pi++:0,d:null};
-    });
-    // The plates share one vanishing point, and it belongs to the viewer, not to the list.
-    // Left at the box's own centre it would scroll up the screen with the box, and the rows
-    // would converge on a point that keeps moving — depth without a camera behind it.
-    const p0=this._deep.find(it=>it.plate);
-    this._plateBox=p0?p0.el.parentElement:null;
-    if(this._plateBox){let y=0,n=this._plateBox;while(n){y+=n.offsetTop;n=n.offsetParent;}this._plateBoxY=y;}
-    this._poy=null;
-    const ct=this.contactRef.current;
-    if(ct&&ct.parentElement){const s=ct.parentElement;let y=0,n=s;while(n){y+=n.offsetTop;n=n.offsetParent;}this._contactY=y;}
-    this._dirtyLayout=false;
-  }
-  paint(){
-    const now=performance.now();
-    const dt=this._lastPaint?Math.min(2.4,(now-this._lastPaint)/16.667):1;
-    this._lastPaint=now;
-    // Frame load in frames-per-frame: 1 is keeping up, 2 is painting at half rate. Read
-    // slowly, because a single long frame is noise and only a sustained one is a device.
-    this._load=this._load==null?1:this._load+(dt-this._load)*.04;
-    const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
-    const L=this.lenis;
-    const sy=L?(L.animatedScroll!=null?L.animatedScroll:(L.scroll||0)):(window.scrollY||0);
-    const src=L&&L.velocity!=null?L.velocity:0;
-    this.velocity+=(src-(this.velocity||0))*(1-Math.pow(1-.38,dt));
-    const v=this.velocity||0;
-    // Intent decays on a frame clock rather than on input events. Events stop arriving
-    // the instant a gesture ends, so without this the page would hold the flick's tight,
-    // fast settings through the whole coast instead of relaxing back into its resting feel.
-    if(this._rate){
-      this._rate*=Math.pow(1-.055,dt);
-      if(this._rate<30)this._rate=0;
-      this.quickness();
-      this.tuneScroll(dt);
-    }
-    const moving=Math.abs(sy-(this._lsy||0))>0.15||Math.abs(v)>0.04||Math.abs(this.mx-this.cx)>0.4||Math.abs(this.my-this.cy)>0.4;
-    if(this._dirtyLayout||!this._vh)this.measure();
-    const heroLive=sy<(this._heroRange||window.innerHeight)*1.05;
-    const pRaw=cl(sy/(this._collapseRange||this._heroRange||1),0,1);
-    const pEase=1-Math.pow(1-pRaw,1.35);
-    // Zoom-through progress, taken straight off Lenis' interpolated scroll. No second
-    // smoothing pass here: at 15x the lag of an extra lerp is very visible as rubber-banding.
-    const z=this._zoomRange?cl((sy-this._collapseRange)/this._zoomRange,0,1):0;
-    // The collapse eases behind the scroll, so it can still be mid-flight after the
-    // scroll has already left the hero. Staying awake until it lands is what keeps a
-    // fast flick from stranding the orb halfway open.
-    const heroEasing=this._p!=null&&Math.abs(pEase-this._p)>1e-4;
-    if(!this.reduced){
-      this.marqX-=(.5+Math.min(Math.abs(v)*2.6,32))*dt;
-      const half=this._marqHalf||0;
-      if(half&&this.marqX<=-half)this.marqX+=half;
-      const m=this.marqRef.current;
-      if(m)m.style.transform='translate3d('+this.marqX.toFixed(1)+'px,0,0)';
-    }
-    // The corridor below keeps easing after the scroll has stopped. Sleeping on the first
-    // still frame would strand a fanned-out index or a half-turned card exactly where the
-    // reader let go, so the loop stays awake until those have landed too.
-    const wasEasing=!!this._easing;
-    if(!moving&&!heroLive&&!heroEasing&&!wasEasing&&this._settled)return;
-    this._settled=!moving&&!heroLive&&!heroEasing&&!wasEasing;
-    this._easing=false;
-    this._lsy=sy;
-    const vh=this._vh,vw=this._vw;
-    const Z=this.props.zoomIntensity!=null?this.props.zoomIntensity:1;
-    const follow=1-Math.pow(1-.14,dt);
-    // How fast the page is actually travelling, 0 at rest → 1 in a flick. Related to intent
-    // but not the same thing: intent reads the input device, this reads the result.
-    const spd=Math.min(1,Math.abs(v)/34);
-    this._push=this._push==null?spd:this._push+(spd-this._push)*this.grip(.1,dt);
-    if(Math.abs(spd-this._push)>.004)this._easing=true;
-    const push=this.reduced?0:this._push;
-
-    this.cx+=(this.mx-this.cx)*follow;this.cy+=(this.my-this.cy)*follow;
-    const c=this.cursorRef.current;
-    if(c)c.style.transform='translate3d('+this.cx.toFixed(1)+'px,'+this.cy.toFixed(1)+'px,0)';
-
-    const gp=cl(sy/Math.max(1,this._sh-vh),0,1);
-    const pr=this.progRef.current;if(pr)pr.style.transform='scaleX('+gp.toFixed(4)+')';
-    const tn=this.tintRef.current;if(tn)tn.style.opacity=(gp*0.55+Math.min(Math.abs(v)*.006,.1)).toFixed(3);
-
-    this._p=this._p==null?pEase:this._p+(pEase-this._p)*this.grip(.19,dt);
-    if(Math.abs(pEase-this._p)<1e-4)this._p=pEase;
-    const p=this._p;
-    const o=this.orbRef.current;
-    // Keep writing past the hero window until p has actually landed, so the orb always
-    // ends up fully collapsed instead of frozen at whatever it reached on the way out.
-    if(o&&(heroLive||this._orbP!==p)){
-      const rx=((this.cy/vh)-.5)*-10,ry=((this.cx/vw)-.5)*14;
-      const oa=1-cl((p-.8)/.2,0,1);
-      o.style.transform='translate(-50%,-50%) perspective(1200px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) rotate('+(p*48+v*.38).toFixed(2)+'deg) scale('+(1+Math.pow(p,1.7)*2.15*Z+Math.min(Math.abs(v)*.0022,.12)).toFixed(4)+')';
-      o.style.opacity=oa.toFixed(3);
-      // Redraw for as long as any of it shows; wipe the canvas once it doesn't, so a
-      // stale frame can't reappear when the orb fades back in on the way up.
-      if(oa>.002)this.paintHole(p,dt);
-      else if(this._hctx)this._hctx.clearRect(0,0,this._hw,this._hh);
-      this._orbP=p;
-    }
-    const hc=this.heroCoreRef.current;
-    if(hc){
-      hc.style.transform='translate3d(0,'+(-p*90+v*.42).toFixed(1)+'px,0) scale('+(1-p*.28*Z).toFixed(4)+')';
-      hc.style.opacity=(1-cl(p/.42,0,1)).toFixed(3);
-      hc.style.pointerEvents=p>.35?'none':'auto';
-    }
-    const he=this.heroEndRef.current;
-    if(he){
-      const inn=cl((p-.34)/.2,0,1);
-      // Settles at ~1.05 by the end of the collapse, then the zoom takes it the rest of the way.
-      const base=0.94+inn*.06+cl((p-.62)/.38,0,1)*.05;
-      // Exponential, so the growth reads at a constant rate the whole way in — linear scale
-      // feels like the camera is braking. The slight ease-in keeps the handoff from the
-      // collapse seamless instead of snapping into motion at z=0.
-      const ze=z*(.34+.66*z);
-      const zs=Math.pow(1+14*Z,ze);
-      // Gone before the camera reaches the gap between the two lines, which is what you'd
-      // otherwise be staring into for the last stretch.
-      const gone=cl((z-.6)/.34,0,1);
-      he.style.opacity=(inn*(1-gone)).toFixed(3);
-      he.style.transform='translate3d(0,'+((1-inn)*40+v*.28*(1-z)).toFixed(1)+'px,0) scale('+(base*zs).toFixed(4)+')';
-    }
-    const sh=this.scrollHintRef.current;
-    if(sh)sh.style.opacity=(1-cl(p*4,0,1)).toFixed(3);
-
-    const sk=cl(v*.07,-5.4,5.4);this.skew+=(sk-this.skew)*this.grip(.07,dt);
-    const bd=this.bandRef.current;
-    if(bd&&!this.reduced&&this.props.velocitySkew!==false)
-      bd.style.transform='skewY('+this.skew.toFixed(3)+'deg)';
-
-    // Past the horizon the page stops sliding and starts travelling. Everything below the
-    // hero lives in one corridor: content arrives out of deep Z, squares up flat at the
-    // reading line, and passes the camera on the way out. Speed stretches the far end of
-    // the corridor, so covering ground reads as covering distance.
-    if(this._deep&&!this.reduced){
-      // Rewritten only when it has actually moved: unlike a transform, perspective-origin
-      // repaints the whole 3D context it governs.
-      if(this._plateBox){
-        const poy=Math.round((sy+vh*.5-this._plateBoxY)/4)*4;
-        if(poy!==this._poy){this._poy=poy;this._plateBox.style.perspectiveOrigin='50% '+poy+'px';}
-      }
-      for(const it of this._deep){
-        const cy=it.y+it.h*.5-sy;
-        if(cy<-vh*.8||cy>vh*1.8)continue;
-        // -1 = overhead and leaving, 0 = at the reading line, +1 = still far down the corridor.
-        // The middle band of the screen is deliberately dead: depth belongs to arriving and
-        // leaving, and anything sitting where it is meant to be read stays flat and legible.
-        const off=(cy-vh*.5)/vh;
-        const d=cl(Math.sign(off)*Math.max(0,Math.abs(off)-.18)/.3,-1,1);
-        // Each plate follows with a little less grip than the one above it, so a flick fans
-        // the index like a dealt deck — and it closes again the moment the scroll settles.
-        it.d=it.d==null?d:it.d+(d-it.d)*(it.plate?this.grip(.2-it.pi*.019,dt):1);
-        if(Math.abs(d-it.d)>.002)this._easing=true;
-        const q=it.d,a=Math.abs(q);
-        if(it.plate){
-          // Below the line a row is still lying in the disk, seen from above; above the line
-          // it has tipped up and is passing over the camera.
-          const z=q>0?-q*q*(320+push*190)*Z:a*a*140*Z;
-          it.el.style.transform='translate3d(0,0,'+z.toFixed(1)+'px) rotateX('+(q*22*Z).toFixed(2)+'deg)';
-          it.el.style.opacity=(1-Math.pow(a,1.5)*.72).toFixed(3);
-        }else{
-          // Same corridor, quieter: prose has to stay readable a beat longer than an index row.
-          const z=(q>0?-q*q*(150+push*110):a*a*70)*Z;
-          it.el.style.transform='perspective(1300px) translate3d(0,'+(q*10).toFixed(1)+'px,'+z.toFixed(1)+'px) rotateX('+(q*7*Z).toFixed(2)+'deg)';
-          it.el.style.opacity=(1-a*.42).toFixed(3);
-        }
+  for(var c=0;c<chars.length;c++) chars[c].ghost.style.visibility='hidden';
+  function step(now){
+    /* Wall-clock normalised, clamped, so a stalled tab does not fast-forward. */
+    var dt = last ? Math.min(100, now-last) : 16.667; last = now;
+    frame += dt/16.667;
+    var done = 0;
+    for(var i=0;i<chars.length;i++){
+      var c = chars[i];
+      if(frame >= c.end){ c.ghost.style.visibility='visible'; c.over.textContent=''; done++; }
+      else if(frame >= c.start){
+        if(!c.dud || Math.random() < 0.28) c.dud = ALPHABET[Math.floor(Math.random()*ALPHABET.length)];
+        c.over.textContent = c.dud;
       }
     }
+    if(done === chars.length) return;
+    raf = requestAnimationFrame(step);
+  }
+  this.play = function(){ if(REDUCED){ for(var i=0;i<chars.length;i++){ chars[i].ghost.style.visibility='visible'; chars[i].over.textContent=''; } return; }
+    frame=0; last=0; cancelAnimationFrame(raf); raf=requestAnimationFrame(step); };
+}
 
-    if(this._mth&&this._mthN>1&&this._mthTop!=null){
-      // lenis-snap can finish loading after the first measure, so keep asking until it takes.
-      if(!this._snapper)this.snapPanels();
-      const n=this._mthN;
-      const raw=cl((sy-this._mthTop)/vh,0,n-1);
-      this._mthF=this._mthF==null?raw:this._mthF+(raw-this._mthF)*this.grip(.28,dt);
-      if(Math.abs(raw-this._mthF)>.0006)this._easing=true;
-      const f=this._mthF;
-      // b is the hand-off being played and t is how far through it we are. Clamping b to the
-      // last gap means the final panel is held by a completed transition rather than by a
-      // separate case.
-      const b=cl(Math.floor(f),0,n-2),t=cl(f-b,0,1),e=t*t*(3-2*t);
-      const pn=this._mth;
-      for(let i=0;i<n;i++){
-        const live=i===b||i===b+1;
-        pn[i].style.visibility=live?'visible':'hidden';
-        if(live)pn[i].style.zIndex=i===b?'2':'3';
-      }
-      const out=pn[b],inn=pn[b+1];
-      const oc=out.firstElementChild,ic=inn.firstElementChild;
-      const head=this.mthHeadRef.current,box=this.mthBoxRef.current,rule=this.mthRuleRef.current;
-      // Every instrument is silenced first, so a hand-off only ever has to speak for itself.
-      if(head)head.style.opacity='0';
-      if(box)box.style.opacity='0';
-      if(rule)rule.style.opacity='0';
-      // Sharp in, sharp out: an instrument is only present while its own hand-off is moving.
-      const flash=Math.min(1,t*7)*Math.min(1,(1-t)*7);
-      if(this.reduced){
-        out.style.clipPath='none';out.style.opacity=(1-e).toFixed(3);
-        inn.style.clipPath='none';inn.style.opacity=e.toFixed(3);
-        oc.style.transform='none';ic.style.transform='none';
-        oc.style.opacity='1';ic.style.opacity='1';
-      }else if(b===0){
-        // Into "make the work replayable": the next panel is not slid over the last one, it
-        // is scrubbed in under a playhead, the way a trace is re-read rather than replaced.
-        out.style.clipPath='inset(0 0 0 '+(e*100).toFixed(2)+'%)';out.style.opacity='1';
-        inn.style.clipPath='inset(0 '+(100-e*100).toFixed(2)+'% 0 0)';inn.style.opacity='1';
-        // The copy lags its own panel edge, so the head reads as writing the panel in.
-        oc.style.transform='translate3d('+(-e*54).toFixed(1)+'px,0,0)';oc.style.opacity='1';
-        ic.style.transform='translate3d('+((1-e)*58).toFixed(1)+'px,0,0)';ic.style.opacity='1';
-        if(head){head.style.opacity=flash.toFixed(3);head.style.transform='translate3d('+(e*vw).toFixed(1)+'px,0,0)';}
-      }else if(b===1){
-        // Into "sandbox before you trust": the panel is sealed into a box before the next one
-        // is allowed out of it. Nothing crosses the wall — the box closes, then it opens.
-        const a=cl(t/.5,0,1),c=cl((t-.5)/.5,0,1);
-        const ae=a*a*(3-2*a),ce=c*c*(3-2*c),BY=27,BX=31;
-        // The copy scales with the wall rather than being cropped by it, so what sits in the
-        // box is a whole run shrunk to fit — which is the point of a sandbox — instead of a
-        // panel sliced through the middle of a word.
-        out.style.clipPath='inset('+(ae*BY).toFixed(2)+'% '+(ae*BX).toFixed(2)+'%)';out.style.opacity='1';
-        oc.style.transform='scale('+(1-ae*.62).toFixed(4)+')';oc.style.opacity=(1-ae*.45).toFixed(3);
-        inn.style.clipPath='inset('+((1-ce)*BY).toFixed(2)+'% '+((1-ce)*BX).toFixed(2)+'%)';inn.style.opacity='1';
-        ic.style.transform='scale('+(.38+ce*.62).toFixed(4)+')';ic.style.opacity='1';
-        if(box){
-          const wy=(t<.5?ae:1-ce),wx=wy;
-          box.style.top=box.style.bottom=(wy*BY).toFixed(2)+'%';
-          box.style.left=box.style.right=(wx*BX).toFixed(2)+'%';
-          box.style.opacity=flash.toFixed(3);
-        }
-      }else{
-        // Into "ship, then measure": the panel is sent away down the same corridor the rest
-        // of the page travels, and only once it has gone does the rule come up under the next.
-        // Two beats, in the order the method names them. First the panel ships: it goes down
-        // the same corridor the rest of the page travels and is nearly gone before anything
-        // replaces it. Only then does the rule come up, and it is a hard edge rather than a
-        // fade, so the outgoing headline is never sitting on top of the incoming one.
-        // The rule starts before the ship has finished, or the middle of the hand-off is a
-        // screen of nothing. The shipped panel stays lit enough to read as a slab going away
-        // down the corridor rather than as something that simply switched off.
-        const s=cl(t/.5,0,1),m=cl((t-.18)/.82,0,1);
-        const se=s*s*(3-2*s),me=m*m*(3-2*m);
-        out.style.clipPath='inset(0 0 '+(me*100).toFixed(2)+'% 0)';out.style.opacity='1';
-        oc.style.transform='perspective(1500px) translate3d(0,'+(-se*220).toFixed(1)+'px,'+(-se*1000*Z).toFixed(1)+'px)';
-        oc.style.opacity=(1-se*.55).toFixed(3);
-        inn.style.clipPath='inset('+((1-me)*100).toFixed(2)+'% 0 0 0)';inn.style.opacity='1';
-        ic.style.transform='translate3d(0,'+((1-me)*120).toFixed(1)+'px,0)';ic.style.opacity='1';
-        if(rule){
-          rule.style.opacity=(Math.min(1,m*8)*Math.min(1,(1-m)*8)).toFixed(3);
-          rule.style.transform='translate3d(0,'+(-me*vh).toFixed(1)+'px,0)';
-        }
-      }
-      const mtr=this._railMeter;
-      if(mtr)for(let i=0;i<mtr.length;i++)mtr[i].style.setProperty('--on',cl(1-Math.abs(i-f),0,1).toFixed(3));
+/* ── §2.3 · scrollAppear ───────────────────────────────────────────────────
+   The primitive everything is built on. No timelines, no .play(), no internal
+   state: normalise progress into a local window, clamp, apply. Which is why
+   jumping straight to 0.64 renders a correct frame. */
+var appears = [];
+(function collect(){
+  var els = document.querySelectorAll('[data-ap]');
+  for(var i=0;i<els.length;i++){
+    var parts = els[i].getAttribute('data-ap').split(/\s+/);
+    var a = parseFloat(parts[0]), sg = segAt(a);
+    /* An optional third number is where the line starts leaving. Without it a
+       line holds until its chapter's last 0.018 — which is right for a long
+       chapter and much too late for a short one whose set is already filling
+       the frame. */
+    var oAt = parts.length > 2 ? parseFloat(parts[2]) : sg.end - 0.018;
+    var intro = els[i].getAttribute('data-ap-intro');
+    appears.push({ el:els[i], a:a, b:parseFloat(parts[1]), oAt:oAt, oLen:clamp(sg.end-oAt, 0.012, 0.030),
+      /* An intro item arrives on a clock instead of on the wheel: same rise,
+         same easing, just not waiting for a gesture. Its stagger order is the
+         attribute's value. Everything after the arrival — the drift, the
+         fade-out into the fall — is still progress. */
+      intro: intro === null ? -1 : parseFloat(intro),
+      /* Which way a line arrives is a per-chapter decision, not a global one —
+         seven chapters running the same 22px rise is what makes a set of
+         chapters read as one template with the words swapped. */
+      mode: els[i].getAttribute('data-ap-mode') || 'rise',
+      /* Parallax depth, so a stack of lines does not move as one slab. */
+      depth: 0.6 + (i % 3) * 0.55,
+      seg: sg, vis: 0,
+      /* fraction of the window spent translating before it settles (§2.3 moveTurnSplit) */
+      split: 0.72 });
+  }
+})();
+/* The intro clock. −1 is "not started"; the loop advances it in seconds. */
+var INTRO = { t:-1, dur:0.9, stagger:0.14 };
+function introKick(){ INTRO.t = REDUCED ? 99 : 0; }
+function introReset(){ INTRO.t = -1; }
+function applyAppears(p, v){
+  for(var i=0;i<appears.length;i++){
+    var it = appears[i];
+    var w;
+    if(it.intro >= 0) w = INTRO.t < 0 ? 0 : clamp((INTRO.t - it.intro*INTRO.stagger)/INTRO.dur, 0, 1);
+    else if(it.b <= it.a) w = 1;
+    else w = clamp((p - it.a)/(it.b - it.a), 0, 1);
+    /* Symmetric fade at the far end of the chapter so nothing is left lit
+       behind the camera; the chapter's own end is the release point. */
+    var out = clamp((p - it.oAt)/it.oLen, 0, 1);
+    var o = smooth(w) * (1 - out);
+    if(o <= 0.002){
+      if(it.vis){ it.el.style.opacity='0'; it.el.style.visibility='hidden'; it.vis=0; }
+      continue;
     }
-
-    const panel=this.rigPanelRef.current;
-    if(panel&&this._rigRange){
-      const rp=cl((sy-this._rigTop)/this._rigRange,0,1);
-      this._rigP=this._rigP==null?rp:this._rigP+(rp-this._rigP)*this.grip(.22,dt);
-      if(Math.abs(rp-this._rigP)>.0008)this._easing=true;
-      const e=this._rigP<.5?(this._rigP/.5):1;
-      const out=cl((this._rigP-.82)/.18,0,1);
-      // The case study is a slab coming down the same corridor: it arrives out of depth,
-      // squares up, and starts receding again rather than simply shrinking on the spot.
-      const s=(this.reduced?.46+.54*e:.66+.34*e)*(1-out*.05);
-      const z=this.reduced?0:(-(1-e)*300-out*110)*Z;
-      panel.style.transform='perspective(1500px) translate3d(0,0,'+z.toFixed(1)+'px) rotateX('+((9-e*9)*Z).toFixed(2)+'deg) scale('+s.toFixed(4)+')';
-      panel.style.borderRadius=((1-e)*18).toFixed(1)+'px';
-      const f=this.rigFieldRef.current;
-      if(f)f.style.transform='rotate('+(this._rigP*22).toFixed(2)+'deg) scale('+(1.1+this._rigP*.25)+')';
-      const mt=this.rigMetaRef.current;
-      if(mt){mt.style.opacity=cl((e-.55)/.35,0,1).toFixed(3);mt.style.transform='translate3d(0,'+((1-cl((e-.55)/.35,0,1))*22).toFixed(1)+'px,0)';}
-    }
-
-    const ct=this.contactRef.current;
-    // Measured off layout, not off the element's own rect: it is travelling along Z, and a
-    // rect reading would feed that travel back in — and it has to land at exactly flat,
-    // because this is where the page stops.
-    if(ct&&!this.reduced&&this._contactY!=null&&this._contactY-sy<vh+40){
-      const cp=cl((vh-(this._contactY-sy))/(vh*.62),0,1);
-      this._cp=this._cp==null?cp:this._cp+(cp-this._cp)*this.grip(.2,dt);
-      if(Math.abs(cp-this._cp)>.0008)this._easing=true;
-      // The end of the corridor. It comes at you rather than zooming out of nothing.
-      ct.style.transform='perspective(1300px) translate3d(0,0,'+(-(1-this._cp)*380*Z).toFixed(1)+'px) rotateX('+((1-this._cp)*6*Z).toFixed(2)+'deg)';
-    }
-
-    // Peaks just before the text clears, then eases back to nothing so the field is at rest
-    // by the time the pin releases — and stays that way for the rest of the page, where z is
-    // pinned at 1.
-    this.paintStars(sy,gp,v,cl(z/.5,0,1)*(1-cl((z-.82)/.18,0,1)));
-  }
-  clock(){
-    const tick=()=>{const el=this.clockRef.current;if(!el)return;
-      el.textContent=new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' IST';};
-    tick();this._ci=setInterval(tick,1000);
-  }
-  loader(){
-    const t0=performance.now(),dur=2200;
-    const step=()=>{const p=Math.min(1,(performance.now()-t0)/dur),e=1-Math.pow(1-p,4);
-      if(this.countRef.current)this.countRef.current.textContent=String(Math.round(e*100)).padStart(3,'0');
-      if(this.barRef.current)this.barRef.current.style.right=(100-e*100)+'%';
-      if(p<1)requestAnimationFrame(step);
-      else setTimeout(()=>{const l=this.loaderRef.current;if(l)l.style.display='none';},1200);
-    };requestAnimationFrame(step);
-  }
-  initStars(resize){
-    const cv=this.starRef.current;if(!cv)return;
-    const dpr=Math.min(1.25,window.devicePixelRatio||1);
-    const w=cv.clientWidth||window.innerWidth,h=cv.clientHeight||window.innerHeight;
-    cv.width=w*dpr;cv.height=h*dpr;
-    const ctx=cv.getContext('2d',{alpha:false});ctx.setTransform(dpr,0,0,dpr,0,0);
-    this._ctx=ctx;this._w=w;this._h=h;this._sdpr=dpr;
-    const n=this.reduced?40:130;
-    if(!this._pts||resize)this._pts=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random(),r:Math.random()*1.4+.2}));
-    const g=ctx.createRadialGradient(w*.5,h*.45,0,w*.5,h*.45,Math.max(w,h)*.8);
-    g.addColorStop(0,'#141110');g.addColorStop(.55,'#0c0b0a');g.addColorStop(1,'#000000');
-    this._bg=g;
-  }
-  paintStars(sy,gp,v,warp){
-    const ctx=this._ctx;if(!ctx||this.props.starfield===false)return;
-    const w=this._w,h=this._h,dpr=this._sdpr||1;
-    ctx.fillStyle=this._bg;ctx.fillRect(0,0,w,h);
-    const stretch=1+Math.min(Math.abs(v||0)*0.07,2.8);
-    const kick=(v||0)*0.95;
-    const wp=warp||0,cx=w/2,cy=h/2;
-    for(const p of this._pts){
-      const y=(p.y-sy*p.z*.22-kick*p.z)%h,yy=y<0?y+h:y;
-      ctx.globalAlpha=.2+p.z*.7;
-      ctx.fillStyle=p.z>.92?'#c99a3c':(p.z>.55?'#8f8672':'#ece6d9');
-      const r=p.r*(.5+p.z)*(1+gp*.35);
-      if(wp>.004){
-        // Flying in. Speed shows mostly as a trail rather than displacement — a small push
-        // keeps the field from emptying out, and a shrinking trail on the way back down
-        // reads as slowing rather than as reversing.
-        const push=wp*wp*(.08+p.z*.38);
-        const x1=cx+(p.x-cx)*(1+push),y1=cy+(yy-cy)*(1+push);
-        if(x1<-60||x1>w+60||y1<-60||y1>h+60)continue;
-        const a=Math.atan2(y1-cy,x1-cx),len=wp*wp*(8+p.z*76);
-        ctx.setTransform(dpr,0,0,dpr,(x1-Math.cos(a)*len)*dpr,(y1-Math.sin(a)*len)*dpr);
-        ctx.rotate(a);
-        ctx.fillRect(-r,-r,len+r*2,r*2);
-        continue;
-      }
-      ctx.fillRect(p.x-r,yy-r*stretch,r*2,r*2*stretch);
-    }
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.globalAlpha=1;
-  }
-  initHole(resize){
-    const cv=this.holeRef.current;if(!cv)return;
-    const dpr=Math.min(1.1,window.devicePixelRatio||1);
-    const w=cv.clientWidth||400,h=cv.clientHeight||400;
-    cv.width=w*dpr;cv.height=h*dpr;
-    const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
-    this._hctx=ctx;this._hw=w;this._hh=h;this._hdpr=dpr;
-    this._hfont=Math.max(9,Math.min(w,h)*.5*.016);
-    this.buildAtlas();
-    // The atlas bakes in the font, so a late webfont would otherwise leave the streams
-    // in the fallback face for the rest of the session.
-    if(!this._fontsWired&&document.fonts&&document.fonts.ready){
-      this._fontsWired=true;
-      // The webfont also moves every line of the page, and the corridor stages off measured
-      // layout positions — so re-measure once the real metrics are in.
-      document.fonts.ready.then(()=>{if(!this._dead){this.buildAtlas();this._dirtyLayout=true;}}).catch(()=>{});
-    }
-    if(!this._streams||resize){
-      const N=this.reduced?7:14;
-      const sheet=Array.from({length:N},(_,i)=>{
-        const u=N===1?.5:i/(N-1);
-        const lane=u*2-1;
-        return{
-          lane,ang:lane*1.45,wrap:false,
-          wind:3.15+Math.abs(lane)*1.2+(Math.random()-.5)*.2,
-          si:this._randStream(),
-          off:Math.random()*160,
-          spd:.42+Math.random()*.5,
-          a:.78+.22*(1-Math.abs(lane)*.3)
-        };
-      });
-      const wraps=this.reduced?8:18;
-      for(let i=0;i<wraps;i++){
-        const u=(i+.5)/wraps;
-        sheet.push({
-          lane:0,ang:(i/wraps)*6.283+Math.random()*.12,wrap:true,
-          orbit:.62+u*.38,
-          wind:1.4+Math.random()*1.2,
-          si:this._randStream(),
-          off:Math.random()*160,
-          spd:.26+Math.random()*.5,
-          a:.5+.28*u
-        });
-      }
-      this._streams=sheet;
-      this._holeT=0;
-    }
-  }
-  holeSources(){
-    return this._src||(this._src=[
-      'const agent=await rig.run(task);if(diff.ok)return ship(pr);',
-      'for(const step of trace)replay(step.ctx);export type Trace={id:string};',
-      'await Promise.all(jobs.map(j=>sandbox(j)));git commit -m"fix: isolate"',
-      'while(!done){yield* gen();node.next.push(a,b);}fn=>review(diff)',
-      '0x1A9F select traces where confidence<0.4;throw new Error("spec");',
-      'if(x){return}else let out=arr.map(v=>v.id)&&ship();'
-    ]);
-  }
-  _randStream(){return Math.floor(Math.random()*this.holeSources().length);}
-  // Every stream segment used to be a fillText under a rotation and a non-uniform scale,
-  // which is exactly the transform Chrome's glyph cache cannot serve — so all ~800 of them
-  // were re-rasterised from scratch every frame. That one fact was the whole difference
-  // between 10fps and 120fps in the hero, and the hero is the first thing anyone scrolls.
-  // Rasterising each line once per colour band up front turns those calls into plain blits.
-  buildAtlas(){
-    const src=this.holeSources(),bands=8;
-    // Supersampled a little: at rest the orb sits at scale 1 and the code is meant to be read.
-    const px=Math.max(9,Math.min(46,(this._hfont||12)*1.5));
-    const font='500 '+px.toFixed(1)+'px "JetBrains Mono","IBM Plex Mono",ui-monospace,monospace';
-    const cv=this._atlas||(this._atlas=document.createElement('canvas'));
-    const g=cv.getContext('2d');
-    g.font=font;
-    const cw=g.measureText('0').width||px*.6;
-    const rowH=Math.ceil(px*1.7);
-    // Each line is stored twice over, so a window taken at any index into the first copy
-    // can always run off its end without wrapping.
-    const cols=src.reduce((m,s)=>Math.max(m,s.length),0)*2;
-    cv.width=Math.ceil(cols*cw);cv.height=rowH*src.length*bands;
-    g.font=font;g.textAlign='left';g.textBaseline='middle';
-    for(let si=0;si<src.length;si++){
-      const line=src[si]+src[si];
-      for(let b=0;b<bands;b++){
-        const t=b/(bands-1);
-        let cr,cg,cb;
-        if(t<.5){const k=t/.5;cr=250-18*k;cg=248-38*k;cb=242-70*k;}
-        else{const k=(t-.5)/.5;cr=232+23*k;cg=210-62*k;cb=172-122*k;}
-        g.fillStyle='rgb('+cr.toFixed(0)+','+cg.toFixed(0)+','+cb.toFixed(0)+')';
-        g.fillText(line,0,(si*bands+b)*rowH+rowH/2);
-      }
-    }
-    this._atCW=cw;this._atRowH=rowH;this._atBands=bands;
-    // Atlas pixels per CSS pixel — the blit divides by this to land at the old text size.
-    this._atScale=px/Math.max(1,this._hfont||px);
-  }
-  // A safety net for machines that still cannot hold the frame, not a routine dial. Detail
-  // only comes off once frames are measurably being dropped, and returns an order of
-  // magnitude more slowly than it leaves, so the level cannot oscillate against the
-  // framerate it is itself setting. Scroll speed deliberately does not feed this: thinning
-  // the streams during a flick would degrade the scene exactly while it is being watched.
-  holeDetail(){
-    const load=this._load||1;
-    const want=load>1.35?Math.max(.3,1.35/load):1;
-    const cur=this._holeQ==null?1:this._holeQ;
-    return this._holeQ=cur+(want-cur)*(want<cur?.09:.008);
-  }
-  paintHole(p,dt){
-    const ctx=this._hctx;if(!ctx||!this._streams)return;
-    const w=this._hw,h=this._hh,cx=w/2,cy=h/2,dpr=this._hdpr;
-    const maxR=Math.min(w,h)*.5;
-    ctx.clearRect(0,0,w,h);
-    const tilt=-.08,aspect=.92;
-    const pt=(rx,ry,a)=>{const lx=rx*Math.cos(a),ly=ry*Math.sin(a);return{x:cx+lx*Math.cos(tilt)-ly*Math.sin(tilt),y:cy+lx*Math.sin(tilt)+ly*Math.cos(tilt)};};
-    const horizon=maxR*(.3+p*.22);
-    const outerR=maxR*1.01;
-    const fallBoost=1+p*2.2+Math.min(Math.abs(this.velocity||0)*0.08,3.2);
-    this._holeT+=.46*fallBoost*(dt||1);
-    const spin=this._holeT*.0055;
-    const pos=(s,t)=>{
-      if(s.wrap){
-        const rad=outerR*s.orbit*(1-t*.12);
-        const ang=s.ang+spin*(.45+s.orbit)+s.wind*t*.35;
-        return pt(rad,rad*aspect,ang);
-      }
-      const rad=horizon+(outerR-horizon)*Math.pow(1-t,1.08);
-      const tSp=Math.max(0,(t-.12)/.88);
-      const ang=s.ang+spin+s.wind*Math.pow(tSp,.9);
-      const polar=pt(rad,rad*aspect,ang);
-      const mix=Math.min(1,Math.pow(t/.62,1.05));
-      const curtainX=cx+maxR*(1.02+(1-t)*.28);
-      const curtainY=cy+s.lane*maxR*(.72+(1-t)*.38);
-      return{x:curtainX*(1-mix)+polar.x*mix,y:curtainY*(1-mix)+polar.y*mix};
-    };
-
-    const haze=ctx.createRadialGradient(cx,cy,horizon*.35,cx,cy,maxR*1.35);
-    haze.addColorStop(0,'rgba(255,155,60,'+(.28+p*.1).toFixed(2)+')');
-    haze.addColorStop(.32,'rgba(176,82,28,'+(.14+p*.04).toFixed(2)+')');
-    haze.addColorStop(.62,'rgba(120,55,18,'+(.07).toFixed(2)+')');
-    haze.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);ctx.restore();
-
-    const atlas=this._atlas,src=this.holeSources();
-    const cw=this._atCW,rowH=this._atRowH,bands=this._atBands,as=this._atScale||1;
-    const steps=Math.max(8,Math.round((this.reduced?12:26)*this.holeDetail()));
-    const chunk=4,dw=chunk*cw/as,dh=rowH/as;
-    if(atlas&&cw){
-      for(const s of this._streams){
-        const flow=this._holeT*s.spd+s.off;
-        const line=src[s.si]||src[0],len=line.length;
-        for(let i=0;i<steps;i++){
-          const t=i/(steps-1);
-          if(t>.97)continue;
-          const P=pos(s,t),Q=pos(s,Math.min(1,t+1/(steps-1)));
-          const dx=Q.x-P.x,dy=Q.y-P.y;
-          if(dx*dx+dy*dy<.4)continue;
-          const alpha=Math.min(.96,(s.wrap?.85:1)*s.a*(.78+t*.22)*(t<.05?t/.05:1));
-          if(alpha<.06)continue;
-          const idx0=Math.floor(flow*.12+i*chunk)%len;
-          const band=Math.min(bands-1,Math.max(0,Math.round(t*(bands-1))));
-          const stretch=1+t*t*2.2,sc=.68+(1-t)*.55;
-          ctx.globalCompositeOperation=t>.62?'lighter':'source-over';
-          ctx.globalAlpha=alpha;
-          ctx.setTransform(dpr,0,0,dpr,P.x*dpr,P.y*dpr);
-          ctx.rotate(Math.atan2(dy,dx));
-          ctx.scale(stretch*sc,sc);
-          ctx.drawImage(atlas,idx0*cw,(s.si*bands+band)*rowH,chunk*cw,rowH,0,-dh/2,dw,dh);
-        }
-      }
-    }
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.globalAlpha=1;
-    ctx.globalCompositeOperation='source-over';
-
-    ctx.beginPath();ctx.ellipse(cx,cy,horizon,horizon*aspect,tilt,0,6.283);
-    ctx.fillStyle='#000000';ctx.fill();
-
-    ctx.save();
-    ctx.globalCompositeOperation='lighter';
-    const bloom=ctx.createRadialGradient(cx,cy,horizon*.66,cx,cy,horizon*2.15);
-    bloom.addColorStop(0,'rgba(255,170,80,0)');
-    bloom.addColorStop(.38,'rgba(255,125,40,'+(.24+p*.1).toFixed(2)+')');
-    bloom.addColorStop(.55,'rgba(255,198,88,'+(.5+p*.12).toFixed(2)+')');
-    bloom.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.beginPath();
-    ctx.ellipse(cx,cy,horizon*2.15,horizon*2.15*aspect,tilt,0,6.283);
-    ctx.fillStyle=bloom;ctx.fill();
-    const ringSteps=52;
-    for(let i=0;i<ringSteps;i++){
-      const a0=(i/ringSteps)*6.283+spin*2.8;
-      const p0=pt(horizon*1.018,horizon*1.018*aspect,a0);
-      let bright=((p0.y-cy)/(horizon*aspect)+1)/2;
-      bright=.4+.6*Math.max(0,Math.min(1,Math.pow(bright,1.15)));
-      const r=Math.round(170+bright*85),g=Math.round(78+bright*145),b=Math.round(32+bright*120);
-      ctx.fillStyle='rgba('+r+','+g+','+b+','+(.55+bright*.45).toFixed(2)+')';
-      ctx.setTransform(dpr,0,0,dpr,p0.x*dpr,p0.y*dpr);
-      ctx.rotate(a0+tilt);
-      const bw=Math.max(2.2,horizon*(.11+bright*.1)),bh=Math.max(1.6,horizon*(.058+bright*.07));
-      ctx.fillRect(-bw*.5,-bh*.5,bw,bh);
-    }
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.restore();
-  }
-  renderVals(){
-    return {
-      heroEndRef:this.heroEndRef,
-      rootRef:this.rootRef,starRef:this.starRef,tintRef:this.tintRef,cursorRef:this.cursorRef,progRef:this.progRef,
-      loaderRef:this.loaderRef,countRef:this.countRef,barRef:this.barRef,clockRef:this.clockRef,
-      marqRef:this.marqRef,bandRef:this.bandRef,heroPinRef:this.heroPinRef,heroCoreRef:this.heroCoreRef,
-      orbRef:this.orbRef,holeRef:this.holeRef,scrollHintRef:this.scrollHintRef,railRef:this.railRef,railMeterRef:this.railMeterRef,
-      mthHeadRef:this.mthHeadRef,mthBoxRef:this.mthBoxRef,mthRuleRef:this.mthRuleRef,
-      rigPanelRef:this.rigPanelRef,rigFieldRef:this.rigFieldRef,rigMetaRef:this.rigMetaRef,contactRef:this.contactRef,
-      projects:[
-        {num:'01',name:'Rig',desc:'Runtime and review loop for coding agents',stack:'Python · TS · AWS',year:'2025'},
-        {num:'02',name:'Nova Genesis Orbital Guard',desc:'Satellite tracking and conjunction alerts',stack:'Python · TLE · Three.js',year:'2025'},
-        {num:'03',name:'Racing-line Optimizer',desc:'Minimum-lap-time solver for a student driverless racing team',stack:'Python · NumPy · ROS',year:'2024'},
-        {num:'04',name:'PR Review Agent',desc:'Diff-aware reviewer that argues with itself first',stack:'LLM · GitHub API',year:'2024'}
-      ],
-      // g moves the field glow a quarter turn per panel, so consecutive panels never share a
-      // lit corner. It is what makes the wipe and the box read as two different screens
-      // rather than the same one redrawn.
-      rail:[
-        {n:'01',k:'Specification',g:'20% 26%',t:'Start at the assumption',d:'Most agent failures are specification failures. I write the assumption down first, then build the smallest thing that can falsify it.'},
-        {n:'02',k:'Traceability',g:'78% 24%',t:'Make the work replayable',d:'Every step an agent takes is recorded with the context that produced it, so a reviewer reads intent instead of reconstructing it from a diff.'},
-        {n:'03',k:'Isolation',g:'26% 74%',t:'Sandbox before you trust',d:'Execution is isolated by default. Nothing an agent runs can reach production until a human has seen the trace it produced.'},
-        {n:'04',k:'Evidence',g:'74% 70%',t:'Ship, then measure',d:'Systems earn their complexity. If a layer cannot show what it caught last week, it comes back out.'}
-      ],
-      rigPoints:[
-        {i:'01',t:'Sandboxed execution layer with replayable step traces.'},
-        {i:'02',t:'Repo-aware context builder — retrieval scoped to the change, not the codebase.'},
-        {i:'03',t:'Self-review pass that flags the diff the agent is least confident about.'}
-      ],
-      tags:['Agents','LLM infra','Autonomous driving','Orbital mechanics','Python','TypeScript','AWS'],
-      certs:[
-        {n:'Machine Learning Specialization',o:'DeepLearning.AI'},
-        {n:'Google Data Analytics',o:'Google'},
-        {n:'Cloud Practitioner',o:'AWS'},
-        {n:'Head Delegate',o:'MUN circuit'}
-      ]
-    };
+    it.vis = 1;
+    var m = smooth(clamp(w/it.split, 0, 1)), r = 1 - m;
+    /* Copy is attached to the scroll, not laid over it: every line drifts
+       against the push by its own depth and settles when the push stops. */
+    var drift = -v * 340 * it.depth;
+    var tf, clip = '';
+    if(it.mode === 'left')       tf = 'translate3d('+(r*-58 + drift*0.4).toFixed(1)+'px,'+(drift).toFixed(1)+'px,0)';
+    else if(it.mode === 'right') tf = 'translate3d('+(r* 58 - drift*0.4).toFixed(1)+'px,'+(drift).toFixed(1)+'px,0)';
+    else if(it.mode === 'scale') tf = 'translate3d(0,'+(r*16 - out*26 + drift).toFixed(1)+'px,0) scale('+(0.93+0.07*m).toFixed(3)+')';
+    else if(it.mode === 'clip'){ tf = 'translate3d(0,'+(r*10 - out*26 + drift).toFixed(1)+'px,0)';
+                                 clip = 'inset(0 '+((1-m)*100).toFixed(1)+'% 0 0)'; }
+    else                         tf = 'translate3d(0,'+(r*22 - out*26 + drift).toFixed(1)+'px,0)';
+    it.el.style.opacity = o.toFixed(3);
+    it.el.style.transform = tf;
+    if(it.mode === 'clip') it.el.style.clipPath = clip;
+    it.el.style.visibility = 'visible';
   }
 }
+
+/* ── §2.6 · Adaptive resolution ────────────────────────────────────────────
+   Ported policy: cap DPR at 2, budget the pixels, degrade fast and recover
+   slowly, and remember the settled value so a returning visitor starts right. */
+var DPR = (function(){
+  var MAXD=2, MIND=1, DOWN_MS=21, UP_MS=17, WINDOW=90, DOWN_CD=1200, UP_CD=6000;
+  var budget = (innerWidth < 860 ? 3.0e6 : 4.6e6);
+  var key = 'dpr:'+screen.width+'x'+screen.height+'@'+(devicePixelRatio||1);
+  var dpr = Math.min(devicePixelRatio||1, MAXD);
+  try{ var c = JSON.parse(localStorage.getItem(key)||'null');
+       if(c && Date.now()-c.t < 864e5) dpr = c.d; }catch(e){}
+  while(innerWidth*innerHeight*dpr*dpr > budget && dpr > MIND) dpr = Math.max(MIND, dpr-0.25);
+  var samples=[], lastDown=0, lastUp=0;
+  function sample(ms){
+    samples.push(ms); if(samples.length > WINDOW) samples.shift();
+    if(samples.length < WINDOW) return false;
+    var s=0; for(var i=0;i<samples.length;i++) s+=samples[i];
+    var avg=s/samples.length, now=performance.now(), changed=false;
+    if(avg > DOWN_MS && dpr > MIND && now-lastDown > DOWN_CD){ dpr=Math.max(MIND,dpr-0.25); lastDown=now; changed=true; }
+    else if(avg < UP_MS && dpr < Math.min(devicePixelRatio||1,MAXD) && now-lastUp > UP_CD){ dpr=Math.min(Math.min(devicePixelRatio||1,MAXD),dpr+0.25); lastUp=now; changed=true; }
+    if(changed){ samples.length=0; try{ localStorage.setItem(key, JSON.stringify({d:dpr,t:Date.now()})); }catch(e){} }
+    return changed;
+  }
+  return { get:function(){ return dpr; }, sample:sample };
+})();
+
+/* ── Canvas + §2.10 camera ─────────────────────────────────────────────────
+   One camera, one world. The chapters are rooms in one building laid out along
+   +Z, and the camera walks through them. Repeated z values are deliberate
+   holds: the camera parks while the set changes around it. */
+var scene = document.getElementById('scene'), ctx = scene.getContext('2d');
+var grade = document.getElementById('grade'), gctx = grade.getContext('2d');
+var W=0, H=0, CX=0, CY=0, DEVPX=1;
+function resize(){
+  var d = DEVPX = DPR.get();
+  W = innerWidth; H = innerHeight; CX = W/2; CY = H/2;
+  [[scene,ctx],[grade,gctx]].forEach(function(pair){
+    pair[0].width = Math.round(W*d); pair[0].height = Math.round(H*d);
+    pair[0].style.width = W+'px'; pair[0].style.height = H+'px';
+    pair[1].setTransform(d,0,0,d,0,0);
+  });
+  buildAtlas();
+  syncFov();
+}
+addEventListener('resize', resize);
+/* The atlas bakes the font in, so a webfont that lands late would otherwise
+   leave every stream in the fallback face for the rest of the session. */
+if(document.fonts && document.fonts.ready)
+  document.fonts.ready.then(function(){ AT.px = 0; buildAtlas(); }).catch(function(){});
+
+/* The building the camera walks through. Repeated z values are deliberate
+   holds — the camera parks while the set changes around it — and the lateral
+   swings are what stop the middle of the film reading as one long dolly. */
+var KEYFRAMES = [
+  { t:0.00, x:   0, y:  -40, z:-260, rx: 0,  ry: 0,  rz: 0   },
+  { t:0.12, x:   0, y:  -24, z: 300, rx: 0,  ry: 0,  rz: 0   },
+  { t:0.17, x: 250, y:  -74, z: 700, rx: 1,  ry:-4,  rz:-1.8 },  /* swing right of the graph */
+  { t:0.24, x:   0, y:  -10, z:1120, rx: 0,  ry: 2,  rz: 1.4 },  /* cross the centre */
+  { t:0.30, x:-215, y:  -54, z:1480, rx:-1,  ry: 5,  rz: 2.2 },  /* and out the far side */
+  { t:0.36, x:-140, y: -186, z:1960, rx: 4,  ry: 3,  rz: 1.5 },  /* drop toward the floor */
+  { t:0.44, x: 130, y:  -18, z:2510, rx:-2,  ry:-3,  rz:-1.4 },  /* rise into the cell mouth */
+  { t:0.52, x:   0, y:  -40, z:2980, rx: 0,  ry: 0,  rz: 0   },
+  { t:0.58, x:   0, y:  -44, z:3080, rx: 0,  ry: 0,  rz: 0.6 },  /* hold — the review runs */
+  { t:0.615,x: 152, y:  -30, z:4180, rx: 0,  ry:-3,  rz:-2.6 },  /* slalom: card 01 to port */
+  { t:0.652,x:-152, y:  -38, z:4780, rx: 0,  ry: 3,  rz: 2.6 },  /* card 02 to starboard */
+  { t:0.684,x: 148, y:  -30, z:5300, rx: 0,  ry:-3,  rz:-2.5 },  /* card 03 */
+  { t:0.717,x:-148, y:  -38, z:5820, rx: 0,  ry: 3,  rz: 2.5 },  /* card 04 */
+  { t:0.74, x:   0, y:  -60, z:6180, rx: 2,  ry: 0,  rz: 0   },
+  { t:0.79, x:-760, y: -690, z:5180, rx:25,  ry:-13, rz: 3.4 },  /* climb out, banking */
+  { t:0.835,x: 430, y:-1245, z:5320, rx:41,  ry: 10, rz:-3.4 },  /* over the top of the track */
+  { t:0.88, x:   0, y:-1430, z:5560, rx:48,  ry: 0,  rz: 0   },
+  { t:1.00, x:   0, y: -190, z:6320, rx: 4,  ry: 0,  rz: 0   }   /* dive back to the tarmac */
+];
+var cam = { x:0, y:0, z:0, rx:0, ry:0, rz:0, fov:820, lookY:0,
+            _cy:1,_sy:0,_cx:1,_sx:0,_cr:1,_sr:0 };
+/* Focal length in pixels. Held constant, a 414px viewport stands three times
+   closer to every object than a 1440px one does — the same card fills the
+   frame instead of passing it. Scaled by width, the framing is the framing. */
+var BASE_FOV = 820;
+function syncFov(){ BASE_FOV = W < 860 ? Math.max(200, W*0.57) : 820; }
+/* Catmull–Rom, not an ease per segment: easing every keyframe means the camera
+   comes to a halt at each one, which is exactly what makes a long move read as
+   a slideshow. A spline keeps velocity continuous across the joins and lets the
+   overshoot at a hard turn do the banking for free. */
+function cr(p0,p1,p2,p3,t){
+  var t2=t*t, t3=t2*t;
+  return 0.5*(2*p1 + (p2-p0)*t + (2*p0-5*p1+4*p2-p3)*t2 + (3*p1-3*p2+p3-p0)*t3);
+}
+function camAt(p, T){
+  var i=0; while(i < KEYFRAMES.length-2 && p > KEYFRAMES[i+1].t) i++;
+  var k1=KEYFRAMES[i], k2=KEYFRAMES[i+1];
+  var k0=KEYFRAMES[i-1]||k1, k3=KEYFRAMES[i+2]||k2;
+  var t = clamp((p-k1.t)/Math.max(1e-6,k2.t-k1.t), 0, 1);
+  cam.x  = cr(k0.x,k1.x,k2.x,k3.x,t);
+  cam.y  = cr(k0.y,k1.y,k2.y,k3.y,t);
+  cam.z  = cr(k0.z,k1.z,k2.z,k3.z,t);
+  cam.rx = cr(k0.rx,k1.rx,k2.rx,k3.rx,t);
+  cam.ry = cr(k0.ry,k1.ry,k2.ry,k3.ry,t) * Math.PI/180;
+  cam.rz = cr(k0.rz,k1.rz,k2.rz,k3.rz,t) * Math.PI/180;
+
+  var v = Scroll.vel(), sp = Scroll.speed();
+  /* Inertia. The rig has mass: it runs a little ahead of the timeline when you
+     push, banks into the push, and opens up its focal length as it accelerates. */
+  cam.z  += v * 1400;
+  cam.y  += v * 260;
+  cam.rz += v * 1.05;
+  cam.fov = BASE_FOV * (1 - 0.16*sp);
+  if(!REDUCED){
+    /* Breath, so a parked camera is never actually frozen — and only while the
+       reader has stopped pushing, or it would fight the inertia above. */
+    var b = 1 - sp;
+    cam.x  += Math.sin(T*0.29)*9*b;
+    cam.y  += Math.cos(T*0.23)*7*b;
+    cam.rz += Math.sin(T*0.17)*0.005*b;
+    /* The catch. One Gaussian kick where the review finds the failing hunk —
+       a function of progress, so scrubbing back plays it again exactly. */
+    var g = Math.exp(-Math.pow((p-0.5545)/0.0060, 2));
+    if(g > 0.003){
+      cam.x   += Math.sin(T*41)*8*g;
+      cam.y   += Math.cos(T*37)*6*g;
+      cam.rz  += Math.sin(T*29)*0.011*g;
+      cam.fov *= 1 + 0.055*g;
+    }
+  }
+  camSync();
+}
+/* Mouse-look, windowed with edge fades so it never pops on. 3° and 4°:
+   restraint is the whole trick. Runs after camAt and adds to it. */
+var LOOKS = [ { a:0.30, b:0.50, pitch:3, yaw:4 }, { a:0.60, b:0.73, pitch:3, yaw:4 } ];
+var mx=0, my=0, cmx=0, cmy=0;
+addEventListener('mousemove', function(e){ mx=(e.clientX/innerWidth-0.5)*2; my=(e.clientY/innerHeight-0.5)*2; }, {passive:true});
+function lookAt(p, dt){
+  var amt=0, pitch=0, yaw=0;
+  for(var i=0;i<LOOKS.length;i++){ var L=LOOKS[i];
+    var f = Math.min(clamp((p-L.a)/0.01,0,1), clamp((L.b-p)/0.01,0,1));
+    if(f>amt){ amt=f; pitch=L.pitch; yaw=L.yaw; } }
+  if(REDUCED) amt = 0;
+  var k = 1 - Math.pow(1-0.06, 60*dt);
+  cmx += (mx-cmx)*k; cmy += (my-cmy)*k;
+  cam.ry   += cmx * yaw * amt * Math.PI/180;
+  cam.lookY = cmy * pitch * amt * Math.PI/180;
+  camSync();
+}
+/* proj runs a few thousand times a frame; the six trig terms do not change
+   inside one, so they are resolved here instead of per call. */
+function camSync(){
+  cam._cy = Math.cos(cam.ry); cam._sy = Math.sin(cam.ry);
+  var rx = cam.rx*Math.PI/180 + cam.lookY;
+  cam._cx = Math.cos(rx); cam._sx = Math.sin(rx);
+  cam._cr = Math.cos(cam.rz); cam._sr = Math.sin(cam.rz);
+}
+/* Project a world point. Returns null when it is behind the camera.
+   Deliberately allocates: callers hold several projected points at once to draw
+   a quad or a segment, and a shared scratch object would hand all of them the
+   same coordinates. */
+function proj(wx,wy,wz){
+  var dx=wx-cam.x, dy=wy-cam.y, dz=wz-cam.z;
+  var nx=dx*cam._cy - dz*cam._sy, nz=dx*cam._sy + dz*cam._cy;
+  var ny=dy*cam._cx - nz*cam._sx; nz = dy*cam._sx + nz*cam._cx;
+  /* Culled well before the near plane: a point at nz=20 projects at 40× and
+     lands as a full-screen flash rather than as geometry. */
+  if(nz <= 140) return null;
+  var s = cam.fov/nz, px = nx*s, py = ny*s;
+  /* Roll last — a rotation about the view axis is a screen-space rotation. */
+  return { x: CX + px*cam._cr - py*cam._sr, y: CY + px*cam._sr + py*cam._cr, s: s, z: nz };
+}
+
+/* ── §2.9 · Post-processing as a per-chapter preset ────────────────────────
+   The palette barely moves between chapters. The exposure does. Values are
+   tweened over 0.9s on scene:changed, through a plain proxy object. */
+var PRESETS = {
+  instruction:{ bloom:0.80, thresh:0.40, vigIn:0.46, vigOut:1.00, warm:0.10 },
+  repo:       { bloom:0.55, thresh:0.35, vigIn:0.52, vigOut:1.00, warm:0.04 },
+  sandbox:    { bloom:1.00, thresh:0.30, vigIn:0.58, vigOut:1.00, warm:0.14 },
+  review:     { bloom:1.25, thresh:0.25, vigIn:0.44, vigOut:0.92, warm:0.02 },
+  shipped:    { bloom:0.50, thresh:0.50, vigIn:0.26, vigOut:0.78, warm:0.06 },
+  trajectory: { bloom:0.90, thresh:0.35, vigIn:0.42, vigOut:0.94, warm:0.12 },
+  contact:    { bloom:1.55, thresh:0.20, vigIn:0.50, vigOut:1.00, warm:0.18 }
+};
+var fx = {}, fxTo = {}, fxK = ['bloom','thresh','vigIn','vigOut','warm'];
+(function(){ var s=PRESETS.instruction; for(var i=0;i<fxK.length;i++){ fx[fxK[i]]=s[fxK[i]]; fxTo[fxK[i]]=s[fxK[i]]; } })();
+EventBus.on('scene:changed', function(e){
+  var s = PRESETS[e.to.name] || PRESETS.instruction;
+  for(var i=0;i<fxK.length;i++) fxTo[fxK[i]] = s[fxK[i]];
+  if(REDUCED) for(i=0;i<fxK.length;i++) fx[fxK[i]] = s[fxK[i]];
+});
+function fxUpdate(dt){
+  var k = 1 - Math.pow(1-0.09, 60*dt);            /* ≈ 0.9s settle */
+  for(var i=0;i<fxK.length;i++) fx[fxK[i]] += (fxTo[fxK[i]]-fx[fxK[i]])*k;
+}
+function fxDraw(){
+  gctx.clearRect(0,0,W,H);
+  var r = Math.max(W,H)*0.75;
+  var v = gctx.createRadialGradient(CX,CY*1.02,r*fx.vigIn, CX,CY*1.02,r*fx.vigOut);
+  v.addColorStop(0,'rgba(6,5,4,0)');
+  v.addColorStop(0.72,'rgba(6,5,4,'+(0.34*fx.vigOut).toFixed(3)+')');
+  v.addColorStop(1,'rgba(6,5,4,'+(0.88*fx.vigOut).toFixed(3)+')');
+  gctx.fillStyle=v; gctx.fillRect(0,0,W,H);
+  if(fx.warm > 0.005){
+    gctx.globalCompositeOperation='lighter';
+    var g = gctx.createRadialGradient(CX,CY*1.1,0, CX,CY*1.1,r*0.9);
+    g.addColorStop(0,'rgba(166,121,31,'+(0.055*fx.warm*10).toFixed(3)+')');
+    g.addColorStop(1,'rgba(166,121,31,0)');
+    gctx.fillStyle=g; gctx.fillRect(0,0,W,H);
+    gctx.globalCompositeOperation='source-over';
+  }
+}
+/* Bloom, faked honestly: a lighter-composited radial smear around a point.
+   Every chapter draws its highlights through this so the grade reads as one. */
+function bloomAt(x,y,r,color,alpha){
+  var a = alpha*fx.bloom; if(a < 0.004 || r < 1) return;
+  var g = ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0, color.replace('%A%', Math.min(1,a).toFixed(3)));
+  g.addColorStop(0.45, color.replace('%A%', (a*0.32).toFixed(3)));
+  g.addColorStop(1, color.replace('%A%','0'));
+  ctx.globalCompositeOperation='lighter';
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,6.2832); ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+}
+
+/* ── §2.7 · Diegetic labels ────────────────────────────────────────────────
+   Text is never drawn into the canvas. Each label is a div whose position is
+   recomputed each frame from a projected world point — crisp at any DPR,
+   selectable, in the accessibility tree, styled in CSS. */
+var labelRoot = document.getElementById('labels'), labels = [];
+function addLabel(html, wx, wy, wz, a, b, dx, dy, wide){
+  var el = document.createElement('div');
+  el.className = 'dlabel' + (dx < 0 ? ' lft' : '');
+  el.innerHTML = html;
+  labelRoot.appendChild(el);
+  /* `wide` marks a label whose chapter parks its copy across the whole frame on
+     a narrow screen — there is no room left to pin anything to the world. */
+  labels.push({ el:el, x:wx, y:wy, z:wz, a:a, b:b, dx:dx||18, dy:dy||-8, on:0, wide:!!wide });
+}
+function updateLabels(p){
+  for(var i=0;i<labels.length;i++){
+    var L=labels[i];
+    var win = L.wide && W < 860 ? 0
+      : Math.min(clamp((p-L.a)/0.014,0,1), clamp((L.b-p)/0.014,0,1));
+    if(win <= 0.002){ if(L.on){ L.el.style.opacity='0'; L.el.style.visibility='hidden'; L.on=0; } continue; }
+    var s = proj(L.x, L.y, L.z);
+    if(!s){ L.el.style.opacity='0'; L.el.style.visibility='hidden'; L.on=0; continue; }
+    L.on=1; L.el.style.visibility='visible';
+    L.el.style.opacity = win.toFixed(3);
+    /* A label parked to the left is pulled back by its own width, so its leader
+       line meets the anchor however long the copy turns out to be — and it is
+       kept inside the frame, because a projected point does not know where the
+       edge of the viewport is. Width is measured once; the copy never changes. */
+    if(!L.w) L.w = L.el.offsetWidth || 220;
+    var lx = s.x + L.dx, G = 16;
+    lx = L.dx < 0 ? clamp(lx, G + L.w, W - G) : clamp(lx, G, Math.max(G, W - G - L.w));
+    L.el.style.transform = 'translate3d('+Math.round(lx)+'px,'+Math.round(clamp(s.y+L.dy, 56, H-72))+'px,0)'
+      + (L.dx < 0 ? ' translateX(-100%)' : '');
+  }
+}
+
+/* ═════ CHAPTERS (§4.2) ═══════════════════════════════════════════════════
+   Every chapter is a pure function of progress. None of them keeps state.    */
+
+var motes = (function(){ var r=rng(7), a=[];
+  for(var i=0;i<260;i++) a.push({ x:(r()-0.5)*3400, y:(r()-0.5)*1900, z:r()*7200, s:0.4+r()*1.5, tw:r()*6.28 });
+  return a; })();
+var conv = (function(){ var r=rng(19), a=[];
+  for(var i=0;i<80;i++) a.push({ ang:r()*6.2832, rad:0.35+r()*0.9, ph:r(), sp:0.6+r()*0.9 });
+  return a; })();
+
+/* — 01 instruction — the black hole ———————————————————————————————————————
+   The one place in the set worth being literal about. A Schwarzschild hole a
+   few degrees off its disk plane, and drawn to the physics rather than to the
+   cliché: the shadow is *circular* whatever the inclination; the photon ring
+   sits at 1.02 shadow radii; the far side of the disk is lensed up and over
+   the top while its underside bends below, which is the pair of arcs that
+   separates a black hole from a ringed planet; and relativistic beaming makes
+   the approaching limb several times brighter than the receding one, Doppler
+   pushing it to the pale end of the palette and the far limb down into the
+   accent red. Falling in, as light rays, is the code. */
+var HOLE_SRC = [
+  'const agent=await rig.run(task);if(diff.ok)return ship(pr);',
+  'for(const step of trace)replay(step.ctx);export type Trace={id:string};',
+  'await Promise.all(jobs.map(j=>sandbox(j)));git commit -m"fix: isolate"',
+  'while(!done){yield* gen();node.next.push(a,b);}fn=>review(diff)',
+  '0x1A9F select traces where confidence<0.4;throw new Error("spec");',
+  'if(x){return}else let out=arr.map(v=>v.id)&&ship();'
+];
+/* Each line is rasterised once per Doppler band into an atlas, so a stream
+   segment is a plain blit. The alternative — fillText under a rotation and a
+   non-uniform scale — is the one transform a glyph cache cannot serve, and
+   with ~900 segments a frame it is the whole difference between 10fps and
+   120fps in the first thing anyone sees. */
+var AT = { cv:null, cw:0, rowH:0, bands:9, px:0 };
+function buildAtlas(){
+  var px = clamp(Math.round(Math.min(W,H)*0.0185), 10, 26);
+  if(AT.cv && AT.px === px) return;
+  AT.px = px;
+  var cv = AT.cv || (AT.cv = document.createElement('canvas'));
+  var g = cv.getContext('2d');
+  var font = '500 '+px+'px "JetBrains Mono","IBM Plex Mono",ui-monospace,monospace';
+  g.font = font;
+  var cw = g.measureText('0').width || px*0.6, rowH = Math.ceil(px*1.7), cols = 0, si, b;
+  for(si=0; si<HOLE_SRC.length; si++) cols = Math.max(cols, HOLE_SRC[si].length);
+  /* Stored twice over, so a window taken anywhere in the first copy can run off
+     its end without wrapping. */
+  cv.width = Math.ceil(cols*2*cw); cv.height = rowH*HOLE_SRC.length*AT.bands;
+  g.font = font; g.textAlign='left'; g.textBaseline='middle';
+  for(si=0; si<HOLE_SRC.length; si++){
+    var line = HOLE_SRC[si] + HOLE_SRC[si];
+    for(b=0; b<AT.bands; b++){
+      /* far and cold → close and beamed: neutral-300 → gold → cream. */
+      var t = b/(AT.bands-1), r, gg, bb;
+      if(t < 0.5){ var k=t/0.5;      r=lerp(95,166,k);  gg=lerp(88,121,k);  bb=lerp(74,31,k); }
+      else       { var k2=(t-0.5)/0.5; r=lerp(166,255,k2); gg=lerp(121,246,k2); bb=lerp(31,232,k2); }
+      g.fillStyle = 'rgb('+(r|0)+','+(gg|0)+','+(bb|0)+')';
+      g.fillText(line, 0, (si*AT.bands+b)*rowH + rowH/2);
+    }
+  }
+  AT.cw = cw; AT.rowH = rowH;
+}
+/* Two families. The curtain streams enter from off the right edge as a flat
+   sheet and wind into the disk; the wrap streams are already in orbit. */
+var STREAMS = (function(){
+  var r = rng(23), a = [], i, N = REDUCED ? 7 : 16;
+  for(i=0;i<N;i++){
+    var lane = (i/(N-1))*2 - 1;
+    a.push({ lane:lane, ang:lane*1.45, wrap:false,
+      wind:3.15 + Math.abs(lane)*1.2 + (r()-0.5)*0.2,
+      si:(r()*HOLE_SRC.length)|0, off:r()*160, spd:0.42+r()*0.5,
+      a:0.78 + 0.22*(1-Math.abs(lane)*0.3) });
+  }
+  var wraps = REDUCED ? 8 : 20;
+  for(i=0;i<wraps;i++){
+    var v = (i+0.5)/wraps;
+    a.push({ lane:0, ang:(i/wraps)*6.2832 + r()*0.12, wrap:true, orbit:0.62+v*0.38,
+      wind:1.4+r()*1.2, si:(r()*HOLE_SRC.length)|0, off:r()*160, spd:0.26+r()*0.5,
+      a:0.5+0.28*v });
+  }
+  return a;
+})();
+/* The hole runs on its own clock (§2.3) — but infall accelerates with how hard
+   you are pushing, so the streams answer the wheel without being tied to it. */
+var holeT = 0;
+
+function drawInstruction(u, p, T){
+  var i, chA = ctx.globalAlpha, uu = clamp(u, 0, 1.6);
+  var grow = Math.pow(clamp(uu,0,1), 1.55);
+  var R = Math.min(W,H) * (0.072 + 0.60*grow);            /* shadow radius */
+  /* Parked up and right of the wordmark, and only moved to the middle of the
+     frame once the copy has started to leave. */
+  var mig = smooth(clamp((uu-0.42)/0.50, 0, 1));
+  /* On a phone there is no room beside the headline, so the hole takes the top
+     third of the frame instead of the corner of it. */
+  var narrow = W < 860;
+  var hx = lerp(CX + (narrow ? W*0.20 : Math.min(W*0.265, 400)), CX, mig);
+  var hy = lerp(CY - (narrow ? H*0.27 : Math.min(H*0.195, 186)), CY - H*0.03, mig);
+  var tilt = -0.08, DISK = 0.17, SHEET = 0.55;
+  var outerR = R*5.0, spin = holeT*0.0055;
+
+  function pt(rx,ry,a){
+    var lx=rx*Math.cos(a), ly=ry*Math.sin(a);
+    return { x: hx + lx*Math.cos(tilt) - ly*Math.sin(tilt),
+             y: hy + lx*Math.sin(tilt) + ly*Math.cos(tilt) };
+  }
+  /* Beaming and Doppler in one gradient across the disk: the approaching limb
+     on the left runs to cream, the receding limb on the right to accent red. */
+  function limb(rr, mul){
+    var g = ctx.createLinearGradient(hx-rr, hy, hx+rr, hy);
+    /* ~3:1 between the limbs. Beaming really is more violent than that, but
+       past about 4:1 the receding half disappears and the halo stops closing —
+       you get a crescent wing instead of a black hole. */
+    g.addColorStop(0.00,'rgba(255,250,240,'+(0.90*mul).toFixed(3)+')');
+    g.addColorStop(0.22,'rgba(255,214,152,'+(0.66*mul).toFixed(3)+')');
+    g.addColorStop(0.50,'rgba(206,132,48,'+(0.46*mul).toFixed(3)+')');
+    g.addColorStop(0.78,'rgba(158,54,34,'+(0.35*mul).toFixed(3)+')');
+    g.addColorStop(1.00,'rgba(122,32,24,'+(0.29*mul).toFixed(3)+')');
+    return g;
+  }
+  /* Few bands, thick and soft, composited additively — a disk is a sheet of
+     glowing gas, and drawing it as a dozen thin hoops turns it into a funnel. */
+  /* Brightness comes off as the disk gains area, or the last third of the
+     fall is a cream wash instead of a black hole. */
+  var dim = chA * (1 - 0.52*grow);
+  var RINGS = 5;
+  function ringR(f){ return R*lerp(1.34, 2.58, f*f*0.6 + f*0.4); }
+  function ringW(f){ return R*lerp(0.30, 0.20, f); }
+
+  /* ── disk haze ── */
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  var haze = ctx.createRadialGradient(hx,hy,R*0.42, hx,hy,R*4.6);
+  haze.addColorStop(0,   'rgba(255,155,60,'+(0.26*chA).toFixed(3)+')');
+  haze.addColorStop(0.30,'rgba(176,82,28,'+(0.13*chA).toFixed(3)+')');
+  haze.addColorStop(0.62,'rgba(120,55,18,'+(0.06*chA).toFixed(3)+')');
+  haze.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.globalAlpha = 1; ctx.fillStyle = haze; ctx.fillRect(0,0,W,H);
+  ctx.restore();
+
+  /* ── the code, falling in ──────────────────────────────────────────────── */
+  if(AT.cv && AT.cw){
+    var steps = REDUCED ? 12 : 26, chunk = 4;
+    var dw = chunk*AT.cw, dh = AT.rowH;
+    var zs = clamp(R/(Math.min(W,H)*0.30), 0.62, 2.1);   /* the code grows as you fall */
+    for(var s=0; s<STREAMS.length; s++){
+      var S = STREAMS[s], line = HOLE_SRC[S.si], len = line.length;
+      var flow = holeT*S.spd + S.off;
+      for(i=0;i<steps;i++){
+        var t = i/(steps-1); if(t > 0.97) continue;
+        var P = strm(S,t), Q = strm(S, Math.min(1, t + 1/(steps-1)));
+        var ddx = Q.x-P.x, ddy = Q.y-P.y;
+        if(ddx*ddx + ddy*ddy < 0.4) continue;
+        var alpha = Math.min(0.96, (S.wrap?0.85:1)*S.a*(0.78+t*0.22)*(t<0.05?t/0.05:1)) * chA;
+        if(alpha < 0.06) continue;
+        var idx0 = Math.floor(flow*0.12 + i*chunk) % len;
+        var band = clamp(Math.round(t*(AT.bands-1)), 0, AT.bands-1);
+        /* Stretched along its own path near the horizon — the rays smear as
+           they are wound in, which is the whole read of the reference. */
+        var stretch = 1 + t*t*2.2, sc = (0.68 + (1-t)*0.55) * zs;
+        ctx.globalCompositeOperation = t > 0.62 ? 'lighter' : 'source-over';
+        ctx.globalAlpha = alpha;
+        ctx.setTransform(DEVPX,0,0,DEVPX, P.x*DEVPX, P.y*DEVPX);
+        ctx.rotate(Math.atan2(ddy,ddx));
+        ctx.scale(stretch*sc, sc);
+        ctx.drawImage(AT.cv, idx0*AT.cw, (S.si*AT.bands+band)*AT.rowH, dw, dh, 0, -dh/2, dw, dh);
+      }
+    }
+    ctx.setTransform(DEVPX,0,0,DEVPX,0,0);
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha = chA;
+  }
+  function strm(S,t){
+    if(S.wrap){
+      var wr = outerR*S.orbit*(1-t*0.12);
+      return pt(wr, wr*SHEET, S.ang + spin*(0.45+S.orbit) + S.wind*t*0.35);
+    }
+    var rad = R + (outerR-R)*Math.pow(1-t, 1.08);
+    var tSp = Math.max(0,(t-0.12)/0.88);
+    var polar = pt(rad, rad*SHEET, S.ang + spin + S.wind*Math.pow(tSp,0.9));
+    var mix = Math.min(1, Math.pow(t/0.62, 1.05));
+    return { x: (hx + outerR*(1.02+(1-t)*0.28))*(1-mix) + polar.x*mix,
+             y: (hy + S.lane*outerR*(0.72+(1-t)*0.38))*(1-mix) + polar.y*mix };
+  }
+
+  /* ── the disk, seen a few degrees off edge on ── */
+  ctx.globalCompositeOperation = 'lighter';
+  for(i=0;i<RINGS;i++){
+    var f = i/(RINGS-1), rr = ringR(f);
+    ctx.strokeStyle = limb(rr, (1 - f*0.62) * 0.60 * dim);
+    ctx.lineWidth = ringW(f);
+    ctx.beginPath(); ctx.ellipse(hx,hy, rr, rr*DISK, tilt, 0, 6.2832); ctx.stroke();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  /* ── the shadow. Circular whatever the inclination — that is the one thing
+        every stylised black hole gets wrong. ── */
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(hx,hy,R,0,6.2832); ctx.fill();
+  /* ── photon ring: the sharpest thing in the frame, at 1.02 shadow radii ── */
+  var pg = ctx.createLinearGradient(hx-R, hy, hx+R, hy);
+  pg.addColorStop(0.00,'rgba(255,253,248,'+(0.98*chA).toFixed(3)+')');
+  pg.addColorStop(0.42,'rgba(255,226,178,'+(0.72*chA).toFixed(3)+')');
+  pg.addColorStop(1.00,'rgba(184,52,47,'+(0.30*chA).toFixed(3)+')');
+  ctx.strokeStyle = pg; ctx.lineWidth = Math.max(1.1, R*0.020);
+  ctx.beginPath(); ctx.arc(hx,hy,R*1.02,0,6.2832); ctx.stroke();
+  /* ── the lensed images. The far side of the disk is bent up and over the
+        shadow and its underside bent below, so the flat bar through the middle
+        closes into a halo. This pair is what separates a black hole from a
+        ringed planet, and it is the only reason the shape reads at a glance. ── */
+  ctx.globalCompositeOperation = 'lighter';
+  for(i=0;i<RINGS;i++){
+    var f2 = i/(RINGS-1), r2 = ringR(f2), t2 = r2 - R*1.34;
+    ctx.lineWidth = ringW(f2)*0.46;
+    ctx.strokeStyle = limb(r2, (1-f2*0.55)*0.66*dim);
+    ctx.beginPath(); ctx.ellipse(hx,hy, r2*0.90, R*1.11 + t2*0.70, tilt, Math.PI, 6.2832); ctx.stroke();
+    ctx.strokeStyle = limb(r2, (1-f2*0.55)*0.32*dim);
+    ctx.beginPath(); ctx.ellipse(hx,hy, r2*0.90, R*1.07 + t2*0.38, tilt, 0, Math.PI); ctx.stroke();
+  }
+  /* ── and the near half of the disk, which passes in front of the shadow ── */
+  for(i=0;i<RINGS;i++){
+    var f3 = i/(RINGS-1), r3 = ringR(f3);
+    ctx.strokeStyle = limb(r3, (1-f3*0.62)*0.60*dim);
+    ctx.lineWidth = ringW(f3);
+    ctx.beginPath(); ctx.ellipse(hx,hy, r3, r3*DISK, tilt, 0, Math.PI); ctx.stroke();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  bloomAt(hx, hy, R*2.6, 'rgba(255,150,60,%A%)', 0.16*chA);
+  bloomAt(hx - R*1.55, hy + R*0.10, R*0.95, 'rgba(255,238,210,%A%)', 0.30*chA);
+
+  /* Past the horizon the shadow *is* the transition: it grows until it owns the
+     frame, and the next chapter fades up out of it. Written as a pure function
+     of u like everything else, so scrubbing back re-opens it exactly. */
+  var swallow = clamp((uu-0.72)/0.24, 0, 1) * clamp((1.34-uu)/0.24, 0, 1);
+  if(swallow > 0.002){
+    ctx.globalAlpha = smooth(swallow);
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(hx, hy, R*(1 + 24*swallow*swallow), 0, 6.2832); ctx.fill();
+    ctx.globalAlpha = chA;
+  }
+}
+
+/* — 02 repo — a file/import graph assembling out of scattered points ————— */
+var LAYERS = 5;
+var PER_LAYER = 18;
+var nodes = (function(){ var r=rng(3), a=[], seen=[0,0,0,0,0];
+  for(var i=0;i<LAYERS*PER_LAYER;i++){
+    var layer = i % LAYERS, k = seen[layer]++;
+    a.push({
+      /* Structured: one column per import depth, fanned by index. Columns run
+         across x rather than into z, because a graph layered along the camera's
+         own axis projects to a single smear and reads as noise. The whole thing
+         is parked right of centre so the chapter's copy keeps a clear field. */
+      sx: -90 + layer*280 + (r()-0.5)*80,
+      sy: -440 + k*52 + (r()-0.5)*22,
+      sz: 2350 + layer*38 + (r()-0.5)*50,
+      /* Chaos: the same nodes, thrown. */
+      cx:(r()-0.5)*3000, cy:(r()-0.5)*1700, cz:900 + r()*2000,
+      layer:layer, hot: r()<0.13, ph:r()*6.28
+    });
+  }
+  return a; })();
+/* Each node imports two things one layer down — but not its two closest, which
+   would draw every edge dead horizontal and turn the graph into a scanline
+   pattern. Reaching past the nearest neighbour is what makes it fan. */
+var edges = (function(){ var a=[], PICK=[2,5];
+  for(var i=0;i<nodes.length;i++){
+    var A=nodes[i], cands=[];
+    for(var j=0;j<nodes.length;j++){
+      var B=nodes[j];
+      if(B.layer - A.layer !== 1) continue;
+      cands.push([j, Math.abs(A.sy-B.sy)]);
+    }
+    if(!cands.length) continue;
+    cands.sort(function(p,q){ return p[1]-q[1]; });
+    for(var c=0;c<PICK.length;c++){
+      var pick = cands[Math.min(PICK[c], cands.length-1)];
+      a.push([i, pick[0], pick[1]]);
+    }
+  }
+  return a; })();
+var GRAPH_C = { x:470, z:2350 };
+function drawRepo(u, p, T){
+  var asm = smooth(clamp((u-0.05)/0.55,0,1));
+  var pts = [], i;
+  /* Once it has assembled, the graph sways on its own axis. A full rotation
+     would carry half the nodes behind the camera; ±7° is enough to keep the
+     depth reading as depth. */
+  var sway = REDUCED ? 0 : Math.sin(T*0.16)*0.12*asm;
+  var swc = Math.cos(sway), sws = Math.sin(sway);
+  for(i=0;i<nodes.length;i++){
+    var n=nodes[i];
+    var drift = REDUCED ? 0 : Math.sin(T*0.5+n.ph)*7;
+    var ox = n.sx-GRAPH_C.x, oz = n.sz-GRAPH_C.z;
+    var sx = GRAPH_C.x + ox*swc - oz*sws, sz = GRAPH_C.z + ox*sws + oz*swc;
+    var s = proj(lerp(n.cx,sx,asm), lerp(n.cy,n.sy,asm)+drift, lerp(n.cz,sz,asm));
+    pts.push(s ? { x:s.x, y:s.y, s:s.s } : null);
+  }
+  /* Edges fade in only once the structure is close to settled — the point is
+     that the shape appears, not that lines were always there. */
+  var eA = clamp((asm-0.35)/0.5,0,1);
+  if(eA > 0.01){
+    ctx.lineWidth=1;
+    for(i=0;i<edges.length;i++){
+      var e=edges[i], A=pts[e[0]], B=pts[e[1]];
+      if(!A||!B) continue;
+      var hot = nodes[e[0]].hot && nodes[e[1]].hot;
+      ctx.strokeStyle = hot
+        ? 'rgba(184,52,47,'+(0.62*eA).toFixed(3)+')'
+        : 'rgba(95,88,74,'+(0.5*eA*clamp(1-e[2]/420,0.25,1)).toFixed(3)+')';
+      ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    }
+  }
+  for(i=0;i<nodes.length;i++){
+    var q=pts[i]; if(!q) continue;
+    var r = Math.max(1, (nodes[i].hot?4.2:2.6)*q.s);
+    if(nodes[i].hot){
+      bloomAt(q.x,q.y, r*10, 'rgba(184,52,47,%A%)', 0.22*eA);
+      ctx.fillStyle='rgba(216,150,142,'+(0.55+0.45*asm).toFixed(2)+')';
+    } else ctx.fillStyle='rgba(163,154,135,'+(0.35+0.5*asm).toFixed(2)+')';
+    ctx.beginPath(); ctx.arc(q.x,q.y,r,0,6.2832); ctx.fill();
+  }
+  /* A settled graph is a diagram; a graph with something moving through it is
+     a system. One packet on every third edge, resolving downstream. */
+  if(eA > 0.3 && !REDUCED){
+    ctx.globalCompositeOperation='lighter';
+    for(i=0;i<edges.length;i+=3){
+      var pe=edges[i], PA=pts[pe[0]], PB=pts[pe[1]];
+      if(!PA||!PB) continue;
+      var f = (T*0.5 + i*0.0917) % 1;
+      ctx.fillStyle='rgba(255,214,150,'+(0.8*eA*Math.sin(f*Math.PI)).toFixed(3)+')';
+      ctx.beginPath();
+      ctx.arc(PA.x+(PB.x-PA.x)*f, PA.y+(PB.y-PA.y)*f,
+        Math.max(1.1, 3.4*lerp(PA.s,PB.s,f)), 0, 6.2832);
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation='source-over';
+  }
+}
+
+/* — 03 sandbox — a contained volume, an agent stepping, each step a trace ——
+   Cheapest scene in the set: a grid shader, a wireframe box and seven quads. */
+var FLOOR_Y = 300;
+var STEPS = ['read repo','plan diff','write patch','run tests','lint','self-review','open PR'];
+function drawSandbox(u, p, T){
+  var i, s, s2;
+  /* infinity floor */
+  ctx.lineWidth=1;
+  for(i=0;i<44;i++){
+    var z = 2400 + i*110;
+    var a = clamp(1 - i/44, 0, 1);
+    var L = proj(-1500, FLOOR_Y, z), R = proj(1500, FLOOR_Y, z);
+    if(!L||!R) continue;
+    ctx.strokeStyle='rgba(66,58,43,'+(0.55*a*a).toFixed(3)+')';
+    ctx.beginPath(); ctx.moveTo(L.x,L.y); ctx.lineTo(R.x,R.y); ctx.stroke();
+  }
+  for(i=-8;i<=8;i++){
+    var x=i*180;
+    s=proj(x,FLOOR_Y,2400); s2=proj(x,FLOOR_Y,7100);
+    if(!s||!s2) continue;
+    var g=ctx.createLinearGradient(s.x,s.y,s2.x,s2.y);
+    g.addColorStop(0,'rgba(66,58,43,.5)'); g.addColorStop(1,'rgba(66,58,43,0)');
+    ctx.strokeStyle=g; ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(s2.x,s2.y); ctx.stroke();
+  }
+  /* the cell — everything the agent does happens inside it */
+  var cz=3600, hw=430, hh=300, hd=330;
+  var box = clamp((u-0.06)/0.18,0,1);
+  var V=[], ok=true;
+  var corners=[[-hw,-hh,-hd],[hw,-hh,-hd],[hw,hh,-hd],[-hw,hh,-hd],[-hw,-hh,hd],[hw,-hh,hd],[hw,hh,hd],[-hw,hh,hd]];
+  for(i=0;i<8;i++){ s=proj(corners[i][0], corners[i][1], cz+corners[i][2]); if(!s){ok=false;break;} V.push({x:s.x,y:s.y}); }
+  if(ok && box>0.01){
+    var E=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+    ctx.strokeStyle='rgba(166,121,31,'+(0.5*box).toFixed(3)+')';
+    ctx.lineWidth=1;
+    for(i=0;i<E.length;i++){ ctx.beginPath(); ctx.moveTo(V[E[i][0]].x,V[E[i][0]].y); ctx.lineTo(V[E[i][1]].x,V[E[i][1]].y); ctx.stroke(); }
+    /* light cone from above */
+    var top=proj(0,-hh-360,cz);
+    if(top){
+      ctx.globalCompositeOperation='lighter';
+      /* Apex down onto the four floor corners — 4..7 are the far *face*, and
+         lighting that instead throws the wedge off to one side. */
+      var cg=ctx.createLinearGradient(top.x,top.y,top.x,V[3].y);
+      cg.addColorStop(0,'rgba(255,196,110,'+(0.10*box*fx.bloom).toFixed(3)+')');
+      cg.addColorStop(1,'rgba(255,150,60,0)');
+      ctx.fillStyle=cg;
+      ctx.beginPath(); ctx.moveTo(top.x,top.y); ctx.lineTo(V[3].x,V[3].y); ctx.lineTo(V[2].x,V[2].y);
+      ctx.lineTo(V[6].x,V[6].y); ctx.lineTo(V[7].x,V[7].y); ctx.closePath(); ctx.fill();
+      ctx.globalCompositeOperation='source-over';
+    }
+    /* A containment plane sweeping the cell, front to back, on its own clock.
+       The box is what makes the sandbox a claim; the sweep is what makes it
+       look like the claim is being enforced continuously. */
+    if(!REDUCED && box > 0.2){
+      var sf = (T*0.26) % 1, pz = cz - hd + sf*hd*2, fa = Math.sin(sf*Math.PI);
+      var q1=proj(-hw,-hh,pz), q2=proj(hw,-hh,pz), q3=proj(hw,hh,pz), q4=proj(-hw,hh,pz);
+      if(q1&&q2&&q3&&q4){
+        ctx.globalCompositeOperation='lighter';
+        var sg=ctx.createLinearGradient(q1.x,q1.y,q4.x,q4.y);
+        sg.addColorStop(0,'rgba(184,52,47,0)');
+        sg.addColorStop(0.55,'rgba(200,80,62,'+(0.11*fa*box).toFixed(3)+')');
+        sg.addColorStop(1,'rgba(184,52,47,0)');
+        ctx.fillStyle=sg;
+        ctx.beginPath(); ctx.moveTo(q1.x,q1.y); ctx.lineTo(q2.x,q2.y); ctx.lineTo(q3.x,q3.y); ctx.lineTo(q4.x,q4.y); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle='rgba(236,230,217,'+(0.26*fa*box).toFixed(3)+')'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(q1.x,q1.y); ctx.lineTo(q2.x,q2.y); ctx.stroke();
+        ctx.globalCompositeOperation='source-over';
+      }
+    }
+  }
+  /* the agent walking its steps — every completed one leaves a trace */
+  var walk = clamp((u-0.22)/0.62,0,1) * STEPS.length;
+  for(i=0;i<STEPS.length;i++){
+    var done = clamp(walk-i,0,1);
+    if(done<=0) continue;
+    var tx = -hw+70 + i*((hw*2-140)/(STEPS.length-1));
+    var tz = cz - hd + 60 + i*((hd*2-120)/(STEPS.length-1));
+    var a=proj(tx-34, FLOOR_Y-2, tz-30), b=proj(tx+34, FLOOR_Y-2, tz-30),
+        c=proj(tx+34, FLOOR_Y-2, tz+30), d=proj(tx-34, FLOOR_Y-2, tz+30);
+    if(a&&b&&c&&d){
+      /* Completed traces keep breathing in sequence — a recorder still running,
+         not a row of finished tiles. */
+      var beat = REDUCED ? 0 : 0.06*Math.sin(T*2 - i*0.6);
+      ctx.fillStyle='rgba(156,31,34,'+(0.20+0.24*done+beat).toFixed(3)+')';
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle='rgba(184,52,47,'+(0.5*done).toFixed(3)+')'; ctx.lineWidth=1; ctx.stroke();
+    }
+    /* the head of the walk is the live one */
+    if(done>0 && done<1){
+      var h=proj(tx, FLOOR_Y-90, tz);
+      if(h){
+        bloomAt(h.x,h.y, 150*h.s, 'rgba(255,190,110,%A%)', 0.45);
+        if(!REDUCED){
+          var ping = (T*1.1)%1;
+          ctx.strokeStyle='rgba(255,190,110,'+(0.42*(1-ping)).toFixed(3)+')'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.arc(h.x,h.y,Math.max(2,(12+ping*90)*h.s),0,6.2832); ctx.stroke();
+        }
+        ctx.fillStyle='rgba(255,238,214,.95)';
+        ctx.beginPath(); ctx.arc(h.x,h.y,Math.max(1.5,9*h.s),0,6.2832); ctx.fill();
+      }
+    }
+  }
+}
+
+/* — 04 review — THE SIGNATURE ————————————————————————————————————————————
+   The diff arrives whole and correct-looking. The review pass sweeps it. One
+   hunk fails, and the sweep stops on it. Screen space, camera parked. */
+var HUNKS = (function(){ var r=rng(41), rows=[];
+  for(var y=0;y<15;y++){ var row=[], x=0;
+    while(x<1){ var w = 0.03+r()*0.11; if(x+w>1) w=1-x; row.push({x:x,w:w,k:r()}); x+=w+0.008; }
+    rows.push(row); }
+  return rows; })();
+var FAIL_ROW = 6, FAIL_COL = 0.66;
+function drawReview(u, p, T){
+  var bw = Math.min(W*0.60, 760), bh = Math.min(H*0.44, 340);
+  var bx = CX - bw/2, by = CY - bh/2 - H*0.02;
+  var rowH = bh/HUNKS.length, gap = Math.min(3, rowH*0.28);
+
+  var arrive = smooth(clamp(u/0.22,0,1));
+  /* The sweep advances, then stalls at the failing hunk and stays there —
+     a pure function of u, so scrubbing back rewinds it exactly. */
+  var adv = 1 - Math.pow(1 - clamp(u/0.52,0,1), 2.2);
+  var sweep = adv * FAIL_COL;
+  var caught = smooth(clamp((u-0.50)/0.20,0,1));
+
+  ctx.save();
+  ctx.globalAlpha *= arrive;                       /* stacks on the chapter's edge fade */
+  /* A scrim, not a cut. The review is the only screen-space chapter in the set
+     and it has to be read, not looked past — the sandbox is still fading out
+     behind it and a diff over a wireframe cell is two pictures at once. */
+  ctx.fillStyle = 'rgba(12,11,10,.94)'; ctx.fillRect(0,0,W,H);
+  for(var y=0;y<HUNKS.length;y++){
+    var row = HUNKS[y], ry = by + y*rowH;
+    for(var i=0;i<row.length;i++){
+      var b = row[i];
+      var X = bx + b.x*bw, WD = Math.max(2, b.w*bw - 3);
+      var reviewed = (b.x + b.w*0.5) < sweep;
+      var isFail = (y===FAIL_ROW) && (b.x <= FAIL_COL && b.x + b.w >= FAIL_COL);
+      if(isFail){
+        var pulse = REDUCED ? 1 : 0.72 + 0.28*Math.sin(T*3.4);
+        ctx.fillStyle = 'rgba(156,31,34,'+(0.22 + 0.66*caught*pulse).toFixed(3)+')';
+        ctx.fillRect(X, ry, WD, rowH-gap);
+        ctx.strokeStyle = 'rgba(184,52,47,'+(0.9*caught).toFixed(3)+')'; ctx.lineWidth=1;
+        ctx.strokeRect(X+0.5, ry+0.5, WD-1, rowH-gap-1);
+        bloomAt(X+WD/2, ry+(rowH-gap)/2, 120*caught, 'rgba(220,70,60,%A%)', 0.5*caught);
+      } else if(reviewed){
+        /* dimmed once the failure is found: attention goes to one place */
+        var dim = 1 - caught*0.62;
+        ctx.fillStyle = 'rgba(166,121,31,'+(0.34*dim).toFixed(3)+')';
+        ctx.fillRect(X, ry, WD, rowH-gap);
+      } else {
+        ctx.fillStyle = 'rgba(52,45,33,'+(0.85).toFixed(2)+')';
+        ctx.fillRect(X, ry, WD, rowH-gap);
+      }
+    }
+  }
+  /* the scan line */
+  var sx = bx + sweep*bw;
+  var stall = caught;                              /* it stops, it does not finish */
+  var lg = ctx.createLinearGradient(0, by-30, 0, by+bh+30);
+  lg.addColorStop(0,'rgba(184,52,47,0)');
+  lg.addColorStop(0.16,'rgba(184,52,47,'+(0.9).toFixed(2)+')');
+  lg.addColorStop(0.5,'rgba(236,230,217,1)');
+  lg.addColorStop(0.84,'rgba(184,52,47,.9)');
+  lg.addColorStop(1,'rgba(184,52,47,0)');
+  ctx.fillStyle = lg;
+  ctx.fillRect(sx-1, by-30, 2, bh+60);
+  bloomAt(sx, CY, 220, 'rgba(200,90,70,%A%)', 0.32 + 0.4*stall);
+
+  /* the bracket that lands on the caught hunk */
+  if(caught > 0.02){
+    var fy = by + FAIL_ROW*rowH - 6, fh = rowH - gap + 12;
+    var fx0 = bx - 16, fx1 = bx + bw + 16;
+    ctx.strokeStyle='rgba(184,52,47,'+(0.8*caught).toFixed(3)+')'; ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(fx0+12, fy); ctx.lineTo(fx0, fy); ctx.lineTo(fx0, fy+fh); ctx.lineTo(fx0+12, fy+fh);
+    ctx.moveTo(fx1-12, fy); ctx.lineTo(fx1, fy); ctx.lineTo(fx1, fy+fh); ctx.lineTo(fx1-12, fy+fh);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  /* Screen-space diegetic labels: same mechanism as the world ones (§2.7),
+     the anchor is just already in screen coordinates. */
+  var lbl = document.getElementById('rev-label');
+  if(lbl){
+    /* Parked left, not right: the chapter index owns the right gutter and the
+       verdict is the one line in the film that must not be read over anything. */
+    lbl.style.opacity = caught.toFixed(3);
+    lbl.style.visibility = caught>0.01 ? 'visible':'hidden';
+    /* Measured once — the copy never changes, and reading offsetWidth every
+       frame would force a layout on every frame of the signature moment. */
+    if(!lbl._w) lbl._w = lbl.offsetWidth || 300;
+    var lx = Math.max(bx-30, lbl._w + 18);
+    lbl.style.transform = 'translate3d('+Math.round(lx)+'px,'+Math.round(by+FAIL_ROW*rowH-4)+'px,0) translateX(-100%)';
+  }
+  var scanLbl = document.getElementById('rev-scan');
+  if(scanLbl){
+    var sa = clamp(u/0.18,0,1)*(1-caught*0.55);
+    scanLbl.style.opacity = sa.toFixed(3);
+    scanLbl.style.visibility = sa>0.01 ? 'visible':'hidden';
+    scanLbl.style.transform = 'translate3d('+Math.round(sx+12)+'px,'+Math.round(by-46)+'px,0)';
+  }
+}
+
+/* — 05 shipped — a card rail over a flowing light ribbon ————————————————— */
+var PROJECTS = [
+  { num:'01', name:'Rig',                        desc:'Runtime and review loop for coding agents',            stack:'Python · TS · AWS',        year:'2025' },
+  { num:'02', name:'Nova Genesis Orbital Guard', desc:'Satellite tracking and conjunction alerts',            stack:'Python · TLE · Three.js',  year:'2025' },
+  { num:'03', name:'Racing-line Optimizer',      desc:'Minimum-lap-time solver for a student driverless racing team',stack:'Python · NumPy · ROS',    year:'2024' },
+  { num:'04', name:'PR Review Agent',            desc:'Diff-aware reviewer that argues with itself first',    stack:'LLM · GitHub API',         year:'2024' }
+];
+/* Spaced so the camera passes one card per swing of the slalom, and angled so
+   each one turns to face the rig as it goes by. Four projects, four turns. */
+var CARD_Z0 = 4400, CARD_DZ = 520, CARD_X = 265;
+function cardPos(i){ return { x: (i%2 ? CARD_X : -CARD_X), y: -30, z: CARD_Z0 + i*CARD_DZ }; }
+function drawShipped(u, p, T){
+  var i, s, s2;
+  /* A rung corridor. Nothing else in the chapter tells you how fast you are
+     actually moving, and a rung crossing the frame in three frames says it
+     before any amount of easing on the cards will. */
+  for(i=0;i<52;i++){
+    var mz = CARD_Z0 - 1400 + i*175;
+    var L = proj(-820,250,mz), Rr = proj(820,250,mz);
+    if(!L||!Rr) continue;
+    var mf = clamp((L.z-200)/620,0,1) * clamp(1-(L.z-200)/3400,0,1);
+    if(mf <= 0.01) continue;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle='rgba(66,58,43,'+(0.7*mf).toFixed(3)+')';
+    ctx.beginPath(); ctx.moveTo(L.x,L.y); ctx.lineTo(Rr.x,Rr.y); ctx.stroke();
+    /* posts at both ends, brighter, so the rung has a beat */
+    var P1 = proj(-820,140,mz), P2 = proj(820,140,mz);
+    if(!P1||!P2) continue;
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle='rgba(138,106,42,'+(0.8*mf).toFixed(3)+')';
+    ctx.beginPath(); ctx.moveTo(L.x,L.y); ctx.lineTo(P1.x,P1.y);
+    ctx.moveTo(Rr.x,Rr.y); ctx.lineTo(P2.x,P2.y); ctx.stroke();
+  }
+  /* the ribbon, running under the rail — its flow is tied to progress as well
+     as to its own clock, so pushing the wheel visibly pushes the light */
+  ctx.globalCompositeOperation='lighter';
+  for(i=0;i<70;i++){
+    var z = CARD_Z0 - 320 + i*30;
+    var ph = i*0.24 + (REDUCED?0:T*0.7) + p*26;
+    var x = Math.sin(ph)*300, y = 250 + Math.cos(ph*0.7)*30;
+    s = proj(x,y,z); s2 = proj(Math.sin(ph+0.24)*300, 250+Math.cos((ph+0.24)*0.7)*30, z+30);
+    if(!s||!s2) continue;
+    var a = clamp(1 - Math.abs(i-35)/40, 0, 1);
+    ctx.strokeStyle='rgba(166,121,31,'+(0.22*a).toFixed(3)+')';
+    ctx.lineWidth=clamp(16*s.s, 1, 22);
+    ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(s2.x,s2.y); ctx.stroke();
+  }
+  ctx.globalCompositeOperation='source-over';
+  /* the cards — geometry only; the words live in DOM labels beside them */
+  var bank = Scroll.vel()*2.4;
+  for(var c=PROJECTS.length-1;c>=0;c--){
+    var P = cardPos(c), hw=172, hh=110;
+    /* Turned in toward the rail, so the camera meets a panel rather than an
+       edge, plus a little extra lean into whatever the wheel is doing. */
+    var ang = (P.x < 0 ? 0.42 : -0.42) + bank;
+    var ca = Math.cos(ang), sa = Math.sin(ang);
+    var a=proj(P.x-hw*ca, P.y-hh, P.z-hw*sa), b=proj(P.x+hw*ca, P.y-hh, P.z+hw*sa),
+        d=proj(P.x+hw*ca, P.y+hh, P.z+hw*sa), e=proj(P.x-hw*ca, P.y+hh, P.z-hw*sa);
+    if(!a||!b||!d||!e) continue;
+    /* A card the camera is about to pass through gets out of the way rather
+       than filling the frame on its way past. */
+    var near = clamp((Math.min(a.z,b.z)-200)/460, 0, 1);
+    if(near <= 0.01) continue;
+    ctx.save(); ctx.globalAlpha *= near;
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(d.x,d.y); ctx.lineTo(e.x,e.y); ctx.closePath();
+    var g=ctx.createLinearGradient(a.x,a.y,d.x,d.y);
+    g.addColorStop(0,'rgba(31,26,20,.96)'); g.addColorStop(1,'rgba(12,11,10,.97)');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.strokeStyle='rgba(138,106,42,.62)'; ctx.lineWidth=1; ctx.stroke();
+    /* An inset frame, so the panel reads as a surface with a face rather than
+       as an empty rectangle the camera happens to be flying through. */
+    var i1=proj(P.x-(hw-26)*ca, P.y-hh+22, P.z-(hw-26)*sa), i2=proj(P.x+(hw-26)*ca, P.y-hh+22, P.z+(hw-26)*sa),
+        i3=proj(P.x+(hw-26)*ca, P.y+hh-22, P.z+(hw-26)*sa), i4=proj(P.x-(hw-26)*ca, P.y+hh-22, P.z-(hw-26)*sa);
+    if(i1&&i2&&i3&&i4){
+      ctx.strokeStyle='rgba(66,58,43,.85)';
+      ctx.beginPath(); ctx.moveTo(i1.x,i1.y); ctx.lineTo(i2.x,i2.y); ctx.lineTo(i3.x,i3.y); ctx.lineTo(i4.x,i4.y); ctx.closePath(); ctx.stroke();
+    }
+    /* The leading edge catches the light as the card swings past. */
+    var lead = clamp(1 - Math.abs(Math.min(a.z,b.z)-560)/760, 0, 1);
+    if(lead > 0.02){
+      ctx.strokeStyle='rgba(255,224,178,'+(0.85*lead).toFixed(3)+')'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(e.x,e.y); ctx.stroke();
+      bloomAt((a.x+e.x)/2,(a.y+e.y)/2, Math.abs(e.y-a.y)*0.55, 'rgba(255,214,150,%A%)', 0.30*lead);
+    }
+    /* the hairline that says "01" without setting type in the canvas */
+    var m1=proj(P.x-(hw-26)*ca, P.y+hh-40, P.z-(hw-26)*sa),
+        m2=proj(P.x-(hw-96)*ca, P.y+hh-40, P.z-(hw-96)*sa);
+    if(m1&&m2){ ctx.strokeStyle='rgba(184,52,47,.9)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(m1.x,m1.y); ctx.lineTo(m2.x,m2.y); ctx.stroke(); }
+    bloomAt((a.x+d.x)/2,(a.y+d.y)/2, Math.abs(d.x-a.x)*0.7, 'rgba(110,20,24,%A%)', 0.14);
+    ctx.restore();
+  }
+}
+
+/* — 06 trajectory — a racing line optimising itself over a track outline ——
+   Placeholder geometry: real racing-line data would replace the control points. */
+var TRACK = (function(){
+  var pts=[], n=132;
+  for(var i=0;i<n;i++){
+    var a = i/n*6.2832;
+    var r = 900 + Math.sin(a*3)*250 + Math.sin(a*2+1.1)*160 + Math.cos(a*5)*70;
+    pts.push({ x:Math.cos(a)*r, z:6300 + Math.sin(a)*r*0.72 });
+  }
+  return pts; })();
+function racingLine(iters){
+  /* Minimum-curvature shrink: each pass pulls every point toward the midpoint
+     of its neighbours, bounded by the track width. */
+  var line = TRACK.map(function(p){ return { x:p.x, z:p.z }; });
+  var n = line.length, WIDTH = 118;
+  for(var k=0;k<iters;k++){
+    var next = new Array(n);
+    for(var i=0;i<n;i++){
+      var a=line[(i-1+n)%n], b=line[i], c=line[(i+1)%n];
+      var mx=(a.x+c.x)/2, mz=(a.z+c.z)/2;
+      var nx=b.x+(mx-b.x)*0.42, nz=b.z+(mz-b.z)*0.42;
+      /* keep it on the tarmac */
+      var ox=TRACK[i].x, oz=TRACK[i].z, dx=nx-ox, dz=nz-oz, d=Math.hypot(dx,dz);
+      if(d > WIDTH){ nx = ox + dx/d*WIDTH; nz = oz + dz/d*WIDTH; }
+      next[i]={x:nx,z:nz};
+    }
+    line = next;
+  }
+  return line;
+}
+var _lineCache = { it:-1, line:null };
+function drawTrajectory(u, p, T){
+  var i, s, s2, n=TRACK.length;
+  /* track edges */
+  ctx.lineWidth=1;
+  [-118,118].forEach(function(off){
+    ctx.strokeStyle='rgba(66,58,43,.75)';
+    ctx.beginPath(); var started=false;
+    for(i=0;i<=n;i++){
+      var a=TRACK[i%n], b=TRACK[(i+1)%n];
+      var dx=b.x-a.x, dz=b.z-a.z, L=Math.hypot(dx,dz)||1;
+      s=proj(a.x - dz/L*off, FLOOR_Y, a.z + dx/L*off);
+      if(!s){ started=false; continue; }
+      if(!started){ ctx.moveTo(s.x,s.y); started=true; } else ctx.lineTo(s.x,s.y);
+    }
+    ctx.stroke();
+  });
+  /* the line, optimised by however far you have scrolled */
+  var iters = Math.round(clamp((u-0.12)/0.62,0,1) * 46);
+  if(_lineCache.it !== iters){ _lineCache.it = iters; _lineCache.line = racingLine(iters); }
+  var line = _lineCache.line;
+  var reveal = clamp((u-0.06)/0.30,0,1);
+  var count = Math.round(n*reveal);
+  ctx.lineWidth = 2.2;
+  for(i=0;i<count;i++){
+    var a=line[i], b=line[(i+1)%n];
+    /* curvature colour: gold where it is fast, red where it is loaded */
+    var q=line[(i-1+n)%n];
+    var v1x=a.x-q.x, v1z=a.z-q.z, v2x=b.x-a.x, v2z=b.z-a.z;
+    var cross = Math.abs(v1x*v2z - v1z*v2x)/((Math.hypot(v1x,v1z)*Math.hypot(v2x,v2z))||1);
+    var curv = clamp(cross*7, 0, 1);
+    s = proj(a.x, FLOOR_Y-3, a.z); s2 = proj(b.x, FLOOR_Y-3, b.z);
+    if(!s||!s2) continue;
+    var R=Math.round(lerp(166,184,curv)), G=Math.round(lerp(121,52,curv)), B=Math.round(lerp(31,47,curv));
+    ctx.strokeStyle='rgba('+R+','+G+','+B+',.95)';
+    ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(s2.x,s2.y); ctx.stroke();
+    if(curv > 0.55) bloomAt(s.x, s.y, 34, 'rgba(200,70,60,%A%)', 0.20*curv);
+  }
+  /* The line it started from, kept as a ghost — the optimisation only reads as
+     an optimisation if you can still see what it moved away from. */
+  if(iters > 2){
+    ctx.strokeStyle='rgba(95,88,74,'+(0.34*clamp(iters/20,0,1)).toFixed(3)+')';
+    ctx.lineWidth=1; ctx.beginPath();
+    var open=false;
+    for(i=0;i<=n;i++){
+      s = proj(TRACK[i%n].x, FLOOR_Y-2, TRACK[i%n].z);
+      if(!s){ open=false; continue; }
+      if(!open){ ctx.moveTo(s.x,s.y); open=true; } else ctx.lineTo(s.x,s.y);
+    }
+    ctx.stroke();
+  }
+  /* Three cars on the line it just found, each dragging its own tail. One car
+     is a marker; three running at different phases is a session. */
+  if(reveal > 0.86 && !REDUCED){
+    var CARS = [0, 0.37, 0.68], TAIL = 14;
+    for(var c=0;c<CARS.length;c++){
+      var base = (T*0.115 + CARS[c]) % 1;
+      ctx.lineWidth = 3; ctx.lineCap = 'round';
+      for(var j=TAIL;j>0;j--){
+        var f0 = (base - j*0.0035 + 1) % 1, f1 = (base - (j-1)*0.0035 + 1) % 1;
+        var A = line[Math.floor(f0*n)%n], B = line[Math.floor(f1*n)%n];
+        s = proj(A.x, FLOOR_Y-8, A.z); s2 = proj(B.x, FLOOR_Y-8, B.z);
+        if(!s||!s2) continue;
+        ctx.strokeStyle='rgba(255,214,150,'+(0.5*(1-j/TAIL)*(1-j/TAIL)).toFixed(3)+')';
+        ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(s2.x,s2.y); ctx.stroke();
+      }
+      ctx.lineCap='butt';
+      var cpt = line[Math.floor(base*n)%n];
+      s = proj(cpt.x, FLOOR_Y-10, cpt.z);
+      if(s){ bloomAt(s.x, s.y, 58, 'rgba(255,214,150,%A%)', c?0.4:0.72);
+        ctx.fillStyle = c ? 'rgba(236,230,217,.8)' : 'rgba(255,244,226,.95)';
+        ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(1.4,(c?8:11)*s.s),0,6.2832); ctx.fill(); }
+    }
+  }
+}
+
+/* — 07 contact — aperture close to a letterbox band, then shut ——————————————
+   Two moves, not one. The aperture closes to a letterbox that still holds the
+   whole sign-off — closing further here would crop the only call to action on
+   the page. Then, once the copy has left, the last of the wheel brings the two
+   lit edges together, they meet in one line, and the frame goes out. */
+var END_SHUT = { at:0.972, len:0.020 };     /* edges meet, once the copy has left */
+var END_DARK = { at:0.988, len:0.008 };     /* and the light goes */
+function drawContact(u, p, T){
+  var close = smooth(clamp((u-0.06)/0.62,0,1));
+  var shut  = smooth(clamp((p-END_SHUT.at)/END_SHUT.len, 0, 1));
+  var dark  = smooth(clamp((p-END_DARK.at)/END_DARK.len, 0, 1));
+  var slit = lerp(H*0.5, H*0.26, close) * (1-shut);
+  ctx.fillStyle='#0c0b0a';
+  ctx.fillRect(0, 0, W, CY - slit);
+  ctx.fillRect(0, CY + slit, W, H);
+  /* the two edges of the aperture, lit */
+  ctx.globalCompositeOperation='lighter';
+  var g1=ctx.createLinearGradient(0,CY-slit-90,0,CY-slit);
+  g1.addColorStop(0,'rgba(156,31,34,0)'); g1.addColorStop(1,'rgba(184,52,47,'+(0.3*close).toFixed(3)+')');
+  ctx.fillStyle=g1; ctx.fillRect(0, CY-slit-90, W, 90);
+  var g2=ctx.createLinearGradient(0,CY+slit,0,CY+slit+90);
+  g2.addColorStop(0,'rgba(184,52,47,'+(0.3*close).toFixed(3)+')'); g2.addColorStop(1,'rgba(156,31,34,0)');
+  ctx.fillStyle=g2; ctx.fillRect(0, CY+slit, W, 90);
+  ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='rgba(138,106,42,'+(0.6*close).toFixed(3)+')';
+  ctx.fillRect(0, CY-slit-1, W, 1); ctx.fillRect(0, CY+slit, W, 1);
+  /* Bookend: the field falls back toward a single point, the same move as the
+     first chapter run in reverse — and light runs along the two edges of the
+     aperture so the last frame is still moving when the reader stops. */
+  if(!REDUCED){
+    ctx.globalCompositeOperation='lighter';
+    for(var i=0;i<conv.length;i++){
+      var c = conv[i];
+      var f = ((T*0.09*c.sp + c.ph) % 1);
+      var rad = (1-f) * c.rad * Math.max(W,H) * 0.62;
+      var x = CX + Math.cos(c.ang)*rad, y = CY + Math.sin(c.ang)*rad*0.42;
+      if(Math.abs(y-CY) > slit) continue;
+      ctx.fillStyle='rgba(236,230,217,'+(0.42*f*f*close).toFixed(3)+')';
+      ctx.fillRect(x, y, 2, 2);
+    }
+    for(var e=0;e<14;e++){
+      var g0 = ((T*0.22 + e/14) % 1);
+      var ex = (e%2 ? 1-g0 : g0) * W, ey = (e%2 ? CY+slit : CY-slit-1);
+      var eg = ctx.createLinearGradient(ex-120,0,ex+120,0);
+      eg.addColorStop(0,'rgba(255,214,150,0)');
+      eg.addColorStop(0.5,'rgba(255,232,196,'+(0.5*close).toFixed(3)+')');
+      eg.addColorStop(1,'rgba(255,214,150,0)');
+      ctx.fillStyle=eg; ctx.fillRect(ex-120, ey, 240, 1.4);
+    }
+    ctx.globalCompositeOperation='source-over';
+  }
+  /* The meeting. The two red edges converge on the centre line, overlap into
+     one hot filament, and the filament goes out. Everything here is a function
+     of p, so scrubbing back re-opens the aperture exactly. */
+  if(shut > 0.001){
+    var hot = 1 - dark;
+    ctx.globalCompositeOperation='lighter';
+    var fg=ctx.createLinearGradient(0, CY-140, 0, CY+140);
+    fg.addColorStop(0,'rgba(156,31,34,0)');
+    fg.addColorStop(0.5,'rgba(196,64,50,'+(0.42*shut*hot).toFixed(3)+')');
+    fg.addColorStop(1,'rgba(156,31,34,0)');
+    ctx.fillStyle=fg; ctx.fillRect(0, CY-140, W, 280);
+    /* The filament thins as the edges close and brightens as they touch. */
+    var fh = Math.max(1, 2 + 5*(1-shut));
+    ctx.fillStyle='rgba(255,236,206,'+(0.30 + 0.70*shut*hot).toFixed(3)+')';
+    ctx.fillRect(0, CY - fh/2, W, fh);
+    bloomAt(CX, CY, W*0.55*shut, 'rgba(214,86,64,%A%)', 0.34*shut*hot);
+    ctx.globalCompositeOperation='source-over';
+  }
+  if(dark > 0.001){ ctx.fillStyle='rgba(12,11,10,'+dark.toFixed(3)+')'; ctx.fillRect(0,0,W,H); }
+}
+
+/* ── The renderer ──────────────────────────────────────────────────────────
+   One rAF for the whole page. Chapters render inside a sliding window around
+   the camera (§2.4): nothing is drawn for a chapter the camera has left. */
+var CHAPTERS = {
+  instruction:drawInstruction, repo:drawRepo, sandbox:drawSandbox,
+  review:drawReview, shipped:drawShipped, trajectory:drawTrajectory, contact:drawContact
+};
+var PAD = 0.055;
+/* The window a chapter renders in, either side of its own bounds. Fixed at
+   0.055 it is a gentle overlap for a long chapter and most of a short one —
+   the review is 0.06 long, so a flat pad left the diff on screen well into
+   the card rail. Scaled to the chapter, every hand-off is the same length. */
+function padOf(S){ return Math.min(0.030, (S.end-S.start)*0.30); }
+var REVIEW_SEG = SEGMENTS[3];
+/* Draw order is segment order with one exception. The review is the only
+   chapter rendered in screen space instead of in the world, so it belongs on
+   top of whatever the camera still has in frame, not in its numbered place —
+   otherwise the card rail fades up through the diff it is meant to follow. */
+var DRAW_ORDER = [0,1,2,4,5,6,3];
+function render(p, T){
+  ctx.clearRect(0,0,W,H);
+  /* Ambient star field — its own clock, never reads progress (§2.3). Under
+     travel it stops being a field of dots and becomes the speedometer: each
+     mote smears radially out of the vanishing point by however hard the reader
+     is pushing, which is the cheapest honest motion cue there is. */
+  var sp = Scroll.speed(), sgn = Scroll.vel() < 0 ? -1 : 1, streak = sp*sp;
+  for(var i=0;i<motes.length;i++){
+    var m=motes[i];
+    var s = proj(m.x, m.y, m.z);
+    if(!s) continue;
+    var tw = REDUCED ? 1 : 0.65+0.35*Math.sin(T*0.9+m.tw);
+    var a = 0.16*tw*clamp(s.z/2600,0.2,1);
+    if(streak > 0.03){
+      var ex=s.x-CX, ey=s.y-CY, L=Math.hypot(ex,ey)||1;
+      var len = streak*(0.20*L + 16)*sgn;
+      ctx.strokeStyle='rgba(163,154,135,'+(a*(0.55+0.75*streak)).toFixed(3)+')';
+      ctx.lineWidth = Math.max(0.7, m.s);
+      ctx.beginPath(); ctx.moveTo(s.x-ex/L*len, s.y-ey/L*len); ctx.lineTo(s.x,s.y); ctx.stroke();
+    } else {
+      ctx.fillStyle='rgba(163,154,135,'+a.toFixed(3)+')';
+      ctx.fillRect(s.x, s.y, m.s, m.s);
+    }
+  }
+  for(var k=0;k<DRAW_ORDER.length;k++){
+    var S=SEGMENTS[DRAW_ORDER[k]], pd = padOf(S);
+    if(p < S.start-pd || p > S.end+pd) continue;
+    var len = S.end - S.start, u = (p - S.start)/len, pu = pd/len;
+    /* One fade rule for every chapter, at both ends of its window, so nothing
+       in the set can pop on or pop off. */
+    var edge = Math.min(clamp((u+pu)/pu,0,1), clamp((1+pu-u)/pu,0,1));
+    ctx.save();
+    ctx.globalAlpha = edge;
+    CHAPTERS[S.name](clamp(u,-0.6,1.6), p, T);
+    ctx.restore();
+  }
+  /* The review's two labels are screen-anchored, so they are not on the world
+     label list and nothing else would ever put them away. */
+  if(p < REVIEW_SEG.start-padOf(REVIEW_SEG) || p > REVIEW_SEG.end+padOf(REVIEW_SEG)) hideReviewLabels();
+  fxDraw();
+}
+function hideReviewLabels(){
+  var a=document.getElementById('rev-scan'), b=document.getElementById('rev-label');
+  if(a){ a.style.opacity='0'; a.style.visibility='hidden'; }
+  if(b){ b.style.opacity='0'; b.style.visibility='hidden'; }
+}
+
+/* ── §2.12 · Transitions ───────────────────────────────────────────────────
+   A div scaling on the Y axis. Driven as a pure function of progress rather
+   than fired on an event, so a boundary wipes identically whichever direction
+   you cross it from — and the hard swap happens behind full opacity for free.
+   Only two boundaries get one: entering the review, and entering the close.
+   Everywhere else the camera simply travels. */
+var WIPES = [ { at:0.52, w:0.011 }, { at:0.88, w:0.011 } ];
+var wipeEl = document.getElementById('wipe');
+function updateWipe(p){
+  var cover = 0;
+  for(var i=0;i<WIPES.length;i++){
+    var c = clamp(1 - Math.abs(p - WIPES[i].at)/WIPES[i].w, 0, 1);
+    if(c > cover) cover = c;
+  }
+  cover = REDUCED ? (cover>0.5?1:0) : cover*cover*(3-2*cover);
+  wipeEl.style.transform = 'scaleY('+cover.toFixed(4)+')';
+}
+
+/* ── The end card ──────────────────────────────────────────────────────────
+   Fades up behind the last of the aperture, so the button is already there
+   when the light goes rather than appearing on a screen that is already
+   black. It is a real button: focusable only while it is on screen. */
+var endEl = document.getElementById('endcard'), toTopEl = document.getElementById('toTop'), endOn = -1;
+function updateEnd(p){
+  var e = clamp((p - 0.986)/0.011, 0, 1);
+  var on = e > 0.5 ? 1 : 0;
+  endEl.style.opacity = e.toFixed(3);
+  endEl.style.visibility = e > 0.002 ? 'visible' : 'hidden';
+  endEl.style.pointerEvents = on ? 'auto' : 'none';
+  if(on !== endOn){
+    endOn = on;
+    endEl.setAttribute('aria-hidden', on ? 'false' : 'true');
+    toTopEl.tabIndex = on ? 0 : -1;
+    if(on) document.body.dataset.end = '1'; else delete document.body.dataset.end;
+    if(!on && document.activeElement === toTopEl) toTopEl.blur();
+  }
+}
+/* The way back is the whole timeline in reverse — the same travel the reader
+   just made, run at wheel speed, which is the one thing this page can do that
+   an anchor jump cannot. The hero then arrives the way it did at load. */
+var rewinding = false;
+toTopEl.addEventListener('click', function(){
+  rewinding = true;
+  introReset();
+  EventBus.emit('scroll:setProgress', 0);
+});
+
+/* ── Chrome: index, band, cursor ──────────────────────────────────────── */
+var indexEl = document.getElementById('index'), ixRows = [];
+(function buildIndex(){
+  for(var i=0;i<SEGMENTS.length;i++){
+    (function(S){
+      var b = document.createElement('button');
+      b.className='ix'; b.type='button';
+      b.innerHTML = '<b>'+S.start.toFixed(2)+'</b><u><i></i></u><span>'+S.name+'</span>';
+      b.addEventListener('click', function(){ EventBus.emit('scroll:setProgress', S.focus); });
+      indexEl.appendChild(b);
+      ixRows.push({ el:b, fill:b.querySelector('i'), seg:S });
+    })(SEGMENTS[i]);
+  }
+})();
+function updateChrome(p){
+  document.querySelector('#topbar i').style.transform = 'scaleX('+p.toFixed(4)+')';
+  var cur = segAt(p);
+  for(var i=0;i<ixRows.length;i++){
+    var R=ixRows[i], S=R.seg;
+    var u = clamp((p-S.start)/(S.end-S.start), 0, 1);
+    R.fill.style.transform='scaleX('+u.toFixed(3)+')';
+    var on = (S===cur) ? '1' : '0';
+    if(R.el.dataset.on !== on) R.el.dataset.on = on;
+  }
+  /* the marquee band belongs to the first chapter only */
+  document.getElementById('band').style.opacity = clamp(1 - p/0.10, 0, 1).toFixed(3);
+}
+/* Ambient life: the band runs on its own clock and never touches progress. */
+var bandTrack = document.getElementById('bandTrack'), bandX = 0, bandHalf = 0;
+(function fillBand(){
+  var unit = '<span>break assumptions not production</span><em>✳</em><span>agent infrastructure</span><em>✳</em><span>autonomous systems</span><em>✳</em>';
+  bandTrack.innerHTML = unit + unit;
+  requestAnimationFrame(function(){ bandHalf = bandTrack.scrollWidth/2; });
+})();
+var cursorEl = document.getElementById('cursor'), ccx=0, ccy=0, pmx=0, pmy=0;
+addEventListener('mousemove', function(e){
+  pmx=e.clientX; pmy=e.clientY;
+  var over = !!(e.target.closest && e.target.closest('a,button'));
+  cursorEl.style.width = cursorEl.style.height = over ? '46px' : '22px';
+  cursorEl.style.margin = over ? '-23px 0 0 -23px' : '-11px 0 0 -11px';
+}, {passive:true});
+
+/* Deep links (§6.3) and the reverse: the hash follows the chapter. */
+function hashJump(){
+  var h = (location.hash||'').replace('#','');
+  if(!ANCHORS[h]) return false;
+  for(var i=0;i<SEGMENTS.length;i++) if(SEGMENTS[i].name===ANCHORS[h]){ Scroll.set(SEGMENTS[i].focus); return true; }
+  return false;
+}
+addEventListener('hashchange', hashJump);
+/* The first scene change happens while the loader is still up, before the deep
+   link has been read — it must not touch the hash it is about to be given. */
+var booted = false;
+EventBus.on('scene:changed', function(e){
+  if(!booted) return;
+  for(var k in ANCHORS) if(ANCHORS[k]===e.to.name){
+    if(location.hash !== '#'+k) try{ history.replaceState(null,'','#'+k); }catch(err){}
+    return;
+  }
+  /* Three chapters have no anchor. Leaving the last one's hash in the bar means
+     a reload lands somewhere the reader is not — so it goes. */
+  if(location.hash) try{ history.replaceState(null,'',location.pathname+location.search); }catch(err){}
+});
+/* Tab must not land focus on a chapter that is off-screen (§6.3). */
+addEventListener('focusin', function(e){
+  var ch = e.target.closest && e.target.closest('.ch');
+  if(!ch) return;
+  var name = ch.id.replace('ch-','');
+  for(var i=0;i<SEGMENTS.length;i++)
+    if(SEGMENTS[i].name===name && (Scroll.progress() < SEGMENTS[i].start || Scroll.progress() > SEGMENTS[i].end))
+      EventBus.emit('scroll:setProgress', SEGMENTS[i].focus);
+});
+
+/* ── Labels for the shipped chapter (§2.7) ─────────────────────────────── */
+(function shippedLabels(){
+  for(var i=0;i<PROJECTS.length;i++){
+    var P=PROJECTS[i], pos=cardPos(i);
+    addLabel(
+      '<span class="k">'+P.num+'</span>'+
+      '<span class="n">'+P.name+'</span>'+
+      '<span class="s">'+P.stack+' · '+P.year+'</span>'+
+      '<span class="s" style="text-transform:none;letter-spacing:0;color:var(--color-neutral-400)">'+P.desc+'</span>',
+      /* Inboard of the card, never outboard — the outer edges of the frame
+         are the header and the chapter index, and copy parked there is copy
+         read over something else. */
+      pos.x + (i%2 ? -150 : 150), pos.y - 34, pos.z,
+      /* Each project is legible for the run-up to its own card, not for the
+         whole chapter — four labels alight at once is a list, not a rail. */
+      0.578 + i*0.033, 0.578 + i*0.033 + 0.058,
+      i%2 ? -22 : 22, -10
+    );
+  }
+  /* One in the sandbox, naming the thing the camera is inside. */
+  addLabel('<span class="k">sandbox</span><span class="n">Contained execution</span><span class="s">nothing leaves without a trace</span>',
+    470, -280, 3600, 0.335, 0.515, 22, 0);
+  /* One on the track, honest about what it is. */
+  addLabel('<span class="k">trajectory</span><span class="n">Racing-line optimiser</span><span class="s">placeholder geometry · real data pending</span>',
+    -700, FLOOR_Y-40, 5900, 0.755, 0.875, 22, 0, true);
+})();
+/* The two review labels are screen-anchored, so they are plain DOM. */
+(function reviewLabels(){
+  var a=document.createElement('div'); a.className='dlabel'; a.id='rev-scan';
+  a.innerHTML='<span class="k">review pass</span>';
+  var b=document.createElement('div'); b.className='dlabel lft'; b.id='rev-label';
+  b.innerHTML='<span class="k">hunk 07</span><span class="n">retry loop swallows the failure</span><span class="s">tests still pass · nobody would have looked</span>';
+  labelRoot.appendChild(a); labelRoot.appendChild(b);
+})();
+
+/* ── §2.5 · Warm-up walk, then §2.13 the intro gate ────────────────────────
+   Before the user can scroll, walk the whole timeline invisibly so every
+   gradient, path and buffer is built once. Costs nothing but patience at load,
+   and it is why the first scroll does not hitch. */
+var WARMUP_WALK_SHARE = 0.7;
+var gateEl=document.getElementById('gate'), pctEl=document.getElementById('gatePct'),
+    barEl=document.querySelector('#gateBar i');
+function setLoad(v){
+  v=clamp(v,0,1);
+  pctEl.textContent = String(Math.round(v*100)).padStart(3,'0');
+  barEl.style.right = ((1-v)*100).toFixed(1)+'%';
+}
+function warmup(done){
+  var samples=[], i, j;
+  for(i=0;i<SEGMENTS.length;i++){
+    var S=SEGMENTS[i];
+    samples.push(S.start + (S.end-S.start)*0.25, S.start + (S.end-S.start)*0.75);
+  }
+  var idx=0, frame=0, FRAMES=3;
+  /* The walk is hidden behind the gate, which is opaque and on top of everything. */
+  (function step(){
+    if(idx >= samples.length){
+      setLoad(WARMUP_WALK_SHARE);
+      var t0=performance.now();
+      (function settle(){
+        var f = clamp((performance.now()-t0)/900, 0, 1);
+        setLoad(WARMUP_WALK_SHARE + f*(1-WARMUP_WALK_SHARE));
+        if(f<1) requestAnimationFrame(settle); else done();
+      })();
+      return;
+    }
+    camAt(samples[idx], 0); render(samples[idx], 0);
+    if(++frame >= FRAMES){ frame=0; idx++; }
+    setLoad((idx/samples.length)*WARMUP_WALK_SHARE);
+    requestAnimationFrame(step);
+  })();
+}
+
+/* ── The title track ───────────────────────────────────────────────────────
+   The name and the music are one beat, so the track starts from
+   enterExperience() rather than from load — the same call that kicks the intro
+   clock and the scramble.
+
+   Two things make this more than an .play(). A browser will refuse an autoplay
+   this page has not earned yet; that refusal is not a failure, it just moves
+   the start to the reader's first gesture and lights the toggle until then.
+   And the loop is deliberately lopsided: pass one is the arrival at the track's
+   own level, every pass after it is ambience at a twentieth of that. The step down
+   is ramped across the last seconds of pass one so the second pass opens
+   already quiet instead of dropping mid-bar. */
+var Ambience = (function(){
+  var el = document.getElementById('track'), btn = document.getElementById('sound');
+  var HERO = 1, LOW = 0.05;       /* pass two onward: a twentieth of the arrival */
+  var RISE = 0.5, FALL = 2.2;     /* seconds of fade in, and of the step down */
+  var PREF = 'vk-sound';
+  var GEST = ['pointerdown','keydown','wheel','touchstart'];
+  var pass = 0, lastT = 0, armed = false, muted = true;
+  try{ muted = localStorage.getItem(PREF) !== 'on'; }catch(e){}
+
+  el.loop = true;                 /* looping in the element keeps the seam tight */
+  el.volume = 0;
+  el.muted = muted;
+
+  function paint(blocked){
+    var on = !muted && !el.paused;
+    btn.dataset.on = on ? '1' : '0';
+    btn.dataset.low = (on && pass > 0) ? '1' : '0';
+    if(blocked !== undefined) btn.dataset.blocked = blocked ? '1' : '0';
+    btn.setAttribute('aria-label', on ? 'Mute the soundtrack' : 'Play the soundtrack');
+  }
+  function repaint(){ paint(); }
+
+  /* Level is a pure function of where the track is, recomputed every frame, so
+     a pause, a tab switch or a stalled buffer can never strand it half-faded. */
+  function level(){
+    if(pass > 0) return LOW;
+    var d = el.duration || 0, t = el.currentTime;
+    var up = t < RISE ? t/RISE : 1;
+    var k = (d && d - t < FALL) ? clamp((d-t)/FALL, 0, 1) : 1;
+    return (LOW + (HERO-LOW)*(k*k*(3-2*k))) * up;
+  }
+  function tick(){
+    if(el.paused) return;
+    var t = el.currentTime, d = el.duration || 0;
+    /* loop=true never fires 'ended' — the wrap is the clock running backwards
+       off the end of the track. Anything else that rewinds it (a seek from the
+       console, a reset) is not a pass and must not spend the arrival. */
+    if(t + 0.5 < lastT && lastT > d - 1){ pass++; paint(); }
+    lastT = t;
+    el.volume = clamp(level(), 0, 1);
+  }
+
+  function play(){
+    var r;
+    try{ r = el.play(); }catch(e){ r = null; }
+    if(r && r.then) r.then(function(){ disarm(); paint(false); },
+                           function(){ arm(); paint(true); });
+    else paint(false);
+  }
+  /* The reader's first gesture is the permission the browser was waiting for. */
+  function retry(e){
+    if(muted) return;
+    if(e && e.target && e.target.closest && e.target.closest('#sound')) return;
+    play();
+  }
+  function arm(){
+    if(armed || muted) return;
+    armed = true;
+    for(var i=0;i<GEST.length;i++) addEventListener(GEST[i], retry, {passive:true, capture:true});
+  }
+  function disarm(){
+    if(!armed) return;
+    armed = false;
+    for(var i=0;i<GEST.length;i++) removeEventListener(GEST[i], retry, {capture:true});
+  }
+
+  btn.addEventListener('click', function(){
+    /* A refused autoplay leaves the control reading "off" while nothing is
+       actually muted. The click there is the permission the browser was waiting
+       for, not a toggle — treating it as one would mute what never played. */
+    if(!muted && el.paused){ play(); return; }
+    muted = !muted;
+    el.muted = muted;
+    try{ localStorage.setItem(PREF, muted ? 'off' : 'on'); }catch(e){}
+    /* Muting parks the track rather than playing it into a void: it comes back
+       where it left off, at whatever level that pass has earned. */
+    if(muted){ disarm(); el.pause(); paint(false); }
+    else play();
+  });
+  el.addEventListener('play', repaint);
+  el.addEventListener('pause', repaint);
+  /* No track, no control — better an absent button than a dead one. */
+  el.addEventListener('error', function(){ disarm(); btn.hidden = true; });
+  /* A backgrounded tab keeps neither the frame loop nor the music. */
+  addEventListener('visibilitychange', function(){
+    if(muted) return;
+    if(document.hidden){ if(!el.paused) el.pause(); }
+    else if(el.currentTime > 0) play();
+  });
+
+  paint(false);
+  return { start:function(){ muted ? paint(false) : play(); }, tick:tick };
+})();
+
+/* ── boot ──────────────────────────────────────────────────────────────── */
+resize();
+camAt(0, 0);
+applyAppears(0, 0);
+var scrambler = null;
+(function(){
+  var h1 = document.querySelector('[data-scramble]');
+  if(h1) scrambler = new TextScramble(h1);
+})();
+(function clock(){
+  var el=document.getElementById('clock');
+  function t(){ try{ el.textContent = new Intl.DateTimeFormat('en-GB',
+    {hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kolkata'}).format(new Date())+' IST'; }catch(e){} }
+  t(); setInterval(t, 20000);
+})();
+
+var last = performance.now(), t0 = last;
+function loop(now){
+  var dt = Math.min(0.1, (now-last)/1000); last = now;
+  var T = (now-t0)/1000;
+  var frameStart = now;
+
+  fxUpdate(dt);
+  Ambience.tick();
+  if(INTRO.t >= 0 && INTRO.t < 90) INTRO.t += dt;
+  var p = Scroll.update(dt);
+  /* Landing back at the top after a rewind replays the arrival, so the reader
+     ends where they started rather than at a hero that is simply already on. */
+  if(rewinding && p < 0.006){ rewinding = false; introKick(); if(scrambler) scrambler.play(); }
+  /* Infall accelerates with the wheel, then coasts — the hole answers the
+     reader without being welded to the timeline. */
+  holeT += 0.46*(1 + 2.2*clamp(p/0.12,0,1) + Math.min(3.2, Scroll.speed()*2.8))*(dt*60);
+  camAt(p, T);
+  lookAt(p, dt);
+  render(p, T);
+  applyAppears(p, Scroll.vel());
+  updateLabels(p);
+  updateWipe(p);
+  updateChrome(p);
+  updateEnd(p);
+
+  if(!REDUCED){
+    bandX -= 0.5;
+    if(bandHalf && bandX <= -bandHalf) bandX += bandHalf;
+    bandTrack.style.transform = 'translate3d('+bandX.toFixed(1)+'px,0,0)';
+  }
+  ccx += (pmx-ccx)*0.18; ccy += (pmy-ccy)*0.18;
+  cursorEl.style.transform = 'translate3d('+ccx.toFixed(1)+'px,'+ccy.toFixed(1)+'px,0)';
+
+  if(DPR.sample(performance.now()-frameStart)) resize();
+  requestAnimationFrame(loop);
+}
+
+/* The loader hands straight over to the hero — there is nothing behind an
+   Enter button that the reader has not already agreed to by opening the page.
+   The name arrives on the intro clock while the loader is still fading, so the
+   two moves overlap instead of queueing. */
+function enterExperience(){
+  gateEl.hidden = true;
+  EventBus.emit('experience:entered');
+  if(!hashJump()) Scroll.set(0, true);
+  booted = true;
+  introKick();
+  if(scrambler) scrambler.play();
+  Ambience.start();
+}
+warmup(function(){ setTimeout(enterExperience, 260); });
+if(REDUCED) document.getElementById('hint').textContent = 'Reduced motion · ↑↓ or click a chapter';
+requestAnimationFrame(loop);
+
+/* ═════════════════════════════════════════════════════════════════════════
+   Because progress is a broadcast float (§2.11), the whole experience is
+   drivable from the console. This is the debugging superpower the plan asks
+   to design for deliberately:
+
+     EventBus.emit('scroll:setProgress', 0.55)   → the review frame
+     EventBus.emit('scroll:setProgress', 0.64)   → the card rail
+
+   Keys: ↑ ↓ PgUp PgDn Home End. Click any row in the right-hand index.
+   ═════════════════════════════════════════════════════════════════════════ */
+})();
 </script>
 </body>
 </html>
