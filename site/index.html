@@ -61,7 +61,7 @@ a:hover{color:var(--color-accent-400)}
   <a href="#contact" style="display:flex;align-items:center;gap:10px;padding:9px 18px;border:1px solid var(--color-accent-700);border-radius:100px;font:400 11px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--color-text);white-space:nowrap;flex:none;transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)" style-hover="border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-sm)"><span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)"></span>Open to work</a>
 </header>
 
-<section data-screen-label="Hero" style="position:relative;z-index:2;height:320vh">
+<section data-screen-label="Hero" style="position:relative;z-index:2;height:280vh">
   <div ref="{{ heroPinRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 56px">
 
     <div ref="{{ orbRef }}" style="position:absolute;left:50%;top:50%;width:115vmax;height:115vmax;transform:translate(-50%,-50%);pointer-events:none;will-change:transform,opacity">
@@ -123,7 +123,7 @@ a:hover{color:var(--color-accent-400)}
   </div>
 </section>
 
-<section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:320vh">
+<section data-screen-label="Capabilities rail" style="position:relative;z-index:2;height:250vh">
   <div style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;perspective:1600px">
     <div style="display:flex;justify-content:space-between;padding:0 56px var(--space-8);font:400 11px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-500)"><span>03 — How I work</span><span>Scroll →</span></div>
     <div ref="{{ railRef }}" style="display:flex;gap:28px;padding:0 56px;will-change:transform;transform-style:preserve-3d">
@@ -140,7 +140,7 @@ a:hover{color:var(--color-accent-400)}
   </div>
 </section>
 
-<section id="rig" data-screen-label="Rig case study" style="position:relative;z-index:2;height:300vh">
+<section id="rig" data-screen-label="Rig case study" style="position:relative;z-index:2;height:230vh">
   <div style="position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden">
     <div ref="{{ rigPanelRef }}" style="position:relative;width:100vw;height:100vh;overflow:hidden;background:linear-gradient(180deg,var(--color-surface),var(--color-bg));box-shadow:var(--shadow-md);will-change:transform,border-radius">
       <div ref="{{ rigFieldRef }}" style="position:absolute;inset:-14%;background:radial-gradient(ellipse at 32% 40%,var(--color-accent-800),transparent 56%),radial-gradient(ellipse at 72% 62%,var(--color-section-glow),transparent 55%);opacity:.85"></div>
@@ -221,7 +221,7 @@ class Component extends DCLogic {
   }
   componentDidMount(){
     this.reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    this.velocity=0;this.marqX=0;this.skew=0;this._t0=performance.now();
+    this.velocity=0;this.marqX=0;this.skew=0;this._rate=0;this._q=0;this._t0=performance.now();
     const run=(n,f)=>{try{f();}catch(e){console.error('[portfolio] '+n,e);}};
     run('heroHeight',()=>{
       // The hero owns two stages: the collapse (first 100vh of scroll) and the zoom-through
@@ -260,7 +260,7 @@ class Component extends DCLogic {
 
   scrollLerp(){
     const d=this.props.scrollDuration!=null?+this.props.scrollDuration:1.35;
-    return Math.max(0.025,Math.min(0.12,0.065/Math.max(0.35,d)));
+    return Math.max(0.045,Math.min(0.2,0.115/Math.max(0.35,d)));
   }
   // How hard is the user pushing right now? 0 = a nudge, 1 = a flick.
   // Measured as smoothed input speed in px/s so it reads the same whether the
@@ -273,10 +273,37 @@ class Component extends DCLogic {
     const rate=Math.abs(delta)/dt;
     const prev=this._rate||0;
     // fast attack, slower release: builds within a flick, holds through its lulls
-    const k=1-Math.pow(.001,dt/(rate>prev?.07:.2));
-    this._rate=prev+(rate-prev)*k;
-    this._q=Math.max(0,Math.min(1,(this._rate-650)/2400));
-    return this._q;
+    const k=1-Math.pow(.001,dt/(rate>prev?.055:.16));
+    // Capped just past saturation. Uncapped, a hard flick banks thousands of px/s of
+    // headroom that has to drain before intent starts falling at all, which holds the
+    // flick's settings for most of a second after the flick is over.
+    this._rate=Math.min(3000,prev+(rate-prev)*k);
+    return this.quickness();
+  }
+  // Smoothstep, so intent arrives and leaves without a step change in feel. A hard
+  // threshold here gets felt directly, as the page changing its mind mid-gesture.
+  quickness(){
+    const q=Math.max(0,Math.min(1,((this._rate||0)-300)/2000));
+    return this._q=q*q*(3-2*q);
+  }
+  // Every follow below is extra smoothing stacked on top of Lenis'. At a gentle
+  // scroll that lag is the point — it is the weight. During a flick it is only debt:
+  // the animation lands late and then snaps back. So the follow tightens with intent.
+  grip(base,dt){
+    const a=Math.min(.68,base*(1+(this._q||0)*2.2));
+    return 1-Math.pow(1-a,dt);
+  }
+  // Lenis re-reads options.lerp every time an input event starts a new animation, so
+  // the gesture itself is covered by writing it there. The in-flight animation is
+  // nudged as well: without that, the tail of a flick keeps the flick's tight lerp and
+  // arrives at a dead stop instead of gliding down into one.
+  tuneScroll(dt){
+    const L=this.lenis;if(!L||!L.options)return;
+    const lp=Math.min(.24,this.scrollLerp()*(1+(this._q||0)*1.9));
+    L.options.lerp=lp;
+    L.options.syncTouchLerp=Math.max(.05,lp*.9);
+    const a=L.animate;
+    if(a&&a.isRunning&&a.lerp)a.lerp+=(lp-a.lerp)*(1-Math.pow(1-.12,dt||1));
   }
   engine(){
     if(this._engineOn)return;this._engineOn=true;
@@ -296,9 +323,9 @@ class Component extends DCLogic {
           lerp,
           smoothWheel:true,
           syncTouch:true,
-          syncTouchLerp:Math.max(0.04,lerp*0.85),
+          syncTouchLerp:Math.max(0.05,lerp*0.9),
           touchInertiaExponent:1.85,
-          wheelMultiplier:0.82,
+          wheelMultiplier:1,
           touchMultiplier:1.05,
           anchors:true,allowNestedScroll:true,stopInertiaOnNavigate:true,
           // Adaptive feel: a gentle scroll stays slow and heavily smoothed,
@@ -307,15 +334,13 @@ class Component extends DCLogic {
             const raw=e.deltaY;
             if(!raw)return true;
             const q=this.intent(raw);
+            // Touch is left at 1:1. syncTouch means the page is meant to sit under the
+            // finger, and any multiplier there reads as the content slipping off it.
+            const touch=!!(e.event&&typeof e.event.type==='string'&&e.event.type.slice(0,5)==='touch');
             let d=Math.abs(raw);
-            if(d>240)d=240+(d-240)*.5;
-            e.deltaY=Math.sign(raw)*d*(1+q*q*.85);
-            const L=this.lenis;
-            if(L&&L.options){
-              const lp=Math.min(.19,this.scrollLerp()*(1+q*2.6));
-              L.options.lerp=lp;
-              L.options.syncTouchLerp=Math.max(.04,lp*.9);
-            }
+            if(d>300)d=300+(d-300)*.72;
+            e.deltaY=Math.sign(raw)*d*(touch?1:1+q*.95);
+            this.tuneScroll(1);
             return true;
           }
         });
@@ -341,11 +366,13 @@ class Component extends DCLogic {
       if(sy>head&&sy<tail)return;
       this._snapping=true;
       this.lenis.scrollTo(sy<=head?0:range,{
-        lerp:this.scrollLerp(),
+        // Deliberately brisker than the resting scroll. A snap runs on its own after the
+        // user has let go, and at the resting lerp that unasked-for travel takes ~1s.
+        lerp:Math.max(.11,this.scrollLerp()*1.5),
         userData:{initiator:'snap'},
         onComplete:()=>{this._snapping=false;}
       });
-    },280);
+    },200);
   }
   heroLines(){
     const root=this.rootRef.current||document;
@@ -373,6 +400,9 @@ class Component extends DCLogic {
         for(const ch of word){
           const s=document.createElement('span');
           s.textContent=ch;
+          // Kept as data so the reveal can be rescaled at the moment it fires, when how
+          // fast the reader is moving is finally known.
+          s.dataset.cd=(i*0.014).toFixed(3);
           s.style.cssText='display:inline-block;opacity:0;transform:translateY(.45em) rotate(2deg);transition:opacity .85s cubic-bezier(.16,1,.3,1) '+(i*0.014)+'s,transform 1.05s cubic-bezier(.16,1,.3,1) '+(i*0.014)+'s';
           w.appendChild(s);i++;
         }
@@ -385,7 +415,20 @@ class Component extends DCLogic {
   }
   reveals(){
     const root=this.rootRef.current||document;
-    const showChars=el=>el.querySelectorAll('span span').forEach(s=>{s.style.opacity='1';s.style.transform='none';});
+    // Compress the whole reveal — duration and stagger together — by how fast the reader
+    // is going. At the full stagger a flick leaves the paragraph still assembling itself
+    // a screen and a half after it has been scrolled past.
+    const showChars=el=>{
+      const rush=1-(this._q||0)*.66;
+      el.querySelectorAll('span span').forEach(s=>{
+        if(rush<.98&&s.dataset.cd){
+          const d=(+s.dataset.cd*rush).toFixed(3)+'s';
+          s.style.transition='opacity '+(.85*rush).toFixed(2)+'s cubic-bezier(.16,1,.3,1) '+d+
+                             ',transform '+(1.05*rush).toFixed(2)+'s cubic-bezier(.16,1,.3,1) '+d;
+        }
+        s.style.opacity='1';s.style.transform='none';
+      });
+    };
     if(!window.IntersectionObserver||this.reduced){
       root.querySelectorAll('[data-split]').forEach(showChars);return;
     }
@@ -441,12 +484,24 @@ class Component extends DCLogic {
     const now=performance.now();
     const dt=this._lastPaint?Math.min(2.4,(now-this._lastPaint)/16.667):1;
     this._lastPaint=now;
+    // Frame load in frames-per-frame: 1 is keeping up, 2 is painting at half rate. Read
+    // slowly, because a single long frame is noise and only a sustained one is a device.
+    this._load=this._load==null?1:this._load+(dt-this._load)*.04;
     const cl=(x,a,b)=>Math.max(a,Math.min(b,x));
     const L=this.lenis;
     const sy=L?(L.animatedScroll!=null?L.animatedScroll:(L.scroll||0)):(window.scrollY||0);
     const src=L&&L.velocity!=null?L.velocity:0;
     this.velocity+=(src-(this.velocity||0))*(1-Math.pow(1-.38,dt));
     const v=this.velocity||0;
+    // Intent decays on a frame clock rather than on input events. Events stop arriving
+    // the instant a gesture ends, so without this the page would hold the flick's tight,
+    // fast settings through the whole coast instead of relaxing back into its resting feel.
+    if(this._rate){
+      this._rate*=Math.pow(1-.055,dt);
+      if(this._rate<30)this._rate=0;
+      this.quickness();
+      this.tuneScroll(dt);
+    }
     const moving=Math.abs(sy-(this._lsy||0))>0.15||Math.abs(v)>0.04||Math.abs(this.mx-this.cx)>0.4||Math.abs(this.my-this.cy)>0.4;
     if(this._dirtyLayout||!this._vh)this.measure();
     const heroLive=sy<(this._heroRange||window.innerHeight)*1.05;
@@ -481,7 +536,7 @@ class Component extends DCLogic {
     const pr=this.progRef.current;if(pr)pr.style.transform='scaleX('+gp.toFixed(4)+')';
     const tn=this.tintRef.current;if(tn)tn.style.opacity=(gp*0.55+Math.min(Math.abs(v)*.006,.1)).toFixed(3);
 
-    this._p=this._p==null?pEase:this._p+(pEase-this._p)*(1-Math.pow(1-.16,dt));
+    this._p=this._p==null?pEase:this._p+(pEase-this._p)*this.grip(.19,dt);
     if(Math.abs(pEase-this._p)<1e-4)this._p=pEase;
     const p=this._p;
     const o=this.orbRef.current;
@@ -523,7 +578,7 @@ class Component extends DCLogic {
     const sh=this.scrollHintRef.current;
     if(sh)sh.style.opacity=(1-cl(p*4,0,1)).toFixed(3);
 
-    const sk=cl(v*.07,-5.4,5.4);this.skew+=(sk-this.skew)*(1-Math.pow(1-.07,dt));
+    const sk=cl(v*.07,-5.4,5.4);this.skew+=(sk-this.skew)*this.grip(.07,dt);
     const bd=this.bandRef.current;
     if(bd&&!this.reduced&&this.props.velocitySkew!==false)
       bd.style.transform='skewY('+this.skew.toFixed(3)+'deg)';
@@ -544,7 +599,7 @@ class Component extends DCLogic {
     const rail=this.railRef.current;
     if(rail&&this._railRange){
       const rp=cl((sy-this._railTop)/this._railRange,0,1);
-      this._railP=this._railP==null?rp:this._railP+(rp-this._railP)*(1-Math.pow(1-.18,dt));
+      this._railP=this._railP==null?rp:this._railP+(rp-this._railP)*this.grip(.22,dt);
       rail.style.transform='translate3d('+(-this._railP*this._railDist).toFixed(1)+'px,0,0)';
       const kids=rail.children,n=kids.length||1;
       for(let i=0;i<kids.length;i++){
@@ -557,7 +612,7 @@ class Component extends DCLogic {
     const panel=this.rigPanelRef.current;
     if(panel&&this._rigRange){
       const rp=cl((sy-this._rigTop)/this._rigRange,0,1);
-      this._rigP=this._rigP==null?rp:this._rigP+(rp-this._rigP)*(1-Math.pow(1-.18,dt));
+      this._rigP=this._rigP==null?rp:this._rigP+(rp-this._rigP)*this.grip(.22,dt);
       const e=this._rigP<.5?(this._rigP/.5):1;
       const out=cl((this._rigP-.82)/.18,0,1);
       const s=(.46+.54*e)*(1-out*.06);
@@ -574,7 +629,7 @@ class Component extends DCLogic {
       const r=ct.getBoundingClientRect();
       if(r.top<vh+40){
         const cp=cl(1-(r.top/vh),0,1);
-        this._cp=this._cp==null?cp:this._cp+(cp-this._cp)*(1-Math.pow(1-.16,dt));
+        this._cp=this._cp==null?cp:this._cp+(cp-this._cp)*this.grip(.2,dt);
         ct.style.transform='scale('+(1.16-0.16*this._cp).toFixed(4)+')';
       }
     }
@@ -648,6 +703,14 @@ class Component extends DCLogic {
     cv.width=w*dpr;cv.height=h*dpr;
     const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
     this._hctx=ctx;this._hw=w;this._hh=h;this._hdpr=dpr;
+    this._hfont=Math.max(9,Math.min(w,h)*.5*.016);
+    this.buildAtlas();
+    // The atlas bakes in the font, so a late webfont would otherwise leave the streams
+    // in the fallback face for the rest of the session.
+    if(!this._fontsWired&&document.fonts&&document.fonts.ready){
+      this._fontsWired=true;
+      document.fonts.ready.then(()=>{if(!this._dead)this.buildAtlas();}).catch(()=>{});
+    }
     if(!this._streams||resize){
       const N=this.reduced?7:14;
       const sheet=Array.from({length:N},(_,i)=>{
@@ -656,7 +719,7 @@ class Component extends DCLogic {
         return{
           lane,ang:lane*1.45,wrap:false,
           wind:3.15+Math.abs(lane)*1.2+(Math.random()-.5)*.2,
-          str:this._randStream(),
+          si:this._randStream(),
           off:Math.random()*160,
           spd:.42+Math.random()*.5,
           a:.78+.22*(1-Math.abs(lane)*.3)
@@ -669,7 +732,7 @@ class Component extends DCLogic {
           lane:0,ang:(i/wraps)*6.283+Math.random()*.12,wrap:true,
           orbit:.62+u*.38,
           wind:1.4+Math.random()*1.2,
-          str:this._randStream(),
+          si:this._randStream(),
           off:Math.random()*160,
           spd:.26+Math.random()*.5,
           a:.5+.28*u
@@ -679,16 +742,62 @@ class Component extends DCLogic {
       this._holeT=0;
     }
   }
-  _randStream(){
-    const src=[
+  holeSources(){
+    return this._src||(this._src=[
       'const agent=await rig.run(task);if(diff.ok)return ship(pr);',
       'for(const step of trace)replay(step.ctx);export type Trace={id:string};',
       'await Promise.all(jobs.map(j=>sandbox(j)));git commit -m"fix: isolate"',
       'while(!done){yield* gen();node.next.push(a,b);}fn=>review(diff)',
       '0x1A9F select traces where confidence<0.4;throw new Error("spec");',
       'if(x){return}else let out=arr.map(v=>v.id)&&ship();'
-    ];
-    return src[Math.floor(Math.random()*src.length)].repeat(8);
+    ]);
+  }
+  _randStream(){return Math.floor(Math.random()*this.holeSources().length);}
+  // Every stream segment used to be a fillText under a rotation and a non-uniform scale,
+  // which is exactly the transform Chrome's glyph cache cannot serve — so all ~800 of them
+  // were re-rasterised from scratch every frame. That one fact was the whole difference
+  // between 10fps and 120fps in the hero, and the hero is the first thing anyone scrolls.
+  // Rasterising each line once per colour band up front turns those calls into plain blits.
+  buildAtlas(){
+    const src=this.holeSources(),bands=8;
+    // Supersampled a little: at rest the orb sits at scale 1 and the code is meant to be read.
+    const px=Math.max(9,Math.min(46,(this._hfont||12)*1.5));
+    const font='500 '+px.toFixed(1)+'px "JetBrains Mono","IBM Plex Mono",ui-monospace,monospace';
+    const cv=this._atlas||(this._atlas=document.createElement('canvas'));
+    const g=cv.getContext('2d');
+    g.font=font;
+    const cw=g.measureText('0').width||px*.6;
+    const rowH=Math.ceil(px*1.7);
+    // Each line is stored twice over, so a window taken at any index into the first copy
+    // can always run off its end without wrapping.
+    const cols=src.reduce((m,s)=>Math.max(m,s.length),0)*2;
+    cv.width=Math.ceil(cols*cw);cv.height=rowH*src.length*bands;
+    g.font=font;g.textAlign='left';g.textBaseline='middle';
+    for(let si=0;si<src.length;si++){
+      const line=src[si]+src[si];
+      for(let b=0;b<bands;b++){
+        const t=b/(bands-1);
+        let cr,cg,cb;
+        if(t<.5){const k=t/.5;cr=250-18*k;cg=248-38*k;cb=242-70*k;}
+        else{const k=(t-.5)/.5;cr=232+23*k;cg=210-62*k;cb=172-122*k;}
+        g.fillStyle='rgb('+cr.toFixed(0)+','+cg.toFixed(0)+','+cb.toFixed(0)+')';
+        g.fillText(line,0,(si*bands+b)*rowH+rowH/2);
+      }
+    }
+    this._atCW=cw;this._atRowH=rowH;this._atBands=bands;
+    // Atlas pixels per CSS pixel — the blit divides by this to land at the old text size.
+    this._atScale=px/Math.max(1,this._hfont||px);
+  }
+  // A safety net for machines that still cannot hold the frame, not a routine dial. Detail
+  // only comes off once frames are measurably being dropped, and returns an order of
+  // magnitude more slowly than it leaves, so the level cannot oscillate against the
+  // framerate it is itself setting. Scroll speed deliberately does not feed this: thinning
+  // the streams during a flick would degrade the scene exactly while it is being watched.
+  holeDetail(){
+    const load=this._load||1;
+    const want=load>1.35?Math.max(.3,1.35/load):1;
+    const cur=this._holeQ==null?1:this._holeQ;
+    return this._holeQ=cur+(want-cur)*(want<cur?.09:.008);
   }
   paintHole(p,dt){
     const ctx=this._hctx;if(!ctx||!this._streams)return;
@@ -700,7 +809,6 @@ class Component extends DCLogic {
     const horizon=maxR*(.3+p*.22);
     const outerR=maxR*1.01;
     const fallBoost=1+p*2.2+Math.min(Math.abs(this.velocity||0)*0.08,3.2);
-    const fontSize=Math.max(9,maxR*.016);
     this._holeT+=.46*fallBoost*(dt||1);
     const spin=this._holeT*.0055;
     const pos=(s,t)=>{
@@ -726,37 +834,36 @@ class Component extends DCLogic {
     haze.addColorStop(1,'rgba(0,0,0,0)');
     ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);ctx.restore();
 
-    ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.font='500 '+fontSize+'px "JetBrains Mono",ui-monospace,monospace';
-    const steps=this.reduced?12:26;
-    const chunk=4;
-    for(const s of this._streams){
-      const flow=this._holeT*s.spd+s.off;
-      const len=s.str.length;
-      for(let i=0;i<steps;i++){
-        const t=i/(steps-1);
-        if(t>.97)continue;
-        const P=pos(s,t),Q=pos(s,Math.min(1,t+1/(steps-1)));
-        const dx=Q.x-P.x,dy=Q.y-P.y;
-        if(dx*dx+dy*dy<.4)continue;
-        const idx0=Math.floor(flow*.12+i*chunk)%len;
-        let word='';
-        for(let k=0;k<chunk;k++)word+=s.str[(idx0+k+len)%len];
-        let cr,cg,cb;
-        if(t<.5){const k=t/.5;cr=250-18*k;cg=248-38*k;cb=242-70*k;}
-        else{const k=(t-.5)/.5;cr=232+23*k;cg=210-62*k;cb=172-122*k;}
-        const alpha=Math.min(.96,(s.wrap?.85:1)*s.a*(.78+t*.22)*(t<.05?t/.05:1));
-        if(alpha<.06)continue;
-        const stretch=1+t*t*2.2,sc=.68+(1-t)*.55;
-        ctx.globalCompositeOperation=t>.62?'lighter':'source-over';
-        ctx.fillStyle='rgba('+cr.toFixed(0)+','+cg.toFixed(0)+','+cb.toFixed(0)+','+alpha.toFixed(2)+')';
-        ctx.setTransform(dpr,0,0,dpr,P.x*dpr,P.y*dpr);
-        ctx.rotate(Math.atan2(dy,dx));
-        ctx.scale(stretch*sc,sc);
-        ctx.fillText(word,0,0);
+    const atlas=this._atlas,src=this.holeSources();
+    const cw=this._atCW,rowH=this._atRowH,bands=this._atBands,as=this._atScale||1;
+    const steps=Math.max(8,Math.round((this.reduced?12:26)*this.holeDetail()));
+    const chunk=4,dw=chunk*cw/as,dh=rowH/as;
+    if(atlas&&cw){
+      for(const s of this._streams){
+        const flow=this._holeT*s.spd+s.off;
+        const line=src[s.si]||src[0],len=line.length;
+        for(let i=0;i<steps;i++){
+          const t=i/(steps-1);
+          if(t>.97)continue;
+          const P=pos(s,t),Q=pos(s,Math.min(1,t+1/(steps-1)));
+          const dx=Q.x-P.x,dy=Q.y-P.y;
+          if(dx*dx+dy*dy<.4)continue;
+          const alpha=Math.min(.96,(s.wrap?.85:1)*s.a*(.78+t*.22)*(t<.05?t/.05:1));
+          if(alpha<.06)continue;
+          const idx0=Math.floor(flow*.12+i*chunk)%len;
+          const band=Math.min(bands-1,Math.max(0,Math.round(t*(bands-1))));
+          const stretch=1+t*t*2.2,sc=.68+(1-t)*.55;
+          ctx.globalCompositeOperation=t>.62?'lighter':'source-over';
+          ctx.globalAlpha=alpha;
+          ctx.setTransform(dpr,0,0,dpr,P.x*dpr,P.y*dpr);
+          ctx.rotate(Math.atan2(dy,dx));
+          ctx.scale(stretch*sc,sc);
+          ctx.drawImage(atlas,idx0*cw,(s.si*bands+band)*rowH,chunk*cw,rowH,0,-dh/2,dw,dh);
+        }
       }
     }
     ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.globalAlpha=1;
     ctx.globalCompositeOperation='source-over';
 
     ctx.beginPath();ctx.ellipse(cx,cy,horizon,horizon*aspect,tilt,0,6.283);
