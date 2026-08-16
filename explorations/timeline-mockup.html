@@ -80,6 +80,35 @@ header>*{pointer-events:auto}
 #cta:hover{border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-sm);color:var(--color-text)}
 #cta i{width:6px;height:6px;border-radius:50%;background:var(--color-accent);box-shadow:0 0 10px var(--color-accent)}
 
+/* ── The sound toggle ──────────────────────────────────────────────────────
+   The track belongs to the arrival, so its control lives with the header
+   chrome rather than in the frame. The bars are a level meter, not an icon:
+   they run while the track runs, sit small through the quiet second pass, and
+   flatten under a slash when muted. */
+#hdrRight{display:flex;align-items:center;gap:12px}
+#sound{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:3px;
+  width:32px;height:32px;flex:none;border:1px solid var(--color-neutral-700);border-radius:50%;
+  transition:border-color .4s cubic-bezier(.16,1,.3,1),background .4s cubic-bezier(.16,1,.3,1),box-shadow .4s cubic-bezier(.16,1,.3,1)}
+#sound:hover{border-color:var(--color-accent-700);background:var(--color-hover)}
+#sound i{width:2px;height:3px;background:var(--color-neutral-400);
+  transition:height .45s cubic-bezier(.16,1,.3,1),background .45s cubic-bezier(.16,1,.3,1)}
+#sound[data-on="1"]{border-color:var(--color-accent-700)}
+#sound[data-on="1"] i{background:var(--color-accent-300);animation:eq .78s ease-in-out infinite alternate}
+#sound[data-on="1"] i:nth-child(1){animation-duration:.62s}
+#sound[data-on="1"] i:nth-child(2){animation-duration:.94s;animation-delay:-.3s}
+#sound[data-on="1"] i:nth-child(3){animation-duration:.74s;animation-delay:-.15s}
+#sound[data-on="1"][data-low="1"] i{background:var(--color-accent-600);animation-name:eqLow}
+#sound[data-on="0"]::after{content:"";position:absolute;left:6px;right:6px;top:50%;height:1px;
+  background:var(--color-neutral-300);transform:rotate(-45deg)}
+/* A browser that refused the autoplay is not an error state — it is an
+   invitation, so the control asks once rather than reporting a failure. */
+#sound[data-blocked="1"]{animation:soundWait 2.6s ease-in-out infinite}
+@keyframes eq{from{height:3px}to{height:13px}}
+@keyframes eqLow{from{height:2px}to{height:6px}}
+@keyframes soundWait{0%,100%{border-color:var(--color-neutral-700);box-shadow:none}
+  50%{border-color:var(--color-accent);box-shadow:var(--glow-red-sm)}}
+@media (prefers-reduced-motion:reduce){#sound i,#sound[data-blocked="1"]{animation:none}}
+
 /* The chapter index. The numbers are the structure: these are the real segment
    bounds the engine reads, not decoration, and clicking one jumps the timeline. */
 #index{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:70;
@@ -96,13 +125,6 @@ header>*{pointer-events:auto}
 .ix[data-on="1"]{color:var(--color-neutral-100)}
 .ix[data-on="1"] b{color:var(--color-accent-300)}
 
-#readout{position:fixed;left:var(--gutter);bottom:clamp(14px,2.2vh,22px);z-index:70;
-  display:flex;align-items:baseline;gap:14px;
-  font:400 10px/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--color-neutral-600)}
-#readout b{font:300 22px/1 var(--font-heading);letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--color-neutral-200)}
-/* Speed, not position — the chrome answers the wheel like everything else does. */
-#readout u{display:block;width:64px;height:1px;background:var(--color-neutral-800);text-decoration:none}
-#readout u i{display:block;height:100%;transform:scaleX(0);transform-origin:0 50%;background:var(--color-accent-300)}
 #hint{position:fixed;right:var(--gutter);bottom:clamp(14px,2.2vh,22px);z-index:70;
   font:400 10px/1 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:var(--color-neutral-600)}
 
@@ -154,8 +176,8 @@ header>*{pointer-events:auto}
 #toTop:hover{border-color:var(--color-accent);background:var(--color-hover);box-shadow:var(--glow-red-md)}
 #toTop:hover svg{transform:translateY(-6px)}
 /* At the very end the chrome has nothing left to index, so it leaves too. */
-#index,#readout,#hint,header,#topbar{transition:opacity .55s cubic-bezier(.16,1,.3,1)}
-body[data-end="1"] #index,body[data-end="1"] #readout,body[data-end="1"] #hint,
+#index,#hint,header,#topbar{transition:opacity .55s cubic-bezier(.16,1,.3,1)}
+body[data-end="1"] #index,body[data-end="1"] #hint,
 body[data-end="1"] header,body[data-end="1"] #topbar{opacity:0;pointer-events:none}
 
 /* Text scramble (§2.8): the ghost holds the final glyph's width so the line
@@ -247,7 +269,13 @@ body[data-end="1"] header,body[data-end="1"] #topbar{opacity:0;pointer-events:no
   .contact h2{font-size:clamp(28px,9vw,54px)}
   .rev-foot{max-width:none}
   #hint{display:none}
-  #readout{right:var(--gutter)}
+  /* The header carries three things now and a phone is 360px wide: the mark and
+     the pill both give up the tracking they do not need at this size. */
+  #mark{font-size:10px;letter-spacing:.12em}
+  #mark small{font-size:9px;letter-spacing:.12em}
+  #hdrRight{gap:8px}
+  #sound{width:28px;height:28px}
+  #cta{padding:8px 12px;font-size:10px;letter-spacing:.08em;gap:7px}
 }
 @media (max-height:560px){
   .hero{gap:14px}
@@ -387,12 +415,22 @@ body[data-end="1"] header,body[data-end="1"] #topbar{opacity:0;pointer-events:no
 
 <header>
   <div id="mark">Vaibhav Kodiyan<small>Agentic Engineer</small></div>
-  <a id="cta" href="#contact"><i></i>Open to work</a>
+  <div id="hdrRight">
+    <button id="sound" type="button" data-on="0" aria-label="Play the soundtrack"><i></i><i></i><i></i></button>
+    <a id="cta" href="#contact"><i></i>Open to work</a>
+  </div>
 </header>
+
+<!-- The title track. Two sources because this one file is served both from the
+     site root and from /explorations/ — the browser takes the first that
+     resolves, so neither location needs its own copy of the markup. -->
+<audio id="track" preload="auto" playsinline>
+  <source src="audio/System%20Override.mp3" type="audio/mpeg">
+  <source src="../audio/System%20Override.mp3" type="audio/mpeg">
+</audio>
 
 <nav id="index" aria-label="Chapters"></nav>
 
-<div id="readout" aria-hidden="true"><b>0.000</b><span id="chapName">instruction</span><u id="spd"><i></i></u></div>
 <div id="hint" aria-hidden="true">Scroll · ↑↓ · click a chapter</div>
 
 <div id="band" aria-hidden="true"><div id="bandTrack"></div></div>
@@ -1876,7 +1914,7 @@ toTopEl.addEventListener('click', function(){
   EventBus.emit('scroll:setProgress', 0);
 });
 
-/* ── Chrome: index, readout, band, cursor ─────────────────────────────── */
+/* ── Chrome: index, band, cursor ──────────────────────────────────────── */
 var indexEl = document.getElementById('index'), ixRows = [];
 (function buildIndex(){
   for(var i=0;i<SEGMENTS.length;i++){
@@ -1890,14 +1928,9 @@ var indexEl = document.getElementById('index'), ixRows = [];
     })(SEGMENTS[i]);
   }
 })();
-var roVal = document.querySelector('#readout b'), roName = document.getElementById('chapName'),
-    roSpd = document.querySelector('#spd i');
 function updateChrome(p){
-  roSpd.style.transform = 'scaleX('+Scroll.speed().toFixed(3)+')';
   document.querySelector('#topbar i').style.transform = 'scaleX('+p.toFixed(4)+')';
-  roVal.textContent = p.toFixed(3);
   var cur = segAt(p);
-  roName.textContent = cur.name;
   for(var i=0;i<ixRows.length;i++){
     var R=ixRows[i], S=R.seg;
     var u = clamp((p-S.start)/(S.end-S.start), 0, 1);
@@ -2027,6 +2060,112 @@ function warmup(done){
   })();
 }
 
+/* ── The title track ───────────────────────────────────────────────────────
+   The name and the music are one beat, so the track starts from
+   enterExperience() rather than from load — the same call that kicks the intro
+   clock and the scramble.
+
+   Two things make this more than an .play(). A browser will refuse an autoplay
+   this page has not earned yet; that refusal is not a failure, it just moves
+   the start to the reader's first gesture and lights the toggle until then.
+   And the loop is deliberately lopsided: pass one is the arrival at the track's
+   own level, every pass after it is ambience at a twentieth of that. The step down
+   is ramped across the last seconds of pass one so the second pass opens
+   already quiet instead of dropping mid-bar. */
+var Ambience = (function(){
+  var el = document.getElementById('track'), btn = document.getElementById('sound');
+  var HERO = 1, LOW = 0.05;       /* pass two onward: a twentieth of the arrival */
+  var RISE = 0.5, FALL = 2.2;     /* seconds of fade in, and of the step down */
+  var PREF = 'vk-sound';
+  var GEST = ['pointerdown','keydown','wheel','touchstart'];
+  var pass = 0, lastT = 0, armed = false, muted = false;
+  try{ muted = localStorage.getItem(PREF) === 'off'; }catch(e){}
+
+  el.loop = true;                 /* looping in the element keeps the seam tight */
+  el.volume = 0;
+  el.muted = muted;
+
+  function paint(blocked){
+    var on = !muted && !el.paused;
+    btn.dataset.on = on ? '1' : '0';
+    btn.dataset.low = (on && pass > 0) ? '1' : '0';
+    if(blocked !== undefined) btn.dataset.blocked = blocked ? '1' : '0';
+    btn.setAttribute('aria-label', on ? 'Mute the soundtrack' : 'Play the soundtrack');
+  }
+  function repaint(){ paint(); }
+
+  /* Level is a pure function of where the track is, recomputed every frame, so
+     a pause, a tab switch or a stalled buffer can never strand it half-faded. */
+  function level(){
+    if(pass > 0) return LOW;
+    var d = el.duration || 0, t = el.currentTime;
+    var up = t < RISE ? t/RISE : 1;
+    var k = (d && d - t < FALL) ? clamp((d-t)/FALL, 0, 1) : 1;
+    return (LOW + (HERO-LOW)*(k*k*(3-2*k))) * up;
+  }
+  function tick(){
+    if(el.paused) return;
+    var t = el.currentTime, d = el.duration || 0;
+    /* loop=true never fires 'ended' — the wrap is the clock running backwards
+       off the end of the track. Anything else that rewinds it (a seek from the
+       console, a reset) is not a pass and must not spend the arrival. */
+    if(t + 0.5 < lastT && lastT > d - 1){ pass++; paint(); }
+    lastT = t;
+    el.volume = clamp(level(), 0, 1);
+  }
+
+  function play(){
+    var r;
+    try{ r = el.play(); }catch(e){ r = null; }
+    if(r && r.then) r.then(function(){ disarm(); paint(false); },
+                           function(){ arm(); paint(true); });
+    else paint(false);
+  }
+  /* The reader's first gesture is the permission the browser was waiting for. */
+  function retry(e){
+    if(muted) return;
+    if(e && e.target && e.target.closest && e.target.closest('#sound')) return;
+    play();
+  }
+  function arm(){
+    if(armed || muted) return;
+    armed = true;
+    for(var i=0;i<GEST.length;i++) addEventListener(GEST[i], retry, {passive:true, capture:true});
+  }
+  function disarm(){
+    if(!armed) return;
+    armed = false;
+    for(var i=0;i<GEST.length;i++) removeEventListener(GEST[i], retry, {capture:true});
+  }
+
+  btn.addEventListener('click', function(){
+    /* A refused autoplay leaves the control reading "off" while nothing is
+       actually muted. The click there is the permission the browser was waiting
+       for, not a toggle — treating it as one would mute what never played. */
+    if(!muted && el.paused){ play(); return; }
+    muted = !muted;
+    el.muted = muted;
+    try{ localStorage.setItem(PREF, muted ? 'off' : 'on'); }catch(e){}
+    /* Muting parks the track rather than playing it into a void: it comes back
+       where it left off, at whatever level that pass has earned. */
+    if(muted){ disarm(); el.pause(); paint(false); }
+    else play();
+  });
+  el.addEventListener('play', repaint);
+  el.addEventListener('pause', repaint);
+  /* No track, no control — better an absent button than a dead one. */
+  el.addEventListener('error', function(){ disarm(); btn.hidden = true; });
+  /* A backgrounded tab keeps neither the frame loop nor the music. */
+  addEventListener('visibilitychange', function(){
+    if(muted) return;
+    if(document.hidden){ if(!el.paused) el.pause(); }
+    else if(el.currentTime > 0) play();
+  });
+
+  paint(false);
+  return { start:function(){ muted ? paint(false) : play(); }, tick:tick };
+})();
+
 /* ── boot ──────────────────────────────────────────────────────────────── */
 resize();
 camAt(0, 0);
@@ -2050,6 +2189,7 @@ function loop(now){
   var frameStart = now;
 
   fxUpdate(dt);
+  Ambience.tick();
   if(INTRO.t >= 0 && INTRO.t < 90) INTRO.t += dt;
   var p = Scroll.update(dt);
   /* Landing back at the top after a rewind replays the arrival, so the reader
@@ -2090,6 +2230,7 @@ function enterExperience(){
   booted = true;
   introKick();
   if(scrambler) scrambler.play();
+  Ambience.start();
 }
 warmup(function(){ setTimeout(enterExperience, 260); });
 if(REDUCED) document.getElementById('hint').textContent = 'Reduced motion · ↑↓ or click a chapter';
